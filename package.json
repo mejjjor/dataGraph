@@ -1,0 +1,27 @@
+{
+    "name": "starter-kit",
+    "version": "0.0.1",
+    "description": "start fast !",
+
+    "devDependencies": {
+        "browserify": "^11.0.1",
+        "clean-css": "^3.4.1"
+    },
+
+    "main": "index.js",
+
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "clean": "rm -rf public/*",
+        "prebuild": "npm run clean",
+        "build": "npm run build:assets && npm run build:scripts && npm run build:styles",
+        "build:assets": "cp -r app/assets/* public",
+        "build:scripts": "mkdir public/js && browserify app/js/main.js -o public/js/app.js",
+        "build:styles": "mkdir public/css && find app/styles/ -name \"*.css\" -exec cat {} \\; | cleancss -o public/css/app.css",
+        "server": "http-server public/"
+    },
+    "author": "mejjjor <mejjjor@gmail.com>",
+    "private": true,
+    "license": "MIT"
+
+}
