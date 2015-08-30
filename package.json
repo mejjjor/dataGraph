@@ -3,25 +3,35 @@
     "version": "0.0.1",
     "description": "start fast !",
 
+    "dependencies": {
+        "normalize.css": "^3.0.3"
+    },
+
     "devDependencies": {
         "browserify": "^11.0.1",
         "clean-css": "^3.4.1"
     },
 
     "main": "index.js",
-
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
+
         "clean": "rm -rf public/*",
-        "prebuild": "npm run clean",
-        "build": "npm run build:assets && npm run build:scripts && npm run build:styles",
+
+        "prebuild": "npm run clean -s",
+        "build": "npm run build:assets -s && npm run build:scripts -s && npm run build:styles -s",
+        
         "build:assets": "cp -r app/assets/* public",
-        "build:scripts": "mkdir public/js && browserify app/js/main.js -o public/js/app.js",
-        "build:styles": "mkdir public/css && find app/styles/ -name \"*.css\" -exec cat {} \\; | cleancss -o public/css/app.css",
+        "build:scripts": "mkdir -p public/js && browserify app/js/main.js -o public/js/app.js",
+
+        "build:styles": "mkdir -p public/css && npm run build:styles:normalize; npm run build:styles:all; npm run build:styles:cleancss",
+        "build:styles:normalize": "cat node_modules/normalize.css/normalize.css > public/css/app.css",
+        "build:styles:all": "find  app/styles/ -name \"*.css\" -exec cat {} \\; >> public/css/app.css",
+        "build:styles:cleancss": "cleancss -o public/css/app.css public/css/app.css",
+
         "server": "http-server public/"
     },
     "author": "mejjjor <mejjjor@gmail.com>",
     "private": true,
     "license": "MIT"
-
 }
