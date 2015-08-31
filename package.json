@@ -6,23 +6,29 @@
     "normalize.css": "^3.0.3"
   },
   "devDependencies": {
+    "browser-sync": "^2.8.2",
     "browserify": "^11.0.1",
-    "clean-css": "^3.4.1",
-    "http-server": "^0.8.0"
+    "chokidar-cli": "^1.0.1",
+    "clean-css": "^3.4.1"
   },
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf public/*",
-    "prebuild": "npm run clean -s",
-    "build": "npm run build:assets -s && npm run build:scripts -s && npm run build:styles -s",
+    "prebuild": "mkdir -p public/ && npm run clean -s",
+    "build": "npm run build:assets -s && npm run build:styles -s && npm run build:scripts -s ",
     "build:assets": "cp -r app/assets/* public",
     "build:scripts": "mkdir -p public/js && browserify app/js/main.js -o public/js/app.js",
     "build:styles": "mkdir -p public/css && npm run build:styles:normalize; npm run build:styles:all; npm run build:styles:cleancss",
     "build:styles:normalize": "cat node_modules/normalize.css/normalize.css > public/css/app.css",
     "build:styles:all": "find  app/styles/ -name \"*.css\" -exec cat {} \\; >> public/css/app.css",
     "build:styles:cleancss": "cleancss -o public/css/app.css public/css/app.css",
-    "server": "http-server public/"
+    "watch": "npm run watch:assets & npm run watch:styles & npm run watch:scripts & npm run sync",
+    "watch:assets": "chokidar 'app/assets/**/*' -c 'npm run build:assets -s'",
+    "watch:styles": "chokidar 'app/styles/**/*.css' -c 'npm run build:styles -s'",
+    "watch:scripts": "chokidar 'app/js/**/*.js' -c 'npm run build:scripts -s'",
+    "dev": "npm run build && npm run watch",
+    "sync":"browser-sync start --server public --files \"public/*/*, public/*\""
   },
   "author": "mejjjor <mejjjor@gmail.com>",
   "private": true,

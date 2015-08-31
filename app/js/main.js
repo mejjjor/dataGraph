@@ -1,3 +1,3 @@
-var square = require('./square.js');
-console.log(square(4));
+var hello = require('./myFunction.js');
+console.log(hello());
 
