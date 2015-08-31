@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "start fast !",
   "dependencies": {
+    "d3": "^3.5.6",
     "normalize.css": "^3.0.3"
   },
   "devDependencies": {
@@ -28,7 +29,7 @@
     "watch:styles": "chokidar 'app/styles/**/*.css' -c 'npm run build:styles -s'",
     "watch:scripts": "chokidar 'app/js/**/*.js' -c 'npm run build:scripts -s'",
     "dev": "npm run build && npm run watch",
-    "sync":"browser-sync start --server public --files \"public/*/*, public/*\""
+    "sync": "browser-sync start --server public --files \"public/*/*, public/*\""
   },
   "author": "mejjjor <mejjjor@gmail.com>",
   "private": true,
