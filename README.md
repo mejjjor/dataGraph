@@ -21,3 +21,5 @@ Well, it's works !
 ###Other informations : 
 To edit, go in app folder and do what you want !
 
+This starter kit is NOT tested on windows cumputer ... best experience with linux.
+
