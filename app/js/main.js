@@ -1,5 +1,6 @@
-var d3 = require('../../node_modules/d3/d3.js');
-var rivets = require('../../node_modules/rivets/dist/rivets.js');
+var d3 = require('../../node_modules/d3/d3.min.js');
+var rivets = require('../../node_modules/rivets/dist/rivets.min.js');
+var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 
 var name = "erik";
 var width = 1200,
@@ -50,7 +51,7 @@ function restart() {
         .on("mouseup", function(d) {
             mouseup_node = d;
         })
-        .on("click",click_node)
+        .on("click", click_node)
         .on("dblclick", dblclick_node);
     node.exit().remove();
 
@@ -149,6 +150,13 @@ function spliceLinksForNode(node) {
         });
 }
 
-function click_node(){
-    
+function click_node() {
+
 }
+var data = {
+    title: "Panier de fruits",
+    fruits: ["pomme", "poire"],
+}
+rivets.bind($('#view'), {
+    data: data
+});
