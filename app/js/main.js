@@ -1,6 +1,7 @@
 var d3 = require('../../node_modules/d3/d3.js');
+var rivets = require('../../node_modules/rivets/dist/rivets.js');
 
-
+var name = "erik";
 var width = 1200,
     height = 700;
 
@@ -49,6 +50,7 @@ function restart() {
         .on("mouseup", function(d) {
             mouseup_node = d;
         })
+        .on("click",click_node)
         .on("dblclick", dblclick_node);
     node.exit().remove();
 
@@ -57,9 +59,6 @@ function restart() {
         .attr("class", "link")
         .on("dblclick", dblclick_link);
     link.exit().remove();
-
-
-
 
     force.start();
 }
@@ -148,4 +147,8 @@ function spliceLinksForNode(node) {
         function(l) {
             links.splice(links.indexOf(l), 1);
         });
+}
+
+function click_node(){
+    
 }
