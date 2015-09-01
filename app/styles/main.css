@@ -1,23 +1,27 @@
-
-#graph{
-	border: 1px solid black;
+#graph {
+    border: 1px solid black;
+    background: #073642;
 }
 
-rect {
-  fill: none;
-  pointer-events: all;
+.disable-selection {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
-.node {
-  fill: #000;
-}
-
-.cursor {
-  fill: none;
-  stroke: brown;
-  pointer-events: none;
+.drag_line {
+    stroke: #586E75;
+    stroke-width: 10;
 }
 
 .link {
-  stroke: #999;
+    stroke: #586E75;
+    stroke-width: 10px;
+}
+
+.node {
+    fill: #B58900;
+    stroke-width: 6px;
+    stroke: #073642;
 }
