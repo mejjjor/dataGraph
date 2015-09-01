@@ -38,7 +38,7 @@ restart();
 
 function restart() {
 
-  node = node.data(nodes);
+    node = node.data(nodes);
     node.enter().insert("circle")
         .attr("class", "node")
         .attr("r", 40)
@@ -48,16 +48,18 @@ function restart() {
         })
         .on("mouseup", function(d) {
             mouseup_node = d;
-        });
-         node.exit().remove();
+        })
+        .on("dblclick", dblclick_node);
+    node.exit().remove();
 
     link = link.data(links);
-        link.enter().insert("line", ".node")
-        .attr("class", "link");
-         link.exit().remove();
+    link.enter().insert("line", ".node")
+        .attr("class", "link")
+        .on("dblclick", dblclick_link);
+    link.exit().remove();
 
 
-  
+
 
     force.start();
 }
@@ -85,7 +87,7 @@ function tick() {
 
 function mousemove() {
     if (mousedown_node) {
-	console.log("mousemove");
+        console.log("mousemove");
         drag_line
             .attr("x1", mousedown_node.x)
             .attr("y1", mousedown_node.y)
@@ -95,9 +97,12 @@ function mousemove() {
 }
 
 function mouseup() {
-	console.log("mouseup");
+    console.log("mouseup");
     if (mouseup_node && mousedown_node) {
-        links.push({source: mousedown_node, target: mouseup_node});
+        links.push({
+            source: mousedown_node,
+            target: mouseup_node
+        });
     }
     mousedown_node = null;
     mouseup_node = null;
@@ -111,13 +116,36 @@ function mouseup() {
 }
 
 function dblclick() {
-	console.log("dblclick");
+    console.log("dblclick");
     var point = d3.mouse(this),
         node = {
             x: point[0],
             y: point[1]
         },
         n = nodes.push(node);
-        restart();
+    restart();
 }
- 
+
+function dblclick_node(d) {
+    d3.event.stopPropagation();
+    nodes.splice(d.index, 1);
+    spliceLinksForNode(d);
+    restart();
+}
+
+function dblclick_link(d) {
+    d3.event.stopPropagation();
+    links.splice(links.indexOf(d), 1);
+    restart();
+}
+
+function spliceLinksForNode(node) {
+    toSplice = links.filter(
+        function(l) {
+            return (l.source === node) || (l.target === node);
+        });
+    toSplice.map(
+        function(l) {
+            links.splice(links.indexOf(l), 1);
+        });
+}
