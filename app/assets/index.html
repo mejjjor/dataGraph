@@ -20,11 +20,16 @@
         </ul>
     </div>
     <svg id="graph" class="disable-selection" />
-    <a href="#openModal">Open Modal</a>
-    <div id="openModal" class="modalDialog">
-        <div>
-            <a href="#close" title="Close" class="close">X</a>
-            <p>le formulaire</p>
+    <div id="modalNode" draggable="true">
+        <div id="ModalHandle">
+        </div>
+        <div id="modalContent">
+        <button id="btnCloseModal" title="Close" class="close">X</button>
+        <p>le formulaire</p>
+        <form>
+            <label>Label</label>
+            <input/>
+        </form>
         </div>
     </div>
     <script src="js/app.js"></script>

@@ -130,6 +130,7 @@ function dblclick_node(d) {
     d3.event.stopPropagation();
     nodes.splice(d.index, 1);
     spliceLinksForNode(d);
+    closeModalNode();
     restart();
 }
 
@@ -151,6 +152,25 @@ function spliceLinksForNode(node) {
 }
 
 function click_node() {
+    var point = d3.mouse(this);
+    $('#modalNode').css('opacity', 1);
+    $('#modalNode').css('pointer-events', 'auto');
+    var val = $('#modalNode').css('left');
+    //auto for chrome, 0px for firefox
+    if (val == "auto" || val == "0px") {
+        $('#modalNode').css('left', point[0] + "px");
+        $('#modalNode').css('top', point[1] + "px");
+    }
+
+    d3.event.stopPropagation();
+}
+
+$('#btnCloseModal').click(closeModalNode);
+$(document).click(closeModalNode);
+
+function closeModalNode() {
+    $('#modalNode').css('opacity', 0);
+    $('#modalNode').css('pointer-events', 'none');
 
 }
 var data = {
@@ -160,3 +180,47 @@ var data = {
 rivets.bind($('#view'), {
     data: data
 });
+
+
+//Modal drag & drop
+
+function drag_start(event) {
+    if (handle.contains(target)) {
+
+        var style = window.getComputedStyle(event.target, null);
+        event.dataTransfer.setData("text/plain", (parseInt(style.getPropertyValue("left"), 10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"), 10) - event.clientY));
+    } else {
+        e.preventDefault();
+    }
+}
+
+function drag_over(event) {
+    event.preventDefault();
+    return false;
+}
+
+function drop(event) {
+    var offset = event.dataTransfer.getData("text/plain").split(',');
+    dm.style.left = (event.clientX + parseInt(offset[0], 10)) + 'px';
+    dm.style.top = (event.clientY + parseInt(offset[1], 10)) + 'px';
+    event.preventDefault();
+    return false;
+}
+var dm = document.getElementById('modalNode');
+document.body.addEventListener('dragover', drag_over, false);
+document.body.addEventListener('drop', drop, false);
+
+var dm = document.getElementById('modalNode');
+var handle = document.getElementById('ModalHandle');
+var target = false;
+dm.onmousedown = function(e) {
+    target = e.target;
+};
+dm.ondragstart = function(e) {
+    if (handle.contains(target)) {
+        var style = window.getComputedStyle(e.target, null);
+        e.dataTransfer.setData("text/plain", (parseInt(style.getPropertyValue("left"), 10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"), 10) - e.clientY));
+    } else {
+        e.preventDefault();
+    }
+};
