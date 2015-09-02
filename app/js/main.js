@@ -155,9 +155,7 @@ function click_node() {
     var point = d3.mouse(this);
     $('#modalNode').css('opacity', 1);
     $('#modalNode').css('pointer-events', 'auto');
-    var val = $('#modalNode').css('left');
-    //auto for chrome, 0px for firefox
-    if (val == "auto" || val == "0px") {
+    if ($('#modalNode').css('left') == "0px") {
         $('#modalNode').css('left', point[0] + "px");
         $('#modalNode').css('top', point[1] + "px");
     }
@@ -206,10 +204,8 @@ function drop(event) {
     event.preventDefault();
     return false;
 }
-var dm = document.getElementById('modalNode');
 document.body.addEventListener('dragover', drag_over, false);
 document.body.addEventListener('drop', drop, false);
-
 var dm = document.getElementById('modalNode');
 var handle = document.getElementById('ModalHandle');
 var target = false;

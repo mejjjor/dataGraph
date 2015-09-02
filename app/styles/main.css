@@ -28,6 +28,8 @@
 
 #modalNode {
     width: 300px;
+    top:0px;
+    left:0px;
     position: fixed;
     z-index: 99999;
     opacity: 0;
