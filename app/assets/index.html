@@ -13,20 +13,14 @@
 </head>
 
 <body>
-    <div id="view">
-        <h1>{ data.title }</h1>
-        <ul>
-            <li rv-each-fruit="data.fruits">{ fruit }</li>
-        </ul>
-    </div>
     <svg id="graph" class="disable-selection" />
-    <div id="modalNode" draggable="true">
+    <div id="modal" draggable="true">
         <div id="ModalHandle">
         </div>
         <div id="modalContent">
         <button id="btnCloseModal" title="Close" class="close">X</button>
         <form id="formNode">
-            <!-- <label>Label</label><input rv-value="label"/> -->
+            <label>Label</label><input rv-value="node.label"/>
             <label>Type</label><input/>
             <label>Couleur</label><input/>
             <label>Description</label><input/>

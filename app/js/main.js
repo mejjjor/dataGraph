@@ -41,7 +41,9 @@ restart();
 function restart() {
 
     node = node.data(nodes);
-    node.enter().insert("circle")
+
+
+    var elem = node.enter().insert("circle")
         .attr("class", "node")
         .attr("r", 40)
         .on("mousedown", function(d) {
@@ -53,6 +55,8 @@ function restart() {
         })
         .on("click", click_node)
         .on("dblclick", dblclick_node);
+
+       // elem.append("text").text("aaaaa");
     node.exit().remove();
 
     link = link.data(links);
@@ -125,9 +129,9 @@ function dblclick() {
 
 function dblclick_node(d) {
     d3.event.stopPropagation();
+    modal.closeModal();
     nodes.splice(d.index, 1);
     spliceLinksForNode(d);
-    modal.closeModal();
     restart();
 }
 
@@ -148,19 +152,11 @@ function spliceLinksForNode(node) {
         });
 }
 
-function click_node() {
+function click_node(d) {
     var point = d3.mouse(this);
     modal.openModal(point[0],point[1]);
+    rivets.bind($('#formNode'),{
+        node: d
+    })
     d3.event.stopPropagation();
 }
-
-$('#btnCloseModal').click(modal.closeModal);
-$(document).click(modal.closeModal);
-
-var data = {
-    title: "Panier de fruits",
-    fruits: ["pomme", "poire"],
-}
-rivets.bind($('#view'), {
-    data: data
-});

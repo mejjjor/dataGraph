@@ -2,21 +2,21 @@ var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 
 module.exports = {
     closeModal: function() {
-        $('#modalNode').css('opacity', 0);
-        $('#modalNode').css('pointer-events', 'none');
+        $('#modal').css('opacity', 0);
+        $('#modal').css('pointer-events', 'none');
     },
 
     openModal: function(x, y) {
-        $('#modalNode').css('opacity', 1);
-        $('#modalNode').css('pointer-events', 'auto');
-        if ($('#modalNode').css('left') == "0px") {
-            $('#modalNode').css('left', x + "px");
-            $('#modalNode').css('top', y + "px");
+        $('#modal').css('opacity', 1);
+        $('#modal').css('pointer-events', 'auto');
+        if ($('#modal').css('left') == "0px") {
+            $('#modal').css('left', x + "px");
+            $('#modal').css('top', y + "px");
         }
     }
 }
 
-var dm = document.getElementById('modalNode');
+var dm = document.getElementById('modal');
 var handle = document.getElementById('ModalHandle');
 var target = false;
 
@@ -59,3 +59,10 @@ dm.ondragstart = function(e) {
 
 document.body.addEventListener('dragover', drag_over, false);
 document.body.addEventListener('drop', drop, false);
+
+
+$('#btnCloseModal').click(module.exports.closeModal);
+$('#modal').click(function(e) {
+    e.stopPropagation();
+});
+$(document).click(module.exports.closeModal);
