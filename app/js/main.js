@@ -5,6 +5,8 @@ var modal = require('./modal.js');
 
 var width = 1200,
     height = 700;
+var i = 0;
+var rview;
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -22,10 +24,9 @@ var force = d3.layout.force()
 
 var nodes = force.nodes(),
     links = force.links(),
-    node = svg.selectAll(".node"),
+    node = svg.selectAll("g"),
     link = svg.selectAll(".link");
 
-// line displayed when dragging new nodes
 var drag_line = svg.append("line")
     .attr("class", "drag_line")
     .attr("x1", 0)
@@ -36,16 +37,19 @@ var drag_line = svg.append("line")
 var mousedown_node = null;
 var mouseup_node = null;
 
+rivets.formatters.key = function(value, key) {
+    return value[key];
+};
+
 restart();
 
 function restart() {
 
-    node = node.data(nodes);
+    node = node.data(force.nodes(), function(d) { 
+        return d.id;
+    });
 
-
-    var elem = node.enter().insert("circle")
-        .attr("class", "node")
-        .attr("r", 40)
+    var elem = node.enter().append("g")
         .on("mousedown", function(d) {
             mousedown_node = d;
             drag_line.attr("class", "drag_line");
@@ -56,11 +60,19 @@ function restart() {
         .on("click", click_node)
         .on("dblclick", dblclick_node);
 
-       // elem.append("text").text("aaaaa");
+    elem.append("circle")
+        .attr("class", "circle")
+        .attr("r", 40);
+
+    elem.append("text")
+        .text(i)
+        //.attr("rv-text", "rnodes | key 0 | key 'label'")
+        ;
+
     node.exit().remove();
 
     link = link.data(links);
-    link.enter().insert("line", ".node")
+    link.enter().insert("line", "g")
         .attr("class", "link")
         .on("dblclick", dblclick_link);
     link.exit().remove();
@@ -81,12 +93,10 @@ function tick() {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    node.attr("cx", function(d) {
-            return d.x;
-        })
-        .attr("cy", function(d) {
-            return d.y;
-        });
+    node.attr("transform", function(d) {
+        return "translate(" + d.x + "," + d.y + ")";
+
+    });
 }
 
 function mousemove() {
@@ -100,7 +110,7 @@ function mousemove() {
 }
 
 function mouseup() {
-    if (mouseup_node && mousedown_node) {
+    if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
         links.push({
             source: mousedown_node,
             target: mouseup_node
@@ -118,10 +128,12 @@ function mouseup() {
 }
 
 function dblclick() {
+    i++;
     var point = d3.mouse(this),
         node = {
             x: point[0],
-            y: point[1]
+            y: point[1],
+            id: i
         },
         n = nodes.push(node);
     restart();
@@ -130,8 +142,9 @@ function dblclick() {
 function dblclick_node(d) {
     d3.event.stopPropagation();
     modal.closeModal();
-    nodes.splice(d.index, 1);
     spliceLinksForNode(d);
+    var n = nodes.indexOf(d);
+    nodes.splice(n, 1);
     restart();
 }
 
@@ -152,11 +165,14 @@ function spliceLinksForNode(node) {
         });
 }
 
-function click_node(d) {
+function click_node(node) {
+
+    if (rview != undefined)
+        rview.unbind();
     var point = d3.mouse(this);
-    modal.openModal(point[0],point[1]);
-    rivets.bind($('#formNode'),{
-        node: d
-    })
+    modal.openModal(point[0], point[1]);
+    // rview = rivets.bind($('#formNode'), {
+    //     rnode: node
+    // });
     d3.event.stopPropagation();
 }
