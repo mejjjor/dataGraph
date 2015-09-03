@@ -10,7 +10,7 @@ module.exports = {
         var modal = $('#modal');
         modal.css('opacity', 1);
         modal.css('pointer-events', 'auto');
-        if (modal.css('left') == "0px" || modal.css('left')== 0) {
+        if (modal.css('left') === "0px" || modal.css('left')=== 0) {
             var h = $( window ).height();
             var w = $( window ).width();
             if (y+80 > h)

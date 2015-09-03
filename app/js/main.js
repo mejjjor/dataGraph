@@ -1,12 +1,19 @@
+/////**--DEBUG--**/////
+// var d3 = require('d3');
+// var rivets = require('rivets');
+// var $ = require('jquery');
+// var ko = require('knockout');
+
 var d3 = require('../../node_modules/d3/d3.min.js');
 var rivets = require('../../node_modules/rivets/dist/rivets.min.js');
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
+var ko = require('../../node_modules/knockout/build/output/knockout-latest.js');
 var modal = require('./modal.js');
 
 var width = 1200,
     height = 700;
-var i = 0;
-var rview;
+var node_id = 0;
+var rview; 
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -35,7 +42,7 @@ var drag_line = svg.append("line")
     .attr("y2", 0);
 
 var mousedown_node = null;
-var mouseup_node = null;
+var mouseup_node = null; 
 
 rivets.formatters.key = function(value, key) {
     return value[key];
@@ -45,16 +52,10 @@ restart();
 
 function restart() {
 
-rivets.bind($('#graph'), {
-        rnodes: node
-    });
 
     node = node.data(force.nodes(), function(d) {
         return d.id;
     });
-
- 
-
 
     var elem = node.enter().append("g")
         .on("mousedown", function(d) {
@@ -72,9 +73,16 @@ rivets.bind($('#graph'), {
         .attr("r", 40);
 
     elem.append("text")
-        .attr("rv-text", function(d){
-            //return "rnodes |key 0 | key "+node.indexOf(d)+" | key 'label'";
-            return "aaa";
+        .attr("id", function(d) {
+            return "rTextId" + d.id;
+        })
+        .attr("rv-text", function(d) {
+            return "rnode | key 'label'";
+        })
+        .each(function(d) {
+            rivets.bind($('#rTextId' + node_id), {
+                rnode: d
+            })
         });
 
     node.exit().remove();
@@ -86,6 +94,14 @@ rivets.bind($('#graph'), {
     link.exit().remove();
 
     force.start();
+}
+
+function getIndexById(node_id) {
+    for (i in nodes) {
+        if (nodes[i].id === node_id)
+            return i;
+    }
+    return 0;
 }
 
 function tick() {
@@ -118,6 +134,11 @@ function mousemove() {
 }
 
 function mouseup() {
+
+            rivets.bind($('#rTextId0'), {
+                rnode: nodes[0]
+            })
+
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
         links.push({
             source: mousedown_node,
@@ -136,18 +157,16 @@ function mouseup() {
 }
 
 function dblclick() {
-    i++;
-
     var point = d3.mouse(this),
-        node = {
+        newNode = {
             x: point[0],
             y: point[1],
-            id: i,
-            label: "lab"
+            id: node_id,
+            label: "label "+node_id
         },
-        n = nodes.push(node);
-
+        n = nodes.push(newNode);
     restart();
+    node_id++;
 }
 
 function dblclick_node(d) {
@@ -182,7 +201,7 @@ function click_node(node) {
         rview.unbind();
     modal.openModal(d3.event.clientX, d3.event.clientY);
     rview = rivets.bind($('#formNode'), {
-        rnode: node
+        rFormNode: node
     });
     d3.event.stopPropagation();
 }
