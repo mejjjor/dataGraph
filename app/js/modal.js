@@ -7,11 +7,18 @@ module.exports = {
     },
 
     openModal: function(x, y) {
-        $('#modal').css('opacity', 1);
-        $('#modal').css('pointer-events', 'auto');
-        if ($('#modal').css('left') == "0px") {
-            $('#modal').css('left', x + "px");
-            $('#modal').css('top', y + "px");
+        var modal = $('#modal');
+        modal.css('opacity', 1);
+        modal.css('pointer-events', 'auto');
+        if (modal.css('left') == "0px" || modal.css('left')== 0) {
+            var h = $( window ).height();
+            var w = $( window ).width();
+            if (y+80 > h)
+                y=h-80;
+            if (x+80 > w)
+                x=w-80;
+            modal.css('left', x + "px");
+            modal.css('top', y + "px");
         }
     }
 }
