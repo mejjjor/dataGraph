@@ -1,11 +1,9 @@
 /////**--DEBUG--**/////
 // var d3 = require('d3');
-// var rivets = require('rivets');
 // var $ = require('jquery');
 // var ko = require('knockout');
 
 var d3 = require('../../node_modules/d3/d3.min.js');
-var rivets = require('../../node_modules/rivets/dist/rivets.min.js');
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 var ko = require('../../node_modules/knockout/build/output/knockout-latest.js');
 var modal = require('./modal.js');
@@ -13,7 +11,6 @@ var modal = require('./modal.js');
 var width = 1200,
     height = 700;
 var node_id = 0;
-var rview; 
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -44,10 +41,6 @@ var drag_line = svg.append("line")
 var mousedown_node = null;
 var mouseup_node = null; 
 
-rivets.formatters.key = function(value, key) {
-    return value[key];
-};
-
 restart();
 
 function restart() {
@@ -73,17 +66,7 @@ function restart() {
         .attr("r", 40);
 
     elem.append("text")
-        .attr("id", function(d) {
-            return "rTextId" + d.id;
-        })
-        .attr("rv-text", function(d) {
-            return "rnode | key 'label'";
-        })
-        .each(function(d) {
-            rivets.bind($('#rTextId' + node_id), {
-                rnode: d
-            })
-        });
+        .text("label");
 
     node.exit().remove();
 
@@ -94,14 +77,6 @@ function restart() {
     link.exit().remove();
 
     force.start();
-}
-
-function getIndexById(node_id) {
-    for (i in nodes) {
-        if (nodes[i].id === node_id)
-            return i;
-    }
-    return 0;
 }
 
 function tick() {
@@ -134,10 +109,6 @@ function mousemove() {
 }
 
 function mouseup() {
-
-            rivets.bind($('#rTextId0'), {
-                rnode: nodes[0]
-            })
 
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
         links.push({
@@ -197,11 +168,6 @@ function spliceLinksForNode(node) {
 
 function click_node(node) {
 
-    if (rview != undefined)
-        rview.unbind();
     modal.openModal(d3.event.clientX, d3.event.clientY);
-    rview = rivets.bind($('#formNode'), {
-        rFormNode: node
-    });
     d3.event.stopPropagation();
 }
