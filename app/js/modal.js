@@ -1,9 +1,7 @@
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 
-var preCloseModal = function(){};
 module.exports = {
     closeModal: function() {
-        preCloseModal();
         $('#modal').css('opacity', 0);
         $('#modal').css('pointer-events', 'none');
     },

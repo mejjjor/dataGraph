@@ -13,19 +13,24 @@
 </head>
 
 <body>
-    <svg id="graph" class="disable-selection" />
+    <svg id="graph" class="disable-selection"/>
     <div id="modal" draggable="true">
         <div id="ModalHandle">
         </div>
         <div id="modalContent">
-        <button id="btnCloseModal" title="Close" class="close">X</button>
-        <form id="formNode">
-            <label>Label</label><input data-bind="value: label"/>
-            <label>Type</label><input/>
-            <label>Couleur</label><input/>
-            <label>Description</label><input/>
-            <label>Date</label><input/>
-        </form>
+            <button id="btnCloseModal" title="Close" class="close">X</button>
+            <form id="formNode">
+                <label>Label</label>
+                <input v-model="label" />
+                <label>Type</label>
+                <input/>
+                <label>Couleur</label>
+                <input/>
+                <label>Description</label>
+                <input/>
+                <label>Date</label>
+                <input/>
+            </form>
         </div>
     </div>
     <script src="js/app.js"></script>

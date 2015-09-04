@@ -1,21 +1,24 @@
 /////**--DEBUG--**/////
 // var d3 = require('d3');
 // var $ = require('jquery');
-// var ko = require('knockout');
+// var vue = require('vue');
 
 var d3 = require('../../node_modules/d3/d3.min.js');
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
-var ko = require('../../node_modules/knockout/build/output/knockout-latest.js');
+var Vue = require('../../node_modules/vue/dist/vue.min.js');
+
 var modal = require('./modal.js');
 
-var koUnbind = function() {
-    ko.cleanNode(document.getElementById("formNode"));
-}
-modal.setPreCloseModal(koUnbind);
+Vue.directive('content', {
+     twoWay:true,
+    update: function(value) {
+        this.el.innerHTML = value
+    }
+});
 
 var width = 1200,
     height = 700;
-var node_id = 0;;
+var node_id = 0;
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -56,7 +59,7 @@ function restart() {
     });
 
     var elem = node.enter().append("g")
-        .attr("id", "gKoId" + node_id)
+        .attr("id", "gVueId" + node_id)
         .on("mousedown", function(d) {
             mousedown_node = d;
             drag_line.attr("class", "drag_line");
@@ -72,7 +75,13 @@ function restart() {
         .attr("r", 40);
 
     elem.append("text")
-        .attr("data-bind", "text:label");
+        .attr("v-content", "label")
+         .each(function(d) {
+            new Vue({
+                el: "#gVueId" + node_id,
+                data: d
+            });
+        });
 
     node.exit().remove();
 
@@ -135,17 +144,16 @@ function mouseup() {
 
 function dblclick() {
 
-        var point = d3.mouse(this),
-            newNode = {
-                x: point[0],
-                y: point[1],
-                id: node_id,
-                label: ko.observable("label " + node_id)
-            },
-            n = nodes.push(newNode);
+    var point = d3.mouse(this),
+        newNode = {
+            x: point[0],
+            y: point[1],
+            id: node_id,
+            label: "label " + node_id
+        },
+        n = nodes.push(newNode);
 
     restart();
-    ko.applyBindings(newNode, document.getElementById("gKoId" + node_id));
     node_id++;
 
 }
@@ -178,8 +186,11 @@ function spliceLinksForNode(node) {
 
 function click_node(node) {
     d3.event.stopPropagation();
-    modal.closeModal();
+    var aa = new Vue({
+        el: '#formNode',
+        data: node
+    });
+
     modal.openModal(d3.event.clientX, d3.event.clientY);
-    ko.cleanNode(document.getElementById("formNode")[0]);
-    ko.applyBindings(node, document.getElementById("formNode"));
+
 }
