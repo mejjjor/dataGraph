@@ -6,13 +6,17 @@
     position: fixed;
     z-index: 99999;
     opacity: 0;
-    pointer-events: none;
+    /*pointer-events: none;*/
     border-radius: 10px;
     background: #93A1A1;
 }
 
 #modalContent{
     margin: 5px 20px 13px 20px;
+}
+
+#formNode{
+    display: table;
 }
 
 .close {

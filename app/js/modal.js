@@ -20,9 +20,6 @@ module.exports = {
             modal.css('left', x + "px");
             modal.css('top', y + "px");
         }
-    },
-    setPreCloseModal: function(fn){
-        preCloseModal = fn;
     }
 }
 

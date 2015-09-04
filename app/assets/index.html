@@ -13,6 +13,8 @@
 </head>
 
 <body>
+<datalist id="types">
+</datalist>
     <svg id="graph" class="disable-selection"/>
     <div id="modal" draggable="true">
         <div id="ModalHandle">
@@ -21,7 +23,7 @@
             <button id="btnCloseModal" title="Close" class="close">X</button>
             <form id="formNode">
                 <label>Label</label>
-                <input v-model="label" />
+                <input id="formNodeLabel" v-model="label"/>
                 <label>Type</label>
                 <input/>
                 <label>Couleur</label>

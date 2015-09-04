@@ -10,7 +10,7 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var modal = require('./modal.js');
 
 Vue.directive('content', {
-     twoWay:true,
+    twoWay: true,
     update: function(value) {
         this.el.innerHTML = value
     }
@@ -76,7 +76,7 @@ function restart() {
 
     elem.append("text")
         .attr("v-content", "label")
-         .each(function(d) {
+        .each(function(d) {
             new Vue({
                 el: "#gVueId" + node_id,
                 data: d
@@ -149,7 +149,8 @@ function dblclick() {
             x: point[0],
             y: point[1],
             id: node_id,
-            label: "label " + node_id
+            label: "label " + node_id,
+            type: ""
         },
         n = nodes.push(newNode);
 
@@ -186,11 +187,29 @@ function spliceLinksForNode(node) {
 
 function click_node(node) {
     d3.event.stopPropagation();
+    var nodeTypes =[];
+    for(var i in nodes){
+        if (nodes[i].type != "" && $.inArray(nodes[i].type,nodeTypes)==-1)
+            nodeTypes.push(nodes[i].type);
+    }
+    document.getElementById("types").innerHTML = '';
+    for(var i in nodeTypes){
+        var s = '<option value="'+nodeTypes[i]+'"/>';
+        document.getElementById("types").innerHTML += s;
+    }
+
+    
+    setFormNode();
     var aa = new Vue({
         el: '#formNode',
         data: node
     });
-
     modal.openModal(d3.event.clientX, d3.event.clientY);
 
+}
+
+var content = '<div><label>Label</label> <input type="text" id="formNodeLabel" v-model = "label" /></div><div><label>Type</label><input list="types" v-model = "type"/></div><div><label>Couleur</label><input/></div><div><label>Description</label><input/></div><div><label>Date</label><input/></ div>';
+
+function setFormNode() {
+    document.getElementById("formNode").innerHTML = content;
 }
