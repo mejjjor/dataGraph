@@ -28,8 +28,8 @@
     "build:styles:all": "find  app/styles/ -name \"*.css\" -exec cat {} \\; >> public/css/app.css",
     "build:styles:cleancss": "cleancss -o public/css/app.css public/css/app.css",
     "watch": "npm run watch:assets & npm run watch:styles & npm run watch:scripts & npm run sync",
-    "watch:assets": "chokidar 'app/assets/**/*' -c 'echo `date` npm run build:assets -s'",
-    "watch:styles": "chokidar 'app/styles/**/*.css' -c 'echo `date` npm run build:styles -s'",
+    "watch:assets": "chokidar 'app/assets/**/*' -c 'echo `date` && npm run build:assets -s'",
+    "watch:styles": "chokidar 'app/styles/**/*.css' -c 'echo `date` && npm run build:styles -s'",
     "watch:scripts": "chokidar 'app/js/**/*.js' -c 'echo `date` && npm run build:scripts -s'",
     "dev": "npm run build && npm run watch",
     "sync": "browser-sync start --server public --files \"public/*/*, public/*\""

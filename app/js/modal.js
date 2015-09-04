@@ -1,7 +1,9 @@
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 
+var preCloseModal = function(){};
 module.exports = {
     closeModal: function() {
+        preCloseModal();
         $('#modal').css('opacity', 0);
         $('#modal').css('pointer-events', 'none');
     },
@@ -20,8 +22,12 @@ module.exports = {
             modal.css('left', x + "px");
             modal.css('top', y + "px");
         }
+    },
+    setPreCloseModal: function(fn){
+        preCloseModal = fn;
     }
 }
+
 
 var dm = document.getElementById('modal');
 var handle = document.getElementById('ModalHandle');
