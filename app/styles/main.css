@@ -21,8 +21,35 @@
 }
 
 .circle {
-    fill: #B58900;
+    fill: rgb(108, 113, 196);
     stroke-width: 6px;
     stroke: #073642;
 }
 
+.colorSelector{
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+}
+
+#colorYellow{
+    background-color: #B58900;
+}#colorOrange{
+    background-color: #CB4B16;
+}#colorRed{
+    background-color: #DC322F;
+}#colorMagenta{
+    background-color: #D33682;
+}#colorViolet{
+    background-color: #6C71C4;
+}#colorBlue{
+    background-color: #268BD2;
+}#colorCyan{
+    background-color: #2AA198;
+}#colorGreen{
+    background-color: #859900;
+}
+
+.colorSelected{
+    border:2px solid black;
+}

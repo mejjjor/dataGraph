@@ -10,15 +10,24 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var modal = require('./modal.js');
 
 Vue.directive('content', {
-    twoWay: true,
     update: function(value) {
         this.el.innerHTML = value
+    }
+});
+
+Vue.directive('colorized', {
+    twoWay: true,
+    update: function(value) {
+        this.el.style.fill = value
     }
 });
 
 var width = 1200,
     height = 700;
 var node_id = 0;
+
+var formNodeContent = document.getElementById("formNode").innerHTML;
+
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -72,6 +81,7 @@ function restart() {
 
     elem.append("circle")
         .attr("class", "circle")
+        .attr("v-colorized", "color")
         .attr("r", 40);
 
     elem.append("text")
@@ -150,7 +160,8 @@ function dblclick() {
             y: point[1],
             id: node_id,
             label: "label " + node_id,
-            type: ""
+            type: "",
+            color: ""
         },
         n = nodes.push(newNode);
 
@@ -186,30 +197,49 @@ function spliceLinksForNode(node) {
 }
 
 function click_node(node) {
+
     d3.event.stopPropagation();
-    var nodeTypes =[];
-    for(var i in nodes){
-        if (nodes[i].type != "" && $.inArray(nodes[i].type,nodeTypes)==-1)
+    var nodeTypes = [];
+    for (var i in nodes) {
+        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodeTypes) == -1)
             nodeTypes.push(nodes[i].type);
     }
+    //kk
     document.getElementById("types").innerHTML = '';
-    for(var i in nodeTypes){
-        var s = '<option value="'+nodeTypes[i]+'"/>';
+    for (var i in nodeTypes) {
+        var s = '<option value="' + nodeTypes[i] + '"/>';
         document.getElementById("types").innerHTML += s;
     }
 
-    
+
     setFormNode();
-    var aa = new Vue({
+
+    var colorSelectors = document.getElementsByClassName("colorSelector");
+
+//kk
+    for (var i ; i<colorSelectors.length ;i++) {
+        if (getComputedStyle(colorSelectors[i]).backgroundColor == node.color)
+          colorSelectors[i].style.border = '2px solid black';
+        colorSelectors[i].onclick = function(event) {
+            event.target.style.border = '2px solid black';
+           for (var j in nodes)
+                if (nodes[j].type === node.type)
+                    nodes[j].color = getComputedStyle(event.target).backgroundColor;
+        };
+    }
+
+    new Vue({
         el: '#formNode',
         data: node
     });
     modal.openModal(d3.event.clientX, d3.event.clientY);
-
 }
 
-var content = '<div><label>Label</label> <input type="text" id="formNodeLabel" v-model = "label" /></div><div><label>Type</label><input list="types" v-model = "type"/></div><div><label>Couleur</label><input/></div><div><label>Description</label><input/></div><div><label>Date</label><input/></ div>';
-
 function setFormNode() {
-    document.getElementById("formNode").innerHTML = content;
+    document.getElementById("formNode").innerHTML = formNodeContent;
+}
+
+
+function selectColor(event) {
+    console.log(event.target.id);
 }

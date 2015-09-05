@@ -13,9 +13,9 @@
 </head>
 
 <body>
-<datalist id="types">
-</datalist>
-    <svg id="graph" class="disable-selection"/>
+    <datalist id="types">
+    </datalist>
+    <svg id="graph" class="disable-selection" />
     <div id="modal" draggable="true">
         <div id="ModalHandle">
         </div>
@@ -23,11 +23,17 @@
             <button id="btnCloseModal" title="Close" class="close">X</button>
             <form id="formNode">
                 <label>Label</label>
-                <input id="formNodeLabel" v-model="label"/>
+                <input type="text" id="formNodeLabel" v-model="label" />
                 <label>Type</label>
-                <input/>
-                <label>Couleur</label>
-                <input/>
+                <input list="types" v-model="type" />
+                <div id="colorYellow" class="colorSelector"></div>
+                <div id="colorOrange" class="colorSelector"></div>
+                <div id="colorRed" class="colorSelector"></div>
+                <div id="colorMagenta" class="colorSelector"></div>
+                <div id="colorViolet" class="colorSelector"></div>
+                <div id="colorBlue" class="colorSelector"></div>
+                <div id="colorCyan" class="colorSelector"></div>
+                <div id="colorGreen" class="colorSelector"></div>
                 <label>Description</label>
                 <input/>
                 <label>Date</label>
