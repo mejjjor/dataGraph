@@ -206,7 +206,7 @@ function click_node(node) {
     }
     //kk
     document.getElementById("types").innerHTML = '';
-    for (var i in nodeTypes) {
+    for (var i = 0 in nodeTypes) {
         var s = '<option value="' + nodeTypes[i] + '"/>';
         document.getElementById("types").innerHTML += s;
     }
@@ -216,13 +216,14 @@ function click_node(node) {
 
     var colorSelectors = document.getElementsByClassName("colorSelector");
 
-//kk
-    for (var i ; i<colorSelectors.length ;i++) {
+    for (var i = 0; i < colorSelectors.length; i++) {
         if (getComputedStyle(colorSelectors[i]).backgroundColor == node.color)
-          colorSelectors[i].style.border = '2px solid black';
+            colorSelectors[i].className += " colorSelected";
         colorSelectors[i].onclick = function(event) {
-            event.target.style.border = '2px solid black';
-           for (var j in nodes)
+            for (var j = 0; j < colorSelectors.length; j++)
+                 colorSelectors[j].className = colorSelectors[j].className.replace("colorSelected", "");
+            event.target.className += " colorSelected";
+            for (var j in nodes)
                 if (nodes[j].type === node.type)
                     nodes[j].color = getComputedStyle(event.target).backgroundColor;
         };

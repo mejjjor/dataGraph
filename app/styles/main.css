@@ -21,7 +21,7 @@
 }
 
 .circle {
-    fill: rgb(108, 113, 196);
+    fill: #fff;
     stroke-width: 6px;
     stroke: #073642;
 }
@@ -30,6 +30,7 @@
     display: inline-block;
     height: 15px;
     width: 15px;
+    margin:2px;
 }
 
 #colorYellow{
@@ -52,4 +53,5 @@
 
 .colorSelected{
     border:2px solid black;
+    margin:0px;
 }
