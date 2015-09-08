@@ -1,7 +1,9 @@
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 
+var beforeCloseModal = function() {};
 module.exports = {
     closeModal: function() {
+        beforeCloseModal();
         $('#modal').css('opacity', 0);
         $('#modal').css('pointer-events', 'none');
     },
@@ -10,16 +12,19 @@ module.exports = {
         var modal = $('#modal');
         modal.css('opacity', 1);
         modal.css('pointer-events', 'auto');
-        if (modal.css('left') === "0px" || modal.css('left')=== 0) {
-            var h = $( window ).height();
-            var w = $( window ).width();
-            if (y+80 > h)
-                y=h-80;
-            if (x+80 > w)
-                x=w-80;
+        if (modal.css('left') === "0px" || modal.css('left') === 0) {
+            var h = $(window).height();
+            var w = $(window).width();
+            if (y + 80 > h)
+                y = h - 80;
+            if (x + 80 > w)
+                x = w - 80;
             modal.css('left', x + "px");
             modal.css('top', y + "px");
         }
+    },
+    setBeforeCloseModal: function(fn) {
+        beforeCloseModal = fn;
     }
 }
 

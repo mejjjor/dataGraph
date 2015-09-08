@@ -1,22 +1,18 @@
 
 #modal {
-    width: 300px;
+    width: 360px;
     top:0px;
     left:0px;
     position: fixed;
     z-index: 99999;
     opacity: 0;
-    /*pointer-events: none;*/
+    pointer-events: none;
     border-radius: 10px;
     background: #93A1A1;
 }
 
 #modalContent{
     margin: 5px 20px 13px 20px;
-}
-
-#formNode{
-    display: table;
 }
 
 .close {
@@ -46,4 +42,42 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     cursor: move;
+}
+
+.colorSelector{
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+    margin:2px;
+}
+
+.colorSelected{
+    border:2px solid black;
+    margin:0px;
+}
+
+#formNode{
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+}
+
+#formNode > *{
+    width: 60%;
+    margin:2px;
+}
+
+#formNode > label{
+    width: 35%;
+    align-self: center;
+}
+#formNode > textarea{
+    width: 100%;
+    align-self: center;
+    height: 75px;
+}
+
+#formNodeColorSelector{
+    width: 100%;
+    text-align: center;
 }

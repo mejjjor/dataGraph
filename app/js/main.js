@@ -161,7 +161,10 @@ function dblclick() {
             id: node_id,
             label: "label " + node_id,
             type: "",
-            color: ""
+            color: "",
+            description: "",
+            dateBegin: "",
+            dateEnd: ""
         },
         n = nodes.push(newNode);
 
@@ -216,23 +219,47 @@ function click_node(node) {
 
     var colorSelectors = document.getElementsByClassName("colorSelector");
 
+    //Select color of node
     for (var i = 0; i < colorSelectors.length; i++) {
         if (getComputedStyle(colorSelectors[i]).backgroundColor == node.color)
             colorSelectors[i].className += " colorSelected";
+
         colorSelectors[i].onclick = function(event) {
+            //Unselect all color
             for (var j = 0; j < colorSelectors.length; j++)
-                 colorSelectors[j].className = colorSelectors[j].className.replace("colorSelected", "");
+                colorSelectors[j].className = colorSelectors[j].className.replace("colorSelected", "");
+            //Select color clicked
             event.target.className += " colorSelected";
+            //Change every node color with this type
             for (var j in nodes)
                 if (nodes[j].type === node.type)
                     nodes[j].color = getComputedStyle(event.target).backgroundColor;
         };
     }
 
-    new Vue({
+    var vm = new Vue({
         el: '#formNode',
         data: node
     });
+
+//BUG: sur 1 node -> 1 type, une couleur
+//sur un autre node -> 1 autre type, une autre couleur
+//sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
+    var unwatch = vm.$watch('type', function(newVal, oldVal) {
+        for (var j in nodes)
+            if (nodes[j].type === newVal)
+                node.color = nodes[j].color;
+        for (var k = 0; k < colorSelectors.length; k++)
+            if (getComputedStyle(colorSelectors[k]).backgroundColor === nodes[j].color)
+                colorSelectors[k].className += " colorSelected";
+            else
+                colorSelectors[k].className = colorSelectors[k].className.replace("colorSelected", "");
+    });
+
+    modal.setBeforeCloseModal(function() {
+        unwatch();
+    });
+
     modal.openModal(d3.event.clientX, d3.event.clientY);
 }
 
