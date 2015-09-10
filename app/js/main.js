@@ -68,7 +68,9 @@ function restart() {
     });
 
     var elem = node.enter().append("g")
-        .attr("id", "gVueId" + node_id)
+        .attr("id", function(d){
+            return "gVueId" + d.id
+        })
         .on("mousedown", function(d) {
             mousedown_node = d;
             drag_line.attr("class", "drag_line");
@@ -88,7 +90,7 @@ function restart() {
         .attr("v-content", "label")
         .each(function(d) {
             new Vue({
-                el: "#gVueId" + node_id,
+                el: "#gVueId" + d.id,
                 data: d
             });
         });
@@ -104,7 +106,7 @@ function restart() {
     force.start();
 }
 
-function tick() {
+function tick(e) {
     link.attr("x1", function(d) {
             return d.source.x;
         })
@@ -117,11 +119,18 @@ function tick() {
         .attr("y2", function(d) {
             return d.target.y;
         });
+    // var k = 6 * e.alpha;
+    // nodes.forEach(function(o, i) {
+    //     o.px += i & 2 ? k : -k;
+    //     o.py += i & 1 ? k : -k;
+    // });
+
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
 
     });
 }
+
 
 function mousemove() {
     if (mousedown_node) {
@@ -242,9 +251,9 @@ function click_node(node) {
         data: node
     });
 
-//BUG: sur 1 node -> 1 type, une couleur
-//sur un autre node -> 1 autre type, une autre couleur
-//sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
+    //BUG: sur 1 node -> 1 type, une couleur
+    //sur un autre node -> 1 autre type, une autre couleur
+    //sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
     var unwatch = vm.$watch('type', function(newVal, oldVal) {
         for (var j in nodes)
             if (nodes[j].type === newVal)
@@ -271,3 +280,44 @@ function setFormNode() {
 function selectColor(event) {
     console.log(event.target.id);
 }
+
+
+//////////////////////////DEV///////////////
+
+
+$('#addNodes').click(function(e) {
+    var newNode = {
+        x: 0,
+        y: 0,
+        id: node_id,
+        label: "label " + node_id,
+        type: "",
+        color: "",
+        description: "",
+        dateBegin: "12/2012",
+        dateEnd: "01/2014"
+    };
+    nodes.push(newNode);
+    node_id++;
+
+    var newNode2 = {
+        x: 10,
+        y: 10,
+        id: node_id,
+        label: "label " + node_id,
+        type: "",
+        color: "",
+        description: "",
+        dateBegin: "01/2013",
+        dateEnd: "01/2015"
+    };
+    nodes.push(newNode2);
+    node_id++;
+
+links.push({
+            source: newNode,
+            target: newNode2
+        });
+
+    restart();
+});
