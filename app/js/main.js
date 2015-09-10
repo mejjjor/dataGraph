@@ -16,9 +16,26 @@ Vue.directive('content', {
 });
 
 Vue.directive('colorized', {
-    twoWay: true,
     update: function(value) {
         this.el.style.fill = value
+    }
+});
+
+Vue.directive('date', {
+    twoWay: true,
+    bind: function() {
+        this.handler = function() {
+            var d = this.el.value.split('/');
+            this.set(new Date(d[1], d[0] - 1));
+        }.bind(this)
+        this.el.addEventListener('input', this.handler)
+    },
+    update: function(value) {
+        if (value instanceof Date)
+            this.el.value = (value.getMonth() + 1) + "/" + value.getFullYear();
+    },
+    unbind: function() {
+        this.el.removeEventListener('input', this.handler)
     }
 });
 
@@ -58,17 +75,43 @@ var drag_line = svg.append("line")
 var mousedown_node = null;
 var mouseup_node = null;
 
+var nodeIdDateRange;
+
 restart();
+
+function getMaxRange() {
+    nodeIdDateRange = {
+        min: {
+            date: new Date(8640000000000000),
+            id: ""
+        },
+        max: {
+            date: new Date(-8640000000000000),
+            id: ""
+        }
+    };
+    for (i in nodes) {
+        if (nodes[i].dateBegin instanceof Date && nodes[i].dateBegin < nodeIdDateRange.min.date) {
+            nodeIdDateRange.min.date = nodes[i].dateBegin;
+            nodeIdDateRange.min.id = nodes[i].id;
+        }
+        if (nodes[i].dateEnd instanceof Date && nodes[i].dateEnd > nodeIdDateRange.max.date) {
+            nodeIdDateRange.max.date = nodes[i].dateEnd;
+            nodeIdDateRange.max.id = nodes[i].id;
+        }
+    }
+}
 
 function restart() {
 
+    getMaxRange();
 
     node = node.data(force.nodes(), function(d) {
         return d.id;
     });
 
     var elem = node.enter().append("g")
-        .attr("id", function(d){
+        .attr("id", function(d) {
             return "gVueId" + d.id
         })
         .on("mousedown", function(d) {
@@ -119,11 +162,17 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    // var k = 6 * e.alpha;
-    // nodes.forEach(function(o, i) {
-    //     o.px += i & 2 ? k : -k;
-    //     o.py += i & 1 ? k : -k;
-    // });
+
+    nodes.forEach(function(o, i) {
+        if (o.id === nodeIdDateRange.min.id) {
+            o.x = 50;
+            o.y = height / 2;
+        }
+        if (o.id === nodeIdDateRange.max.id) {
+            o.x = width - 50;
+            o.y = height / 2;
+        }
+    });
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -282,6 +331,7 @@ function selectColor(event) {
 }
 
 
+
 //////////////////////////DEV///////////////
 
 
@@ -294,8 +344,8 @@ $('#addNodes').click(function(e) {
         type: "",
         color: "",
         description: "",
-        dateBegin: "12/2012",
-        dateEnd: "01/2014"
+        dateBegin: new Date(2012, 11),
+        dateEnd: new Date(2014, 0)
     };
     nodes.push(newNode);
     node_id++;
@@ -308,16 +358,16 @@ $('#addNodes').click(function(e) {
         type: "",
         color: "",
         description: "",
-        dateBegin: "01/2013",
-        dateEnd: "01/2015"
+        dateBegin: new Date(2013, 0),
+        dateEnd: new Date(2015, 0)
     };
     nodes.push(newNode2);
     node_id++;
 
-links.push({
-            source: newNode,
-            target: newNode2
-        });
+    links.push({
+        source: newNode,
+        target: newNode2
+    });
 
     restart();
 });
