@@ -55,8 +55,9 @@ var svg = d3.select("#graph")
 
 
 var force = d3.layout.force()
-    .charge(-4000)
-    .linkDistance(300)
+    .charge(-2000)
+    .linkDistance(100)
+    .linkStrength(0.5)
     .size([width, height])
     .on("tick", tick);
 
@@ -166,12 +167,19 @@ function tick(e) {
     nodes.forEach(function(o, i) {
         if (o.id === nodeIdDateRange.min.id) {
             o.x = 50;
-            o.y = height / 2;
         }
         if (o.id === nodeIdDateRange.max.id) {
             o.x = width - 50;
-            o.y = height / 2;
         }
+
+        if (o.x < 40)
+            o.x = 40;
+        if (o.x > width - 40)
+            o.x = width - 40;
+        if (o.y < 40)
+            o.y = 40;
+        if (o.y > height - 40)
+            o.y = height - 40;
     });
 
     node.attr("transform", function(d) {
@@ -226,8 +234,8 @@ function dblclick() {
         },
         n = nodes.push(newNode);
 
-    restart();
     node_id++;
+    restart();
 
 }
 
@@ -330,6 +338,64 @@ function selectColor(event) {
     console.log(event.target.id);
 }
 
+function findNodePositionById(id) {
+    for (j in nodes)
+        if (nodes[j].id === id)
+            return j;
+}
+
+$('#import').click(function(e) {
+    dataImport = JSON.parse(document.getElementById("exchange").value);
+
+    nodes.slice(0, nodes.length);
+
+    for (var j in dataImport.nodes){
+        dataImport.nodes[j].dateBegin = new Date(dataImport.nodes[j].dateBegin);
+        dataImport.nodes[j].dateEnd = new Date(dataImport.nodes[j].dateEnd);
+        nodes.push(dataImport.nodes[j]);
+    }
+    links.slice(0, links.length);
+    for (var i in dataImport.links) {
+        var s = findNodePositionById(dataImport.links[i].source);
+        var t = findNodePositionById(dataImport.links[i].target);
+        var tempLink = {
+            source: nodes[s],
+            target: nodes[t]
+        };
+        links.push(tempLink);
+    }
+    restart();
+});
+
+$('#export').click(function(e) {
+    var dataExport = {
+        nodes: [],
+        links: []
+    };
+
+    for (var i in nodes) {
+        var tempNode = {
+            x: i * 10 % width,
+            y: i * 10 % height,
+            id: nodes[i].id,
+            label: nodes[i].label,
+            type: nodes[i].type,
+            color: nodes[i].color,
+            description: nodes[i].description,
+            dateBegin: nodes[i].dateBegin,
+            dateEnd: nodes[i].dateEnd
+        }
+        dataExport.nodes.push(tempNode);
+    }
+    for (var j in links) {
+        var tempLink = {
+            source: links[j].source.id,
+            target: links[j].target.id
+        }
+        dataExport.links.push(tempLink);
+    }
+    document.getElementById("exchange").value = JSON.stringify(dataExport);
+});
 
 
 //////////////////////////DEV///////////////
