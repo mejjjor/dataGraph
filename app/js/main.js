@@ -52,8 +52,8 @@ Vue.directive('date', {
     }
 });
 
-var width = 1200,
-    height = 700;
+var width = 1600,
+    height = 1000;
 var node_id = 0;
 
 var formNodeContent = document.getElementById("formNode").innerHTML;
@@ -68,15 +68,15 @@ var svg = d3.select("#graph")
 
 
 var force = d3.layout.force()
-    .charge(function(d){
-        if(d.origin)
-            return -8000;
-        return -2000;
+    .charge(function(d) {
+        if (d.origin)
+            return -7000;
+        return -2500;
     })
-    .chargeDistance(1000)
-    .linkDistance(160)
-    .linkStrength(0.3)
-    .gravity(0.3)
+    //.chargeDistance(1000)
+    .linkDistance(110)
+    .linkStrength(0.5)
+    .gravity(0.25)
     .size([width, height])
     .on("tick", tick);
 
@@ -124,7 +124,7 @@ function getMaxRange() {
 }
 
 function restart() {
-
+force.resume();
     getMaxRange();
 
     node = node.data(force.nodes(), function(d) {
@@ -166,8 +166,6 @@ function restart() {
             });
         });
 
-
-
     node.exit().remove();
 
     link = link.data(links);
@@ -197,23 +195,41 @@ function tick(e) {
         });
 
     nodes.forEach(function(o, i) {
+
+        if (!o.origin) {
+            if (o.id == 3){
+                console.log("rere");
+            }
+            for (var i in links) {
+                if (links[i].target === o) {
+                    var dx = o.x - links[i].source.x;
+                    var dy = o.y - links[i].source.y;
+                    if (Math.abs(dx) > 220)
+                        o.x -= dx / 10;
+                    if (Math.abs(dy) > 220)
+                        o.y -= dy / 10;
+                }
+            }
+        }
+
+
         if (o.id === nodeIdDateRange.min.id) {
             //   o.y = height / 2;
-            o.x = 50;
+            o.x = 115;
         }
         if (o.id === nodeIdDateRange.max.id) {
-            o.x = width - 50;
+            o.x = width - 115;
             // o.y = height / 2;
         }
 
-        if (o.x < 40)
-            o.x = 40;
-        if (o.x > width - 40)
-            o.x = width - 40;
-        if (o.y < 40)
-            o.y = 40;
-        if (o.y > height - 40)
-            o.y = height - 40;
+        // if (o.x < 40)
+        //     o.x = 40;
+        // if (o.x > width - 40)
+        //     o.x = width - 40;
+        // if (o.y < 40)
+        //     o.y = 40;
+        // if (o.y > height - 40)
+        //     o.y = height - 40;
     });
 
     node.attr("transform", function(d) {
@@ -352,7 +368,7 @@ function click_node(node) {
     //BUG: sur 1 node -> 1 type, une couleur
     //sur un autre node -> 1 autre type, une autre couleur
     //sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
-    var unwatch = vm.$watch('type', function(newVal, oldVal) {
+    var unwatchType = vm.$watch('type', function(newVal, oldVal) {
         for (var j in nodes)
             if (nodes[j].type === newVal)
                 node.color = nodes[j].color;
@@ -363,11 +379,31 @@ function click_node(node) {
                 colorSelectors[k].className = colorSelectors[k].className.replace("colorSelected", "");
     });
 
+
+    var unwatchOrigin = vm.$watch('origin', function(newVal, oldVal) {
+        treeDirection(node, null);
+    });
+
     modal.setBeforeCloseModal(function() {
-        unwatch();
+        unwatchType();
     });
 
     modal.openModal(d3.event.clientX, d3.event.clientY);
+}
+
+function treeDirection(node, previousNode) {
+    for (var i in links) {
+        if (links[i].source === node || links[i].target === node) {
+            if (!links[i].source.origin && !links[i].target.origin) {
+                if (links[i].target === node && links[i].source != previousNode) {
+                    links[i].target = links[i].source;
+                    links[i].source = node;
+                }
+                if (links[i].source != previousNode)
+                    treeDirection(links[i].target, node);
+            }
+        }
+    }
 }
 
 function setFormNode() {

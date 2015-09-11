@@ -47,9 +47,9 @@
                 <label class="fullWidth" for="formNodeDescription">Description :</label>
                 <textarea id="formNodeDescription" v-model="description" placeHolder="Markdown available !"></textarea>
                 <label for="formNodeDateBegin">Date begin :</label>
-                <input id="formNodeDateBegin" type="text" v-model="dateBegin" placeHolder="mm/yyyy" />
+                <input id="formNodeDateBegin" type="text" v-date="dateBegin" placeHolder="mm/yyyy" />
                 <label for="formNodeDateEnd">Date end :</label>
-                    <input id="formNodeDateEnd" type="text" v-model="dateEnd" placeHolder="mm/yyyy" />
+                    <input id="formNodeDateEnd" type="text" v-date="dateEnd" placeHolder="mm/yyyy" />
             </form>
         </div>
     </div>
