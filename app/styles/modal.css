@@ -1,8 +1,7 @@
-
 #modal {
     width: 360px;
-    top:0px;
-    left:0px;
+    top: 0px;
+    left: 0px;
     position: fixed;
     z-index: 99999;
     opacity: 0;
@@ -11,7 +10,7 @@
     background: #93A1A1;
 }
 
-#modalContent{
+#modalContent {
     margin: 5px 20px 13px 20px;
 }
 
@@ -44,40 +43,44 @@
     cursor: move;
 }
 
-.colorSelector{
+.colorSelector {
     display: inline-block;
     height: 15px;
     width: 15px;
-    margin:2px;
+    margin: 2px;
 }
 
-.colorSelected{
-    border:2px solid black;
-    margin:0px;
+.colorSelected {
+    border: 2px solid black;
+    margin: 0px;
 }
 
-#formNode{
-    display:flex;
-    flex-wrap:wrap;
-    align-content:flex-start;
+#formNode {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
 }
 
-#formNode > *{
+#formNode > * {
     width: 60%;
-    margin:2px;
+    margin: 2px;
 }
 
-#formNode > label{
+#formNode > label {
     width: 35%;
     align-self: center;
 }
-#formNode > textarea{
+
+#formNode > textarea {
     width: 100%;
     align-self: center;
     height: 75px;
 }
 
-#formNodeColorSelector{
-    width: 100%;
+#formNodeColorSelector {
     text-align: center;
+}
+
+#formNode > div {
+    width: 100%;
 }
