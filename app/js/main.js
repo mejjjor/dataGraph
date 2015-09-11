@@ -493,4 +493,4 @@ $('#addNodes').click(function(e) {
     restart();
 });
 
-document.getElementById("exchange").value = data;
+document.getElementById("exchange").value = JSON.stringify(data);
