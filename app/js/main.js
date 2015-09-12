@@ -71,12 +71,13 @@ var force = d3.layout.force()
     .charge(function(d) {
         if (d.origin)
             return -7000;
-        return -2500;
+        return -3000;
     })
     //.chargeDistance(1000)
     .linkDistance(110)
     .linkStrength(0.5)
     .gravity(0.25)
+    .theta(0)
     .size([width, height])
     .on("tick", tick);
 
@@ -124,7 +125,7 @@ function getMaxRange() {
 }
 
 function restart() {
-force.resume();
+    force.resume();
     getMaxRange();
 
     node = node.data(force.nodes(), function(d) {
@@ -148,7 +149,7 @@ force.resume();
     elem.append("circle")
         .attr("class", "circle")
         .attr("v-colorized", "color")
-        .attr("r", 51);
+        .attr("r", 55);
 
     elem.append("rect")
         .attr("v-colorized", "color")
@@ -197,9 +198,6 @@ function tick(e) {
     nodes.forEach(function(o, i) {
 
         if (!o.origin) {
-            if (o.id == 3){
-                console.log("rere");
-            }
             for (var i in links) {
                 if (links[i].target === o) {
                     var dx = o.x - links[i].source.x;
@@ -411,10 +409,6 @@ function setFormNode() {
 }
 
 
-function selectColor(event) {
-    console.log(event.target.id);
-}
-
 function findNodePositionById(id) {
     for (j in nodes)
         if (nodes[j].id === id)
@@ -459,8 +453,6 @@ $('#export').click(function(e) {
     };
 
     for (var i in nodes) {
-        if (nodes[i].id == 9)
-            console.log("eee");
         var tempNode = {
             x: i * 10 % width,
             y: i * 10 % height,

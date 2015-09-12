@@ -1,6 +1,8 @@
 #graph {
     border: 1px solid black;
     background: #073642;
+    font-family: 'Fugaz One', cursive;
+    font-size: 15px;
 }
 
 .disable-selection {
@@ -26,20 +28,34 @@
     stroke: #073642;
 }
 
-#colorYellow{
+#colorYellow {
     background-color: #B58900;
-}#colorOrange{
+}
+
+#colorOrange {
     background-color: #CB4B16;
-}#colorRed{
+}
+
+#colorRed {
     background-color: #DC322F;
-}#colorMagenta{
+}
+
+#colorMagenta {
     background-color: #D33682;
-}#colorViolet{
+}
+
+#colorViolet {
     background-color: #6C71C4;
-}#colorBlue{
+}
+
+#colorBlue {
     background-color: #268BD2;
-}#colorCyan{
+}
+
+#colorCyan {
     background-color: #2AA198;
-}#colorGreen{
+}
+
+#colorGreen {
     background-color: #859900;
 }
