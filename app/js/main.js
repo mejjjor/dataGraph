@@ -235,7 +235,7 @@ function click_node(node) {
         data: node
     });
 
-   var unwatchType = linkTypeAndColor(vm);
+   var unwatchType = linkTypeAndColor(vm,node);
 
     var unwatchOrigin = vm.$watch('origin', function(newVal, oldVal) {
         treeDirection(node, null);
