@@ -18,6 +18,7 @@ var node_id = 0;
 var mousedown_node = null;
 var mouseup_node = null;
 var mousedown_link = null;
+var mousedrag = null;
 var nodesOrigin;
 var colorSelectors;
 
@@ -26,6 +27,7 @@ var svg = d3.select("#graph")
     .attr("height", height)
     .call(d3.behavior.zoom()
         .on("zoom", function() {
+            mousedrag = true;
             svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
         }))
     .on("dblclick.zoom", null)
@@ -42,13 +44,13 @@ svg.append('svg:rect')
 var force = d3.layout.force()
     .charge(function(d) {
         if (d.origin)
-            return -6000;
+            return -5000;
         return -3000;
     })
     //.chargeDistance(1000)
     .linkDistance(110)
-    .linkStrength(0.3)
-    .gravity(0.2)
+    .linkStrength(0.5)
+    .gravity(0.25)
     .theta(0)
     .size([width, height])
     .on("tick", tick);
@@ -154,7 +156,7 @@ function tick(e) {
     var l = nodesOrigin.length;
     if (l > 0) {
         nodesOrigin[0].x = 0;
-        nodesOrigin[l - 1].x = l * 170;
+        nodesOrigin[l - 1].x = l * 150;
     }
 
     node.attr("transform", function(d) {
@@ -180,9 +182,10 @@ function mouseup() {
         });
         restart();
     }
-    if (!mousedown_node && !mousedown_link) {
+    if (!mousedown_node && !mousedown_link && !mousedrag) {
         restart();
     }
+    mousedrag = null;
     mousedown_node = null;
     mouseup_node = null;
     mousedown_link = null;
@@ -273,8 +276,8 @@ $('#import').click(function(e) {
         links.push(tempLink);
     }
 
-     getNodesOrigin();
-     balanceTree();
+    getNodesOrigin();
+    balanceTree();
 
     restart();
 });
