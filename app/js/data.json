@@ -41,7 +41,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 40,
         "y": 40,
@@ -51,7 +52,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 50,
         "y": 50,
@@ -61,7 +63,8 @@
         "color": "rgb(181, 137, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 60,
         "y": 60,
@@ -71,7 +74,8 @@
         "color": "rgb(181, 137, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 70,
         "y": 70,
@@ -81,7 +85,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 80,
         "y": 80,
@@ -91,7 +96,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 90,
         "y": 90,
@@ -101,7 +107,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 100,
         "y": 100,
@@ -111,7 +118,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 110,
         "y": 110,
@@ -121,7 +129,8 @@
         "color": "rgb(181, 137, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 120,
         "y": 120,
@@ -131,7 +140,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 130,
         "y": 130,
@@ -141,7 +151,8 @@
         "color": "rgb(181, 137, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 140,
         "y": 140,
@@ -151,7 +162,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 150,
         "y": 150,
@@ -161,7 +173,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 160,
         "y": 160,
@@ -171,7 +184,8 @@
         "color": "rgb(220, 50, 47)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 170,
         "y": 170,
@@ -181,7 +195,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 180,
         "y": 180,
@@ -191,7 +206,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 190,
         "y": 190,
@@ -201,7 +217,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 200,
         "y": 200,
@@ -211,7 +228,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 210,
         "y": 210,
@@ -221,7 +239,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 220,
         "y": 220,
@@ -231,7 +250,8 @@
         "color": "rgb(181, 137, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 230,
         "y": 230,
@@ -241,7 +261,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 240,
         "y": 240,
@@ -251,7 +272,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 250,
         "y": 250,
@@ -261,7 +283,8 @@
         "color": "rgb(133, 153, 0)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 260,
         "y": 260,
@@ -271,7 +294,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 270,
         "y": 270,
@@ -314,7 +338,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 310,
         "y": 310,
@@ -324,7 +349,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 320,
         "y": 320,
@@ -334,7 +360,8 @@
         "color": "rgb(203, 75, 22)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 330,
         "y": 330,
@@ -344,7 +371,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }, {
         "x": 340,
         "y": 340,
@@ -354,7 +382,8 @@
         "color": "rgb(42, 161, 152)",
         "description": "",
         "dateBegin": "",
-        "dateEnd": ""
+        "dateEnd": "",
+        "origin": false
     }],
     "links": [{
         "source": 1,

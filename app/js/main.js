@@ -42,13 +42,13 @@ svg.append('svg:rect')
 var force = d3.layout.force()
     .charge(function(d) {
         if (d.origin)
-            return -7000;
+            return -6000;
         return -3000;
     })
     //.chargeDistance(1000)
     .linkDistance(110)
-    .linkStrength(0.5)
-    .gravity(0.25)
+    .linkStrength(0.3)
+    .gravity(0.2)
     .theta(0)
     .size([width, height])
     .on("tick", tick);
@@ -74,7 +74,7 @@ restart();
 
 function restart() {
     force.resume();
-    getMaxRange();
+    getNodesOrigin();
 
     node = node.data(force.nodes(), function(d) {
         return d.id;
@@ -151,42 +151,11 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    var minX = {
-        x: Math.min()
-    };
-    var maxX = {
-        x: Math.max()
-    };
-
-    nodes.forEach(function(o, i) {
-        if (!o.origin) {
-            // for (var i in links) {
-            //     if (links[i].target === o) {
-            //         var dx = o.x - links[i].source.x;
-            //         var dy = o.y - links[i].source.y;
-            //         if (Math.abs(dx) > 220)
-            //             o.x -= dx / 10;
-            //         if (Math.abs(dy) > 220)
-            //             o.y -= dy / 10;
-            //         break;
-            //     }
-            // }
-        } else {
-            for (var j = 0; j < nodesOrigin.length - 1; j++) {
-                if (nodesOrigin[j].x > nodesOrigin[j + 1].x - 100)
-                    nodesOrigin[j].x -= 70;
-                if (Math.abs(nodesOrigin[j].y) > 100)
-                    nodesOrigin[j].y = Math.sign(nodesOrigin[j].y)*80;
-            }
-        }
-    });
-    // if (minX.id != undefined && minX.id != nodeIdDateRange.min.node.id) {
-    //     nodeIdDateRange.min.node.x -= 40;
-    // }
-    // if (maxX.id != undefined && maxX.id != nodeIdDateRange.max.node.id) {
-    //     nodeIdDateRange.max.node.x += 40;
-    // }
-
+    var l = nodesOrigin.length;
+    if (l > 0) {
+        nodesOrigin[0].x = 0;
+        nodesOrigin[l - 1].x = l * 170;
+    }
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -279,9 +248,6 @@ function click_node(node) {
 $('#import').click(function(e) {
     dataImport = JSON.parse(document.getElementById("exchange").value);
 
-    // nodes.slice(0, nodes.length);
-    // links.slice(0, links.length);
-    // restart();
     for (var j in dataImport.nodes) {
         if (node_id <= dataImport.nodes[j].id)
             node_id = dataImport.nodes[j].id + 1;
@@ -296,6 +262,7 @@ $('#import').click(function(e) {
         nodes.push(dataImport.nodes[j]);
     }
 
+
     for (var i in dataImport.links) {
         var s = findNodePositionById(dataImport.links[i].source);
         var t = findNodePositionById(dataImport.links[i].target);
@@ -305,6 +272,10 @@ $('#import').click(function(e) {
         };
         links.push(tempLink);
     }
+
+     getNodesOrigin();
+     balanceTree();
+
     restart();
 });
 
@@ -344,6 +315,42 @@ $('#export').click(function(e) {
 
 /////////UTILS//////////
 
+function balanceTree() {
+    var originsWeight = [];
+    var upCounter = 0;
+    var downCounter = 0;
+    for (var i in nodesOrigin) {
+        originsWeight[i] = nodeCounter(nodesOrigin[i], 0);
+        nodesOrigin[i].x = i * 40;
+        nodesOrigin[i].y = 0;
+        if (upCounter > downCounter) {
+            setBranchDirection(nodesOrigin[i], 1, i);
+        } else {
+            setBranchDirection(nodesOrigin[i], -1, i);
+        }
+    }
+}
+
+function setBranchDirection(node, s, i) {
+    for (var j in links) {
+        if (links[j].source.id === node.id && !links[j].target.origin) {
+            links[j].target.x = i * 40;
+            links[j].target.y = j * 50 * s;
+            setBranchDirection(links[j].target, s, i);
+        }
+    }
+}
+
+function nodeCounter(node, c) {
+    for (var j in links) {
+        if (links[j].source.id === node.id && !links[j].target.origin) {
+            c++
+            nodeCounter(links[j].target, c);
+        }
+    }
+    return c;
+}
+
 function findNodePositionById(id) {
     for (j in nodes)
         if (nodes[j].id === id)
@@ -376,18 +383,8 @@ function treeDirection(node, previousNode) {
     }
 }
 
-function getMaxRange() {
+function getNodesOrigin() {
     nodesOrigin = [];
-
-    //     min: {
-    //         date: new Date(8640000000000000),
-    //         node: ""
-    //     },
-    //     max: {
-    //         date: new Date(-8640000000000000),
-    //         node: ""
-    //     }
-    // };
     for (i in nodes) {
         if (nodes[i].origin) {
             nodesOrigin.push(nodes[i]);
