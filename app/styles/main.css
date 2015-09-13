@@ -5,6 +5,10 @@
     font-size: 15px;
 }
 
+#graph rect{
+    fill: #073642;
+}
+
 .disable-selection {
     -webkit-user-select: none;
     -ms-user-select: none;

@@ -1,5 +1,5 @@
 /////**--DEBUG--**/////
-// var d3 = require('d3');
+//var d3 = require('d3');
 // var $ = require('jquery');
 // var vue = require('vue');
 
@@ -11,16 +11,33 @@ var modal = require('./modal.js');
 require('./binding.js');
 var data = require('./data.json');
 
-var width = 1600,
-    height = 1000;
+var width = 1200,
+    height = 800;
 var node_id = 0;
+
+var mousedown_node = null;
+var mouseup_node = null;
+var mousedown_link = null;
+var nodesOrigin;
+var colorSelectors;
 
 var svg = d3.select("#graph")
     .attr("width", width)
     .attr("height", height)
+    .call(d3.behavior.zoom()
+        .on("zoom", function() {
+            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+        }))
+    .on("dblclick.zoom", null)
+    .append('svg:g')
     .on("mousemove", mousemove)
     .on("mouseup", mouseup)
     .on("dblclick", dblclick);
+
+svg.append('svg:rect')
+    .attr('width', width * 3)
+    .attr('height', height * 2)
+    .attr('transform', 'translate(-600,-600)');
 
 var force = d3.layout.force()
     .charge(function(d) {
@@ -48,11 +65,7 @@ var drag_line = svg.append("line")
     .attr("x2", 0)
     .attr("y2", 0);
 
-var mousedown_node = null;
-var mouseup_node = null;
-var mousedown_link = null;
-var nodeIdDateRange;
-var colorSelectors;
+
 var formNodeContent = document.getElementById("formNode").innerHTML;
 document.getElementById("exchange").value = JSON.stringify(data);
 
@@ -72,6 +85,7 @@ function restart() {
             return "gVueId" + d.id
         })
         .on("mousedown", function(d) {
+            d3.event.stopPropagation();
             mousedown_node = d;
             drag_line.attr("class", "drag_line");
         })
@@ -91,13 +105,10 @@ function restart() {
     elem.append("circle")
         .attr("class", "circle")
         .attr("v-colorized", "color")
-        .attr("r", 55);
+        .attr("r", 58);
 
     elem.append("rect")
-        .attr("v-colorized", "color")
-        .attr("id", function(d) {
-            return "rectText" + d.id
-        });
+        .attr("v-colorized", "color");
 
     elem.append("text")
         .attr("v-content", "label")
@@ -140,28 +151,42 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
+    var minX = {
+        x: Math.min()
+    };
+    var maxX = {
+        x: Math.max()
+    };
 
     nodes.forEach(function(o, i) {
         if (!o.origin) {
-            for (var i in links) {
-                if (links[i].target === o) {
-                    var dx = o.x - links[i].source.x;
-                    var dy = o.y - links[i].source.y;
-                    if (Math.abs(dx) > 220)
-                        o.x -= dx / 10;
-                    if (Math.abs(dy) > 220)
-                        o.y -= dy / 10;
-                }
+            // for (var i in links) {
+            //     if (links[i].target === o) {
+            //         var dx = o.x - links[i].source.x;
+            //         var dy = o.y - links[i].source.y;
+            //         if (Math.abs(dx) > 220)
+            //             o.x -= dx / 10;
+            //         if (Math.abs(dy) > 220)
+            //             o.y -= dy / 10;
+            //         break;
+            //     }
+            // }
+        } else {
+            for (var j = 0; j < nodesOrigin.length - 1; j++) {
+                if (nodesOrigin[j].x > nodesOrigin[j + 1].x - 100)
+                    nodesOrigin[j].x -= 70;
+                if (Math.abs(nodesOrigin[j].y) > 100)
+                    nodesOrigin[j].y = Math.sign(nodesOrigin[j].y)*80;
             }
         }
-
-        if (o.id === nodeIdDateRange.min.id) {
-            o.x = 115;
-        }
-        if (o.id === nodeIdDateRange.max.id) {
-            o.x = width - 115;
-        }
     });
+    // if (minX.id != undefined && minX.id != nodeIdDateRange.min.node.id) {
+    //     nodeIdDateRange.min.node.x -= 40;
+    // }
+    // if (maxX.id != undefined && maxX.id != nodeIdDateRange.max.node.id) {
+    //     nodeIdDateRange.max.node.x += 40;
+    // }
+
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -235,7 +260,7 @@ function click_node(node) {
         data: node
     });
 
-   var unwatchType = linkTypeAndColor(vm,node);
+    var unwatchType = linkTypeAndColor(vm, node);
 
     var unwatchOrigin = vm.$watch('origin', function(newVal, oldVal) {
         treeDirection(node, null);
@@ -254,9 +279,9 @@ function click_node(node) {
 $('#import').click(function(e) {
     dataImport = JSON.parse(document.getElementById("exchange").value);
 
-    nodes.slice(0, nodes.length);
-    links.slice(0, links.length);
-    restart();
+    // nodes.slice(0, nodes.length);
+    // links.slice(0, links.length);
+    // restart();
     for (var j in dataImport.nodes) {
         if (node_id <= dataImport.nodes[j].id)
             node_id = dataImport.nodes[j].id + 1;
@@ -352,29 +377,32 @@ function treeDirection(node, previousNode) {
 }
 
 function getMaxRange() {
-    nodeIdDateRange = {
-        min: {
-            date: new Date(8640000000000000),
-            id: ""
-        },
-        max: {
-            date: new Date(-8640000000000000),
-            id: ""
-        }
-    };
+    nodesOrigin = [];
+
+    //     min: {
+    //         date: new Date(8640000000000000),
+    //         node: ""
+    //     },
+    //     max: {
+    //         date: new Date(-8640000000000000),
+    //         node: ""
+    //     }
+    // };
     for (i in nodes) {
-        if (nodes[i].dateBegin instanceof Date && nodes[i].dateBegin < nodeIdDateRange.min.date) {
-            nodeIdDateRange.min.date = nodes[i].dateBegin;
-            nodeIdDateRange.min.id = nodes[i].id;
-        }
-        if (nodes[i].dateEnd instanceof Date && nodes[i].dateEnd > nodeIdDateRange.max.date) {
-            nodeIdDateRange.max.date = nodes[i].dateEnd;
-            nodeIdDateRange.max.id = nodes[i].id;
+        if (nodes[i].origin) {
+            nodesOrigin.push(nodes[i]);
         }
     }
+    nodesOrigin = nodesOrigin.sort(function(a, b) {
+        if (a.dateBegin < b.dateBegin)
+            return -1;
+        return 1;
+
+    });
+
 }
 
-function addNewTypes(){
+function addNewTypes() {
     var nodeTypes = [];
     for (var i in nodes) {
         if (nodes[i].type != "" && $.inArray(nodes[i].type, nodeTypes) == -1)
@@ -388,7 +416,7 @@ function addNewTypes(){
     }
 }
 
-function selectColor(node){
+function selectColor(node) {
     //Select color of node
     for (var i = 0; i < colorSelectors.length; i++) {
         if (getComputedStyle(colorSelectors[i]).backgroundColor == node.color)
@@ -408,7 +436,7 @@ function selectColor(node){
     }
 }
 
-function linkTypeAndColor(vm,node){
+function linkTypeAndColor(vm, node) {
     //BUG: sur 1 node -> 1 type, une couleur
     //sur un autre node -> 1 autre type, une autre couleur
     //sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
