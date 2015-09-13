@@ -326,10 +326,12 @@ function balanceTree() {
         originsWeight[i] = nodeCounter(nodesOrigin[i], 0);
         nodesOrigin[i].x = i * 40;
         nodesOrigin[i].y = 0;
-        if (upCounter > downCounter) {
-            setBranchDirection(nodesOrigin[i], 1, i);
-        } else {
+        if (upCounter >= downCounter) {
+            downCounter+=originsWeight[i];
             setBranchDirection(nodesOrigin[i], -1, i);
+        } else {
+            upCounter+=originsWeight[i];
+            setBranchDirection(nodesOrigin[i], 1, i);
         }
     }
 }
