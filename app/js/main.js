@@ -243,7 +243,7 @@ function click_node(node) {
     modal.openModal(d3.event.clientX, d3.event.clientY);
 }
 
-$('#reload').click(function(e){
+$('#reload').click(function(e) {
     setFilters();
 })
 
@@ -320,27 +320,35 @@ $('#export').click(function(e) {
 
 
 function setFilters() {
+    var radius = 40;
+    var spacing = radius*2+10;
+    var offsetX=radius+20;
+    var offsetY=radius+5;
+
     var nodesTypes = getNodesTypes();
     var filters = d3.select('#filters');
-        filters.selectAll('*').remove();
-        filters.attr("width", width)
-        .attr("height",(((Math.floor(((nodesTypes.length*90)+60)/(width-45)))+1)*90));
+    filters.selectAll('*').remove();
+    filters.attr("width", width)
+        .attr("height", (((Math.floor(((nodesTypes.length * spacing) + offsetX) / (width - offsetY))) + 1) * spacing));
     for (var i in nodesTypes) {
-        var gs= filters.append('g')
-        .attr("transform", function(d) {
-        return "translate(" + (((i*90)+60) % (Math.floor((width-90)/90)*90)) + "," + ((Math.floor(((i*90)+60)/(width-90)))*90+45) + ")";
-    });
+        var gs = filters.append('g')
+            .attr("transform", function(d) {
+                return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
+            });
         gs.append('circle')
-        .attr('r',40)
-        .style('fill',nodesTypes[i].color);
-
+            .attr('r', radius)
+            .style('fill', nodesTypes[i].color)
+            .on('click', toggleType);
         gs.append('text')
-        .text(nodesTypes[i].type)
-        .attr("text-anchor", "middle");
-        
+            .text(nodesTypes[i].type)
+            .attr("text-anchor", "middle");
+
     }
 }
 
+function toggleType() {
+    console.log("zzz");
+}
 
 /////////UTILS//////////
 
@@ -433,9 +441,9 @@ function getNodesOrigin() {
 function getNodesTypes() {
     var nodesTypes = [];
     for (var i in nodes) {
-        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodesTypes.map(function(elem){
-            return elem.type;
-        })) == -1)
+        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodesTypes.map(function(elem) {
+                return elem.type;
+            })) == -1)
             nodesTypes.push(nodes[i]);
     }
     return nodesTypes;
