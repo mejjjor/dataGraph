@@ -46,6 +46,10 @@ svg.append('svg:rect')
     .attr('height', height * 2)
     .attr('transform', 'translate(-600,-600)');
 
+d3.select('#filters')
+    .attr('width', width)
+    .attr('height', 0);
+
 var force = d3.layout.force()
     .charge(function(d) {
         if (d.origin)
@@ -506,7 +510,7 @@ function addLinks(node, nodeS, nodeT) {
 
 function removeLink(nodeS, nodeT) {
     for (i in allLinks) {
-        if (allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
+        if (!allLinks[i] && allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
             allLinks.splice(i, 1);
             break;
         }
@@ -670,6 +674,7 @@ function spliceLinksForNode(node) {
     toSplice.map(
         function(l) {
             links.splice(links.indexOf(l), 1);
+            allLinks.splice(allLinks.indexOf(l), 1);
         });
 }
 
