@@ -10,21 +10,19 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="stylesheet" href="css/app.css">
     <script src="js/vendor/modernizr-2.8.3.min.js"></script>
-    <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script> -->
     <link href='https://fonts.googleapis.com/css?family=Fugaz+One' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
     <div>
-        <button id="addNodes">Add nodes</button>
+        <button id="reload">Reload filters</button>
         <button id="export">Export</button>
         <input type="text" id="exchange" />
         <button id="import">Import</button>
     </div>
-    <!-- <svg id="filters" class="disable-selection"/> -->
     <datalist id="types">
     </datalist>
+    <svg id="filters" class="disable-selection"/>
     <svg id="graph" class="disable-selection" />
     <div id="modal" draggable="true">
         <div id="ModalHandle">

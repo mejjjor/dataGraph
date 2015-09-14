@@ -1,8 +1,13 @@
-#graph {
-    border: 1px solid black;
-    background: #073642;
+svg{
+    background:black;
     font-family: 'Fugaz One', cursive;
+    font-size: 12px;
+}
+
+#graph {
+    background: #073642;
     font-size: 15px;
+    margin-top: -5px;
 }
 
 #graph rect{

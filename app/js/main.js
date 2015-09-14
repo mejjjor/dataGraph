@@ -109,9 +109,6 @@ function restart() {
         .attr("v-colorized", "color")
         .attr("r", 58);
 
-    elem.append("rect")
-        .attr("v-colorized", "color");
-
     elem.append("text")
         .attr("v-content", "label")
         .attr("text-anchor", "middle")
@@ -246,6 +243,10 @@ function click_node(node) {
     modal.openModal(d3.event.clientX, d3.event.clientY);
 }
 
+$('#reload').click(function(e){
+    setFilters();
+})
+
 /////IMPORT / EXPORT////////////
 
 $('#import').click(function(e) {
@@ -265,7 +266,6 @@ $('#import').click(function(e) {
         nodes.push(dataImport.nodes[j]);
     }
 
-
     for (var i in dataImport.links) {
         var s = findNodePositionById(dataImport.links[i].source);
         var t = findNodePositionById(dataImport.links[i].target);
@@ -278,6 +278,8 @@ $('#import').click(function(e) {
 
     getNodesOrigin();
     balanceTree();
+
+    setFilters();
 
     restart();
 });
@@ -316,6 +318,30 @@ $('#export').click(function(e) {
 });
 
 
+
+function setFilters() {
+    var nodesTypes = getNodesTypes();
+    var filters = d3.select('#filters');
+        filters.selectAll('*').remove();
+        filters.attr("width", width)
+        .attr("height",(((Math.floor(((nodesTypes.length*90)+60)/(width-45)))+1)*90));
+    for (var i in nodesTypes) {
+        var gs= filters.append('g')
+        .attr("transform", function(d) {
+        return "translate(" + (((i*90)+60) % (Math.floor((width-90)/90)*90)) + "," + ((Math.floor(((i*90)+60)/(width-90)))*90+45) + ")";
+    });
+        gs.append('circle')
+        .attr('r',40)
+        .style('fill',nodesTypes[i].color);
+
+        gs.append('text')
+        .text(nodesTypes[i].type)
+        .attr("text-anchor", "middle");
+        
+    }
+}
+
+
 /////////UTILS//////////
 
 function balanceTree() {
@@ -327,10 +353,10 @@ function balanceTree() {
         nodesOrigin[i].x = i * 40;
         nodesOrigin[i].y = 0;
         if (upCounter >= downCounter) {
-            downCounter+=originsWeight[i];
+            downCounter += originsWeight[i];
             setBranchDirection(nodesOrigin[i], -1, i);
         } else {
-            upCounter+=originsWeight[i];
+            upCounter += originsWeight[i];
             setBranchDirection(nodesOrigin[i], 1, i);
         }
     }
@@ -404,16 +430,23 @@ function getNodesOrigin() {
 
 }
 
-function addNewTypes() {
-    var nodeTypes = [];
+function getNodesTypes() {
+    var nodesTypes = [];
     for (var i in nodes) {
-        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodeTypes) == -1)
-            nodeTypes.push(nodes[i].type);
+        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodesTypes.map(function(elem){
+            return elem.type;
+        })) == -1)
+            nodesTypes.push(nodes[i]);
     }
+    return nodesTypes;
+}
+
+function addNewTypes() {
+    var nodesTypes = getNodesTypes();
     //kk
     document.getElementById("types").innerHTML = '';
-    for (var i = 0 in nodeTypes) {
-        var s = '<option value="' + nodeTypes[i] + '"/>';
+    for (var i = 0 in nodesTypes) {
+        var s = '<option value="' + nodesTypes[i].type + '"/>';
         document.getElementById("types").innerHTML += s;
     }
 }
