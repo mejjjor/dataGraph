@@ -247,7 +247,7 @@ $('#reload').click(function(e) {
     setFilters();
 })
 
-/////IMPORT / EXPORT////////////
+///// IMPORT / EXPORT ////////////
 
 $('#import').click(function(e) {
     dataImport = JSON.parse(document.getElementById("exchange").value);
@@ -317,13 +317,13 @@ $('#export').click(function(e) {
     document.getElementById("exchange").value = jsonString;
 });
 
-
+////////// FILTERS ////////////
 
 function setFilters() {
     var radius = 40;
-    var spacing = radius*2+10;
-    var offsetX=radius+20;
-    var offsetY=radius+5;
+    var spacing = radius * 2 + 10;
+    var offsetX = radius + 20;
+    var offsetY = radius + 5;
 
     var nodesTypes = getNodesTypes();
     var filters = d3.select('#filters');
@@ -331,23 +331,30 @@ function setFilters() {
     filters.attr("width", width)
         .attr("height", (((Math.floor(((nodesTypes.length * spacing) + offsetX) / (width - offsetY))) + 1) * spacing));
     for (var i in nodesTypes) {
+        nodesTypes[i].toggle = true;
         var gs = filters.append('g')
             .attr("transform", function(d) {
                 return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
+            })
+            .on('click', function() {
+                if (nodesTypes[i].toggle) {
+                    nodesTypes[i].toggle = !nodesTypes[i].toggle;
+                    this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
+                    this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)')
+                }else{
+                    nodesTypes[i].toggle = !nodesTypes[i].toggle;
+                    this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
+                    this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)')
+                }
             });
         gs.append('circle')
             .attr('r', radius)
-            .style('fill', nodesTypes[i].color)
-            .on('click', toggleType);
+            .style('fill', nodesTypes[i].color);
         gs.append('text')
             .text(nodesTypes[i].type)
             .attr("text-anchor", "middle");
 
     }
-}
-
-function toggleType() {
-    console.log("zzz");
 }
 
 /////////UTILS//////////
