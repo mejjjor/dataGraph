@@ -21,6 +21,11 @@ var mousedown_link = null;
 var mousedrag = null;
 var nodesOrigin;
 var colorSelectors;
+var nodesTypes = [];
+var linksDiff = [];
+var nodesDiff = [];
+var allNodes = [];
+var allLinks = [];
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -99,8 +104,8 @@ function restart() {
             d3.event.stopPropagation();
             modal.closeModal();
             spliceLinksForNode(d);
-            var n = nodes.indexOf(d);
-            nodes.splice(n, 1);
+            nodes.splice(nodes.indexOf(d), 1);
+            allNodes.splice(allNodes.indexOf(d), 1);
             restart();
         });
 
@@ -130,6 +135,7 @@ function restart() {
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
             links.splice(links.indexOf(d), 1);
+            allLinks.splice(allLinks.indexOf(d), 1);
             restart();
         });
     link.exit().remove();
@@ -173,10 +179,13 @@ function mousemove() {
 
 function mouseup() {
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
-        links.push({
+        var elem = {
             source: mousedown_node,
-            target: mouseup_node
-        });
+            target: mouseup_node,
+            base: true
+        };
+        allLinks.push(elem);
+        links.push(elem);
         restart();
     }
     if (!mousedown_node && !mousedown_link && !mousedrag) {
@@ -206,9 +215,11 @@ function dblclick() {
             description: "",
             dateBegin: "",
             dateEnd: "",
-            origin: false
-        },
-        n = nodes.push(newNode);
+            origin: false,
+            toggle: true
+        };
+    nodes.push(newNode);
+    allNodes.push(newNode);
 
     node_id++;
     restart();
@@ -253,27 +264,38 @@ $('#import').click(function(e) {
     dataImport = JSON.parse(document.getElementById("exchange").value);
 
     for (var j in dataImport.nodes) {
-        if (node_id <= dataImport.nodes[j].id)
-            node_id = dataImport.nodes[j].id + 1;
-        if (dataImport.nodes[j].dateBegin != "")
-            dataImport.nodes[j].dateBegin = new Date(dataImport.nodes[j].dateBegin);
+        var tempNode = dataImport.nodes[j];
+        if (node_id <= tempNode.id)
+            node_id = tempNode.id + 1;
+        if (tempNode.dateBegin != "")
+            tempNode.dateBegin = new Date(tempNode.dateBegin);
+        //kk
         else
-            dataImport.nodes[j].dateBegin = "";
-        if (dataImport.nodes[j].dateEnd != "")
-            dataImport.nodes[j].dateEnd = new Date(dataImport.nodes[j].dateEnd);
+            tempNode.dateBegin = "";
+        if (tempNode.dateEnd != "")
+            tempNode.dateEnd = new Date(tempNode.dateEnd);
         else
-            dataImport.nodes[j].dateEnd = "";
-        nodes.push(dataImport.nodes[j]);
+            tempNode.dateEnd = "";
+
+        if (tempNode.toggle)
+            nodes.push(tempNode);
+        else
+            nodesDiff.push(tempNode)
+        allNodes.push(tempNode);
     }
 
     for (var i in dataImport.links) {
-        var s = findNodePositionById(dataImport.links[i].source);
-        var t = findNodePositionById(dataImport.links[i].target);
+
         var tempLink = {
-            source: nodes[s],
-            target: nodes[t]
+            source: getNodesById(dataImport.links[i].source),
+            target: getNodesById(dataImport.links[i].target),
+            base: dataImport.links[i].base
         };
-        links.push(tempLink);
+        if (tempLink.source.toggle && tempLink.target.toggle)
+            links.push(tempLink);
+        else if (tempLink.base)
+            linksDiff.push(tempLink);
+        allLinks.push(tempLink);
     }
 
     getNodesOrigin();
@@ -290,25 +312,28 @@ $('#export').click(function(e) {
         links: []
     };
 
-    for (var i in nodes) {
+    for (var i in allNodes) {
         var tempNode = {
+            // ?? x:0,y:0 
             x: i * 10 % width,
             y: i * 10 % height,
-            id: nodes[i].id,
-            label: nodes[i].label,
-            type: nodes[i].type,
-            color: nodes[i].color,
-            description: nodes[i].description,
-            dateBegin: nodes[i].dateBegin,
-            dateEnd: nodes[i].dateEnd,
-            origin: nodes[i].origin
+            id: allNodes[i].id,
+            label: allNodes[i].label,
+            type: allNodes[i].type,
+            color: allNodes[i].color,
+            description: allNodes[i].description,
+            dateBegin: allNodes[i].dateBegin,
+            dateEnd: allNodes[i].dateEnd,
+            origin: allNodes[i].origin,
+            toggle: allNodes[i].toggle
         }
         dataExport.nodes.push(tempNode);
     }
-    for (var j in links) {
+    for (var j in allLinks) {
         var tempLink = {
             source: links[j].source.id,
-            target: links[j].target.id
+            target: links[j].target.id,
+            base: links[j].base
         }
         dataExport.links.push(tempLink);
     }
@@ -325,28 +350,27 @@ function setFilters() {
     var offsetX = radius + 20;
     var offsetY = radius + 5;
 
-    var nodesTypes = getNodesTypes();
+    buildNodesTypes();
+
     var filters = d3.select('#filters');
     filters.selectAll('*').remove();
     filters.attr("width", width)
         .attr("height", (((Math.floor(((nodesTypes.length * spacing) + offsetX) / (width - offsetY))) + 1) * spacing));
     for (var i in nodesTypes) {
-        nodesTypes[i].toggle = true;
         var gs = filters.append('g')
             .attr("transform", function(d) {
                 return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
             })
             .on('click', function() {
-                if (nodesTypes[i].toggle) {
-                    nodesTypes[i].toggle = !nodesTypes[i].toggle;
+                //kk A mettre dans le css
+                if (getTypeFilter(this.childNodes[1].innerHTML).toggle) {
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
                     this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
                     hideType(this.childNodes[1].innerHTML);
                 } else {
-                    nodesTypes[i].toggle = !nodesTypes[i].toggle;
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
                     this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
-                    showType(nodesTypes[i].type);
+                    showType(this.childNodes[1].innerHTML);
                 }
             });
         gs.append('circle')
@@ -355,52 +379,243 @@ function setFilters() {
         gs.append('text')
             .text(nodesTypes[i].type)
             .attr("text-anchor", "middle");
-
     }
+}
+
+function getTypeFilter(type) {
+    for (i in nodesTypes)
+        if (nodesTypes[i].type === type)
+            return nodesTypes[i];
 }
 
 function showType(type) {
 
+    var linksToAdd = [];
+    var nodesToAdd = [];
+    var linksToConstruct = {
+        node: "",
+        visibleTargets: [],
+        visibleSources: []
+    }
+    var nodesToAdd = [];
+    for (var i in nodesDiff) {
+        if (nodesDiff[i].type === type) {
+            linksToConstruct.node = nodesDiff[i];
+            linksToConstruct.visibleSources = getVisibleSources(nodesDiff[i]);
+            linksToConstruct.visibleTargets = getVisibleTargets(nodesDiff[i]);
+            nodesToAdd.push(i);
+        }
+    }
+
+    if (linksToConstruct.visibleSources.length === 0) {
+        for (var j in linksToConstruct.visibleTargets) {
+            addLinks(linksToConstruct.node, [], linksToConstruct.visibleTargets[j])
+        }
+    }
+    if (linksToConstruct.visibleTargets.length === 0) {
+        for (var i in linksToConstruct.visibleSources) {
+            addLinks(linksToConstruct.node, linksToConstruct.visibleSources[i], [])
+        }
+    }
+
+    for (var i in linksToConstruct.visibleSources) {
+        for (var j in linksToConstruct.visibleTargets) {
+            addLinks(linksToConstruct.node, linksToConstruct.visibleSources[i], linksToConstruct.visibleTargets[j])
+            removeLink(linksToConstruct.visibleSources[i].source, linksToConstruct.visibleTargets[j].target);
+        }
+    }
+
+    for (i = nodesToAdd.length - 1; i >= 0; i--)
+        nodes.push(nodesDiff.splice(nodesToAdd[i], 1)[0]);
+
+    for (var i in allNodes) {
+        if (allNodes[i].type === type)
+            allNodes[i].toggle = !allNodes[i].toggle;
+    }
+    restart()
 }
 
+function addLinks(node, nodeS, nodeT) {
+    linksToAdd = [];
+    linksToRemove = [];
+    if (nodeS.length != 0 && nodeT.length != 0) {
+        for (i in links) {
+            if (links[i].source === nodeS.source && links[i].target === nodeT.target) {
+                linksToRemove.push(i);
+
+                var elem = {
+                    source: nodeS.source,
+                    target: node
+                };
+                var l = getLinkInAllLinksByST(elem);
+                if (l === -1) {
+                    elem.base = false;
+                    linksToAdd.push(elem);
+                } else
+                    for (j in linksDiff)
+                        if (linksDiff[j] === l)
+                            linksToAdd.push(linksDiff.splice(j, 1)[0]);
+
+                var elem2 = {
+                    source: node,
+                    target: nodeT.target
+                };
+                var l = getLinkInAllLinksByST(elem2);
+                if (l === -1) {
+                    elem2.base = false;
+                    linksToAdd.push(elem2);
+                } else
+                    for (j in linksDiff)
+                        if (linksDiff[j] === l)
+                            linksToAdd.push(linksDiff.splice(j, 1)[0]);
+            }
+        }
+        for (i = linksToAdd.length - 1; i >= 0; i--)
+            links.push(linksToAdd[i]);
+
+    } else {
+        var elem;
+        if (nodeS.length === 0) {
+            elem = {
+                source: node,
+                target: nodeT.target
+            };
+            elem.base = getLinkInAllLinksByST(elem).base;
+        } else {
+            elem = {
+                source: nodeS.source,
+                target: node
+            };
+            elem.base = getLinkInAllLinksByST(elem).base;
+        }
+        if (elem.base) {
+            for (var i in linksDiff)
+                if (elem === linksDiff[i]) {
+                    linksToRemove.push(i);
+                    break;
+                }
+            linksDiff.splice(linksToRemove[0]);
+        } else {
+            allLinks.push(elem)
+        }
+        links.push(elem);;
+
+    }
+
+}
+
+function removeLink(nodeS, nodeT) {
+    for (i in allLinks) {
+        if (allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
+            allLinks.splice(i, 1);
+            break;
+        }
+    }
+    for (i in links) {
+        if (links[i].source === nodeS && links[i].target === nodeT) {
+            links.splice(i, 1);
+            break;
+        }
+    }
+}
+
+function getVisibleTargets(node) {
+    var targets = [];
+    for (j in allLinks) {
+        if (allLinks[j].source === node)
+            if (allLinks[j].target.toggle)
+                targets.push(allLinks[j]);
+            else
+                targets = targets.concat(getVisibleTargets(allLinks[j].target));
+    }
+    return targets;
+}
+
+function getVisibleSources(node) {
+    var sources = [];
+    for (j in allLinks) {
+        if (allLinks[j].target === node)
+            if (allLinks[j].source.toggle)
+                sources.push(allLinks[j]);
+            else
+                sources = sources.concat(getVisibleSources(allLinks[j].source));
+    }
+    return sources;
+}
+
+
 function hideType(type) {
-    var linksRemovable = [];
-    var nodesRemovable = [];
+    for (var i in allNodes) {
+        if (allNodes[i].type === type)
+            allNodes[i].toggle = !allNodes[i].toggle;
+    }
+    var linksToRemove = [];
+    var nodesToRemove = [];
     for (var i in nodes) {
         if (nodes[i].type === type) {
 
             var linkTargets = [];
             var linkSources = [];
             for (var j in links) {
-                if (links[j].target === nodes[i]){
+                if (links[j].target === nodes[i]) {
                     linkSources.push(links[j].source)
-                    linksRemovable.push(j);
+                    linksToRemove.push(j);
                 }
-                if (links[j].source === nodes[i]){
+                if (links[j].source === nodes[i]) {
                     linkTargets.push(links[j].target)
-                    linksRemovable.push(j);
+                    linksToRemove.push(j);
                 }
             }
             for (var k in linkSources) {
                 for (var l in linkTargets) {
-                    links.push({
-                        "source": linkSources[k],
-                        "target": linkTargets[l]
-                    })
+                    var elem = {
+                        source: linkSources[k],
+                        target: linkTargets[l],
+                        base: false
+                    };
+                    allLinks.push(elem);
+                    links.push(elem);
                 }
             }
-            nodesRemovable.push(i);
+            nodesToRemove.push(i);
         }
     }
-    for (var i=nodesRemovable.length-1;i>=0;i--) {
-        nodes.splice(nodesRemovable[i],1);
+    for (var i = nodesToRemove.length - 1; i >= 0; i--)
+        nodesDiff.push(nodes.splice(nodesToRemove[i], 1)[0]);
+
+    for (var i = linksToRemove.length - 1; i >= 0; i--) {
+        var l = links.splice(linksToRemove[i], 1)[0];
+        if (l.base)
+            linksDiff.push(l);
+        else {
+            for (var j in allLinks) {
+                if (allLinks[j] === l) {
+                    allLinks.splice(j, 1);
+                    break;
+                }
+            }
+        }
     }
-    for (var i=linksRemovable.length-1;i>=0;i--) {
-        links.splice(linksRemovable[i],1);
-    }
+
     restart();
 }
 /////////UTILS//////////
+
+function isLinkInAllLinks(link) {
+    for (var j in allLinks)
+        if (link === allLinks[j]) {
+            return true;
+        }
+    return false;
+}
+
+function getLinkInAllLinksByST(link) {
+    for (var j in allLinks)
+        if (link.source === allLinks[j].source && link.target === allLinks[j].target) {
+            return allLinks[j];
+        }
+    return -1;
+}
 
 function balanceTree() {
     var originsWeight = [];
@@ -440,11 +655,12 @@ function nodeCounter(node, c) {
     return c;
 }
 
-function findNodePositionById(id) {
-    for (j in nodes)
-        if (nodes[j].id === id)
-            return j;
+function getNodesById(id) {
+    for (j in allNodes)
+        if (allNodes[j].id === id)
+            return allNodes[j];
 }
+
 
 function spliceLinksForNode(node) {
     toSplice = links.filter(
@@ -488,19 +704,19 @@ function getNodesOrigin() {
 
 }
 
-function getNodesTypes() {
-    var nodesTypes = [];
-    for (var i in nodes) {
-        if (nodes[i].type != "" && $.inArray(nodes[i].type, nodesTypes.map(function(elem) {
+function buildNodesTypes() {
+    nodesTypes = [];
+    for (var i in allNodes) {
+        if (allNodes[i].type != "" && $.inArray(allNodes[i].type, nodesTypes.map(function(elem) {
                 return elem.type;
             })) == -1)
-            nodesTypes.push(nodes[i]);
+            nodesTypes.push(allNodes[i]);
     }
-    return nodesTypes;
+
 }
 
 function addNewTypes() {
-    var nodesTypes = getNodesTypes();
+    buildNodesTypes();
     //kk
     document.getElementById("types").innerHTML = '';
     for (var i = 0 in nodesTypes) {
