@@ -9,7 +9,7 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 
 var modal = require('./modal.js');
 require('./binding.js');
-var data = require('./data.json');
+var data = require('./data_s.json');
 
 var width = 1200,
     height = 800;
@@ -340,11 +340,13 @@ function setFilters() {
                 if (nodesTypes[i].toggle) {
                     nodesTypes[i].toggle = !nodesTypes[i].toggle;
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
-                    this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)')
-                }else{
+                    this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
+                    hideType(this.childNodes[1].innerHTML);
+                } else {
                     nodesTypes[i].toggle = !nodesTypes[i].toggle;
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
-                    this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)')
+                    this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
+                    showType(nodesTypes[i].type);
                 }
             });
         gs.append('circle')
@@ -357,6 +359,47 @@ function setFilters() {
     }
 }
 
+function showType(type) {
+
+}
+
+function hideType(type) {
+    var linksRemovable = [];
+    var nodesRemovable = [];
+    for (var i in nodes) {
+        if (nodes[i].type === type) {
+
+            var linkTargets = [];
+            var linkSources = [];
+            for (var j in links) {
+                if (links[j].target === nodes[i]){
+                    linkSources.push(links[j].source)
+                    linksRemovable.push(j);
+                }
+                if (links[j].source === nodes[i]){
+                    linkTargets.push(links[j].target)
+                    linksRemovable.push(j);
+                }
+            }
+            for (var k in linkSources) {
+                for (var l in linkTargets) {
+                    links.push({
+                        "source": linkSources[k],
+                        "target": linkTargets[l]
+                    })
+                }
+            }
+            nodesRemovable.push(i);
+        }
+    }
+    for (var i=nodesRemovable.length-1;i>=0;i--) {
+        nodes.splice(nodesRemovable[i],1);
+    }
+    for (var i=linksRemovable.length-1;i>=0;i--) {
+        links.splice(linksRemovable[i],1);
+    }
+    restart();
+}
 /////////UTILS//////////
 
 function balanceTree() {
