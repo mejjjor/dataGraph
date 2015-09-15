@@ -10,7 +10,7 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var modal = require('./modal.js');
 require('./binding.js');
 var tree = require('./treeNodes.js');
-var data = require('./data_s.json');
+var data = require('./data/data_s.json');
 
 var width = 1200,
     height = 800;
