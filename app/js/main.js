@@ -9,11 +9,11 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 
 var modal = require('./modal.js');
 require('./binding.js');
+var tree = require('./treeNodes.js');
 var data = require('./data_s.json');
 
 var width = 1200,
     height = 800;
-var node_id = 0;
 
 var mousedown_node = null;
 var mouseup_node = null;
@@ -21,11 +21,6 @@ var mousedown_link = null;
 var mousedrag = null;
 var nodesOrigin;
 var colorSelectors;
-var nodesTypes = [];
-var linksDiff = [];
-var nodesDiff = [];
-var allNodes = [];
-var allLinks = [];
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -39,7 +34,7 @@ var svg = d3.select("#graph")
     .append('svg:g')
     .on("mousemove", mousemove)
     .on("mouseup", mouseup)
-    .on("dblclick", dblclick);
+    .on("dblclick", createNode);
 
 svg.append('svg:rect')
     .attr('width', width * 3)
@@ -84,7 +79,6 @@ document.getElementById("exchange").value = JSON.stringify(data);
 restart();
 
 function restart() {
-    force.resume();
     getNodesOrigin();
 
     node = node.data(force.nodes(), function(d) {
@@ -107,9 +101,7 @@ function restart() {
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
             modal.closeModal();
-            spliceLinksForNode(d);
-            nodes.splice(nodes.indexOf(d), 1);
-            allNodes.splice(allNodes.indexOf(d), 1);
+            deleteNode(d);
             restart();
         });
 
@@ -139,7 +131,6 @@ function restart() {
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
             links.splice(links.indexOf(d), 1);
-            allLinks.splice(allLinks.indexOf(d), 1);
             restart();
         });
     link.exit().remove();
@@ -183,18 +174,15 @@ function mousemove() {
 
 function mouseup() {
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
-        var elem = {
-            source: mousedown_node,
-            target: mouseup_node,
-            base: true
-        };
-        allLinks.push(elem);
-        links.push(elem);
-        restart();
+        createLink();
     }
     if (!mousedown_node && !mousedown_link && !mousedrag) {
         restart();
     }
+    resetEvents();
+}
+
+function resetEvents(){
     mousedrag = null;
     mousedown_node = null;
     mouseup_node = null;
@@ -206,29 +194,37 @@ function mouseup() {
         .attr("y2", 0);
 }
 
-function dblclick() {
-    var point = d3.mouse(this),
-        newNode = {
-            x: point[0],
-            y: point[1],
-            id: node_id,
-            label: "label " + node_id,
-            labelSize: 0,
-            type: "",
-            color: "",
-            description: "",
-            dateBegin: "",
-            dateEnd: "",
-            origin: false,
-            toggle: true
-        };
-    nodes.push(newNode);
-    allNodes.push(newNode);
-
-    node_id++;
+function createNode() {
+    var point = d3.mouse(this);
+    nodes.push(tree.createNode(point[0], point[1]));
     restart();
+}
+
+function createLink() {
+    links.push(tree.createLink(mousedown_node, mouseup_node));
+    restart();
+}
+
+function deleteNode(node) {
+    for (i in node.sources) {
+        node.sources[i].targets.splice(node.sources[i].targets.indexOf(node), 1);
+        if (node.origin && node.sources[i].origin)
+            node.sources[i].sources.splice(node.sources[i].sources.indexOf(node), 1);
+    }
+    for (i in node.targets) {
+        node.targets[i].sources.splice(node.targets[i].sources.indexOf(node), 1);
+    }
+    spliceLinksForNode(node);
+    treeNodes.splice(treeNodes.indexOf(node), 1);
+    nodes.splice(nodes.indexOf(node), 1);
+}
+
+
+
+function computeOrigin() {
 
 }
+
 
 function click_node(node) {
 
@@ -386,235 +382,9 @@ function setFilters() {
     }
 }
 
-function getTypeFilter(type) {
-    for (i in nodesTypes)
-        if (nodesTypes[i].type === type)
-            return nodesTypes[i];
-}
-
-function showType(type) {
-
-    var linksToAdd = [];
-    var nodesToAdd = [];
-    var linksToConstruct = {
-        node: "",
-        visibleTargets: [],
-        visibleSources: []
-    }
-    var nodesToAdd = [];
-    for (var i in nodesDiff) {
-        if (nodesDiff[i].type === type) {
-            linksToConstruct.node = nodesDiff[i];
-            linksToConstruct.visibleSources = getVisibleSources(nodesDiff[i]);
-            linksToConstruct.visibleTargets = getVisibleTargets(nodesDiff[i]);
-            nodesToAdd.push(i);
-        }
-    }
-
-    if (linksToConstruct.visibleSources.length === 0) {
-        for (var j in linksToConstruct.visibleTargets) {
-            addLinks(linksToConstruct.node, [], linksToConstruct.visibleTargets[j])
-        }
-    }
-    if (linksToConstruct.visibleTargets.length === 0) {
-        for (var i in linksToConstruct.visibleSources) {
-            addLinks(linksToConstruct.node, linksToConstruct.visibleSources[i], [])
-        }
-    }
-
-    for (var i in linksToConstruct.visibleSources) {
-        for (var j in linksToConstruct.visibleTargets) {
-            addLinks(linksToConstruct.node, linksToConstruct.visibleSources[i], linksToConstruct.visibleTargets[j])
-            removeLink(linksToConstruct.visibleSources[i].source, linksToConstruct.visibleTargets[j].target);
-        }
-    }
-
-    for (i = nodesToAdd.length - 1; i >= 0; i--)
-        nodes.push(nodesDiff.splice(nodesToAdd[i], 1)[0]);
-
-    for (var i in allNodes) {
-        if (allNodes[i].type === type)
-            allNodes[i].toggle = !allNodes[i].toggle;
-    }
-    restart()
-}
-
-function addLinks(node, nodeS, nodeT) {
-    linksToAdd = [];
-    linksToRemove = [];
-    if (nodeS.length != 0 && nodeT.length != 0) {
-        for (i in links) {
-            if (links[i].source === nodeS.source && links[i].target === nodeT.target) {
-                linksToRemove.push(i);
-
-                var elem = {
-                    source: nodeS.source,
-                    target: node
-                };
-                var l = getLinkInAllLinksByST(elem);
-                if (l === -1) {
-                    elem.base = false;
-                    linksToAdd.push(elem);
-                } else
-                    for (j in linksDiff)
-                        if (linksDiff[j] === l)
-                            linksToAdd.push(linksDiff.splice(j, 1)[0]);
-
-                var elem2 = {
-                    source: node,
-                    target: nodeT.target
-                };
-                var l = getLinkInAllLinksByST(elem2);
-                if (l === -1) {
-                    elem2.base = false;
-                    linksToAdd.push(elem2);
-                } else
-                    for (j in linksDiff)
-                        if (linksDiff[j] === l)
-                            linksToAdd.push(linksDiff.splice(j, 1)[0]);
-            }
-        }
-        for (i = linksToAdd.length - 1; i >= 0; i--) {
-            links.push(linksToAdd[i]);
-            allLinks.push(linksToAdd[i]);
-        }
-
-    } else {
-        var elem;
-        if (nodeS.length === 0) {
-            elem = {
-                source: node,
-                target: nodeT.target
-            };
-            var e = getLinkInAllLinksByST(elem);
-            if (e === -1)
-                elem.base = false;
-            else
-                elem.base = getLinkInAllLinksByST(elem).base;
-        } else {
-            elem = {
-                source: nodeS.source,
-                target: node
-            };
-            var e = getLinkInAllLinksByST(elem);
-            if (e === -1)
-                elem.base = false;
-            else
-            elem.base = getLinkInAllLinksByST(elem).base;
-        }
-        if (elem.base) {
-            for (var i in linksDiff)
-                if (elem === linksDiff[i]) {
-                    linksToRemove.push(i);
-                    break;
-                }
-            linksDiff.splice(linksToRemove[0]);
-        } else {
-            allLinks.push(elem)
-        }
-
-        links.push(elem);;
-
-    }
-
-}
-
-function removeLink(nodeS, nodeT) {
-    for (i in allLinks) {
-        if (!allLinks[i].base && allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
-            allLinks.splice(i, 1);
-            break;
-        }
-    }
-    for (i in links) {
-        if (links[i].source === nodeS && links[i].target === nodeT) {
-            links.splice(i, 1);
-            break;
-        }
-    }
-}
-
-function getVisibleTargets(node) {
-    var targets = [];
-    for (j in allLinks) {
-        if (allLinks[j].source === node)
-            if (allLinks[j].target.toggle)
-                targets.push(allLinks[j]);
-            else
-                targets = targets.concat(getVisibleTargets(allLinks[j].target));
-    }
-    return targets;
-}
-
-function getVisibleSources(node) {
-    var sources = [];
-    for (j in allLinks) {
-        if (allLinks[j].target === node)
-            if (allLinks[j].source.toggle)
-                sources.push(allLinks[j]);
-            else
-                sources = sources.concat(getVisibleSources(allLinks[j].source));
-    }
-    return sources;
-}
-
-
-function hideType(type) {
-    for (var i in allNodes) {
-        if (allNodes[i].type === type)
-            allNodes[i].toggle = !allNodes[i].toggle;
-    }
-    var linksToRemove = [];
-    var nodesToRemove = [];
-    for (var i in nodes) {
-        if (nodes[i].type === type) {
-
-            var linkTargets = [];
-            var linkSources = [];
-            for (var j in links) {
-                if (links[j].target === nodes[i]) {
-                    linkSources.push(links[j].source)
-                    linksToRemove.push(j);
-                }
-                if (links[j].source === nodes[i]) {
-                    linkTargets.push(links[j].target)
-                    linksToRemove.push(j);
-                }
-            }
-            for (var k in linkSources) {
-                for (var l in linkTargets) {
-                    var elem = {
-                        source: linkSources[k],
-                        target: linkTargets[l],
-                        base: false
-                    };
-                    allLinks.push(elem);
-                    links.push(elem);
-                }
-            }
-            nodesToRemove.push(i);
-        }
-    }
-    for (var i = nodesToRemove.length - 1; i >= 0; i--)
-        nodesDiff.push(nodes.splice(nodesToRemove[i], 1)[0]);
-
-    for (var i = linksToRemove.length - 1; i >= 0; i--) {
-        var l = links.splice(linksToRemove[i], 1)[0];
-        if (l.base)
-            linksDiff.push(l);
-        else {
-            for (var j in allLinks) {
-                if (allLinks[j] === l) {
-                    allLinks.splice(j, 1);
-                    break;
-                }
-            }
-        }
-    }
-
-    restart();
-}
 /////////UTILS//////////
+
+
 
 function isLinkInAllLinks(link) {
     for (var j in allLinks)
@@ -670,13 +440,6 @@ function nodeCounter(node, c) {
     return c;
 }
 
-function getNodesById(id) {
-    for (j in allNodes)
-        if (allNodes[j].id === id)
-            return allNodes[j];
-}
-
-
 function spliceLinksForNode(node) {
     toSplice = links.filter(
         function(l) {
@@ -685,7 +448,6 @@ function spliceLinksForNode(node) {
     toSplice.map(
         function(l) {
             links.splice(links.indexOf(l), 1);
-            allLinks.splice(allLinks.indexOf(l), 1);
         });
 }
 
@@ -728,7 +490,6 @@ function buildNodesTypes() {
             })) == -1)
             nodesTypes.push(allNodes[i]);
     }
-
 }
 
 function addNewTypes() {
