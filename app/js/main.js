@@ -474,8 +474,10 @@ function addLinks(node, nodeS, nodeT) {
                             linksToAdd.push(linksDiff.splice(j, 1)[0]);
             }
         }
-        for (i = linksToAdd.length - 1; i >= 0; i--)
+        for (i = linksToAdd.length - 1; i >= 0; i--) {
             links.push(linksToAdd[i]);
+            allLinks.push(linksToAdd[i]);
+        }
 
     } else {
         var elem;
@@ -484,12 +486,20 @@ function addLinks(node, nodeS, nodeT) {
                 source: node,
                 target: nodeT.target
             };
-            elem.base = getLinkInAllLinksByST(elem).base;
+            var e = getLinkInAllLinksByST(elem);
+            if (e === -1)
+                elem.base = false;
+            else
+                elem.base = getLinkInAllLinksByST(elem).base;
         } else {
             elem = {
                 source: nodeS.source,
                 target: node
             };
+            var e = getLinkInAllLinksByST(elem);
+            if (e === -1)
+                elem.base = false;
+            else
             elem.base = getLinkInAllLinksByST(elem).base;
         }
         if (elem.base) {
@@ -502,6 +512,7 @@ function addLinks(node, nodeS, nodeT) {
         } else {
             allLinks.push(elem)
         }
+
         links.push(elem);;
 
     }
@@ -510,7 +521,7 @@ function addLinks(node, nodeS, nodeT) {
 
 function removeLink(nodeS, nodeT) {
     for (i in allLinks) {
-        if (!allLinks[i] && allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
+        if (!allLinks[i].base && allLinks[i].source === nodeS && allLinks[i].target === nodeT) {
             allLinks.splice(i, 1);
             break;
         }
