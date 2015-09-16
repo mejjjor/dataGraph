@@ -2,19 +2,35 @@ var nodeNextId = 0;
 var treeNodes = [];
 var links = [];
 var nodes = [];
+var filters = {
+    allowTypes: [],
+    excludeNames: [],
+    dateBegin: "",
+    dateEnd: "",
+    OriginNodes: []
+}
 module.exports = {
     getTreeNodes: function() {
         return treeNodes;
     },
-    getLinks: function() {
-        return links;
-    },
-    getNodes: function() {
-        return nodes;
-    },
     removeAllNodesFromTreeNodes: function() {
         treeNodes = [];
+        nodeNextId = 0;
     },
+
+    setFilterAllowTypes: function(types) {
+        filters.allowTypes = types;
+    },
+    setFilterExcludeNames: function(names) {
+        filters.allowNames = names;
+    },
+    setFilterDateBegin: function(dateBegin) {
+        filters.dateBegin = dateBegin;
+    },
+    setFilterDateEnd: function(dateEnd) {
+        filters.dateEnd = dateEnd;
+    },
+
     createNode: function() {
         return createNode(0, 0);
     },
@@ -75,7 +91,70 @@ module.exports = {
                 link.target.targets.splice(link.target.targets.indexOf(link.source), 1);
             }
         }
+    },
+    getGraph: function() {
+        nodes = [];
+        links = [];
+        var startingNodes = getStartingNodes();
+        for (var i in startingNodes) {
+            computeGraph(startingNodes[i], null, null, startingNodes[i]);
+        }
+        return {
+            nodes: nodes,
+            links: links
+        }
     }
+}
+
+function isShowable(node) {
+    if (filters.allowTypes.indexOf(node.type) != -1)
+        if (filters.excludeNames.indexOf(node.label) === -1)
+            if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd) {
+                for (var i in filters.OriginNodes) {
+                    if (filters.OriginNodes[i].label === node.label)
+                        if (filters.OriginNodes[i].type === node.type)
+                            if (filters.OriginNodes[i].dateBegin === node.dateBegin && filters.OriginNodes[i].dateEnd === node.dateEnd)
+                                return false;
+                }
+                return true;
+            }
+    return false;
+}
+
+function computeGraph(node, lastShowableNode, firstShowableNode, lastOriginNode) {
+    if (isShowable(node)) {
+        nodes.push(node);
+        if (lastShowableNode != null) {
+            links.push({
+                source: lastShowableNode,
+                target: node
+            });
+        } else {
+            firstShowableNode = node;
+        }
+        lastShowableNode = node;
+    }
+    for (var i in node.targets) {
+        newFirstNode = computeGraph(node.targets[i], lastShowableNode, firstShowableNode, lastOriginNode);
+        if (firstShowableNode != null && newFirstNode != firstShowableNode) {
+            links.push({
+                source: firstShowableNode,
+                target: newFirstNode
+            });
+        }
+        firstShowableNode = newFirstNode;
+    }
+    if (node.origin) {
+    	if (lastShowableNode != node)
+        	lastShowableNode = firstShowableNode;
+        //lastOriginNode = node;
+        for (var i in node.sources) {
+            if (node.sources[i] != lastOriginNode)
+                lastShowableNode = computeGraph(node.sources[i], lastShowableNode, firstShowableNode, node);
+        	//return lastShowableNode;
+        }
+    }
+    return firstShowableNode;
 }
 
 function computeOrigin() {
@@ -130,4 +209,29 @@ function getNodesOrigin() {
         }
     }
     return acc;
+}
+
+function getStartingNodes() {
+    var acc = [];
+    var nodesOrigin = getNodesOrigin();
+    var isNeeded = true;
+    while (isNeeded) {
+        for (var i in nodesOrigin) {
+            for (var j in nodesOrigin[i].sources)
+                throughBrothers(nodesOrigin[i].sources[j], nodesOrigin[i], nodesOrigin);
+            acc.push(nodesOrigin.splice(nodesOrigin.indexOf(nodesOrigin[i]), 1)[0]);
+            break;
+        }
+        if (nodesOrigin.length === 0)
+            isNeeded = false;
+    }
+    return acc;
+}
+
+function throughBrothers(node, previousNode, nodesOrigin) {
+    for (var j in node.sources) {
+        if (node.sources[j] != previousNode)
+            throughBrothers(node.sources[j], node, nodesOrigin)
+    }
+    nodesOrigin.splice(nodesOrigin.indexOf(node), 1)
 }
