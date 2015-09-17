@@ -59,7 +59,7 @@ describe("CRUD on tree", function() {
                 expect(nodeS.targets).to.include(nodeT);
                 expect(nodeS.targets.length).to.be.equal(1);
                 expect(nodeT.sources).to.include(nodeS);
-                expect(nodeT.sources.length).to.be.equal(1);
+                expect(nodeS.targets.length).to.be.equal(1);
                 expect(nodeT.targets).to.be.empty;
             });
             it("source is origin", function() {
@@ -82,22 +82,9 @@ describe("CRUD on tree", function() {
                 expect(nodeS.sources).to.include(nodeT);
                 expect(nodeS.sources.length).to.be.equal(1);
                 expect(nodeS.targets).to.be.empty;
-                expect(nodeT.sources).to.be.empty;
+                expect(nodeT.source).to.be.empty;
                 expect(nodeT.targets).to.include(nodeS);
                 expect(nodeT.targets.length).to.be.equal(1);
-            });
-            it("target and source are origin", function() {
-                var nodeS = tree.createNode();
-                var nodeT = tree.createNode();
-                nodeS.origin = true;
-                nodeT.origin = true;
-                tree.createLink(nodeS, nodeT);
-                expect(nodeS.sources).to.include(nodeT);
-                expect(nodeS.sources.length).to.be.equal(1);
-                expect(nodeS.targets).to.be.empty;;
-                expect(nodeT.sources).to.include(nodeS);
-                expect(nodeT.sources.length).to.be.equal(1);
-                expect(nodeT.targets).to.be.empty;
             });
         });
     });
@@ -174,19 +161,6 @@ describe("CRUD on tree", function() {
                 expect(nodeS.sources).to.be.empty;
                 expect(nodeS.targets).to.be.empty;
             });
-            it("both origin node", function() {
-                var nodeS = tree.createNode();
-                var nodeT = tree.createNode();
-                nodeS.origin = true;
-                nodeT.origin = true;
-                tree.createLink(nodeS, nodeT);
-                tree.deleteNode(nodeT);
-                var treeNodes = tree.getTreeNodes();
-                expect(treeNodes.length).to.be.equal(1);
-                expect(treeNodes[0]).to.be.equal(nodeS);
-                expect(nodeS.sources).to.be.empty;
-                expect(nodeS.targets).to.be.empty;
-            });
         });
     });
     describe("link delete", function() {
@@ -228,18 +202,6 @@ describe("CRUD on tree", function() {
             var nodeS = tree.createNode();
             var nodeT = tree.createNode();
             nodeT.origin = true;
-            var link = tree.createLink(nodeS, nodeT);
-            tree.deleteLink(link);
-            expect(nodeS.sources).to.be.empty;
-            expect(nodeS.targets).to.be.empty;
-            expect(nodeT.sources).to.be.empty;
-            expect(nodeT.targets).to.be.empty;
-        });
-        it("both nodes are origin", function() {
-            var nodeS = tree.createNode();
-            var nodeT = tree.createNode();
-            nodeT.origin = true;
-            nodeS.origin = true;
             var link = tree.createLink(nodeS, nodeT);
             tree.deleteLink(link);
             expect(nodeS.sources).to.be.empty;
