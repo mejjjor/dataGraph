@@ -90,9 +90,11 @@ module.exports = {
         if (treeNodes.length != 0) {
             var acc = [getNodeOrigin()];
             var lastNode = computeNode(acc[0], null);
+            var isVisible = (lastNode != null)
             while (acc.length != 0) {
                 var node = acc.splice(0, 1)[0];
-                var newAcc = computeGraph(node, lastNode);
+                var newAcc = computeGraph(node, lastNode,isVisible);
+                isVisible = true;
                 for (var i in newAcc) {
                     acc.push(newAcc[i]);
                 }
@@ -107,14 +109,14 @@ module.exports = {
     }
 }
 
-function computeGraph(node, lastNode) {
+function computeGraph(node, lastNode,isVisible) {
     var acc = [];
     for (var i in node.targets) {
         var newLastNode = computeNode(node.targets[i], lastNode);
-        if (lastNode != node && lastNode === null)
+        if (lastNode != node && !isVisible && lastNode != newLastNode)
             lastNode = newLastNode;
         if (newLastNode != node.targets[i]) {
-            var newAcc = computeGraph(node.targets[i], lastNode);
+            var newAcc = computeGraph(node.targets[i], lastNode,true);
             if (lastNode === null && newAcc.length > 0)
             	lastNode = newAcc[newAcc.length-1];
             for (var i in newAcc) {
