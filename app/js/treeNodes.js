@@ -1,3 +1,4 @@
+var _ = require('../../node_modules/underscore/underscore-min.js');
 var nodeNextId = 1;
 var treeNodes = [];
 var links = [];
@@ -10,6 +11,16 @@ var filters = {
     OriginNodes: []
 }
 module.exports = {
+    init: function(d3Nodes, d3Links) {
+        nodes = d3Nodes;
+        links = d3Links;
+    },
+    getData: function() {
+        return {
+            nodes: nodes,
+            links: links
+        };
+    },
     getTreeNodes: function() {
         return treeNodes;
     },
@@ -49,6 +60,8 @@ module.exports = {
             dateBegin: "",
             dateEnd: ""
         };
+        if (treeNodes.length === 0)
+            elem.origin = true;
         treeNodes.push(elem);
         nodeNextId++;
         return elem;;
@@ -79,21 +92,24 @@ module.exports = {
         for (var i in node.targets)
             node.targets[i].sources = [];
         treeNodes.splice(treeNodes.indexOf(node), 1);
+
     },
     deleteLink: function(link) {
         link.target.sources.splice(0, 1);
         link.source.targets.splice(link.source.targets.indexOf(link.target), 1);
     },
-    getGraph: function() {
-        nodes = [];
-        links = [];
+    setGraph: function() {
+        while (nodes.length > 0)
+            nodes.pop();
+        while (links.length > 0)
+            links.pop();
         if (treeNodes.length != 0) {
             var acc = [getNodeOrigin()];
             var lastNode = computeNode(acc[0], null);
             var isVisible = (lastNode != null)
             while (acc.length != 0) {
                 var node = acc.splice(0, 1)[0];
-                var newAcc = computeGraph(node, lastNode,isVisible);
+                var newAcc = computeGraph(node, lastNode, isVisible);
                 isVisible = true;
                 for (var i in newAcc) {
                     acc.push(newAcc[i]);
@@ -102,23 +118,32 @@ module.exports = {
                     lastNode = acc[0];
             }
         }
-        return {
-            nodes: nodes,
-            links: links
+    },
+    getNodesTypes: function() {
+        nodesTypes = [];
+        for (var i in treeNodes) {
+            if (treeNodes[i].type != "" && !_.contains(nodesTypes, treeNodes[i].type))
+                nodesTypes.push(treeNodes[i].type);
         }
+        return nodesTypes;
+    },
+    setNodeOrigin:function(node){
+    	for(i in treeNodes)
+    		if(treeNodes[i] != node)
+    			treeNodes[i].origin = false;
     }
 }
 
-function computeGraph(node, lastNode,isVisible) {
+function computeGraph(node, lastNode, isVisible) {
     var acc = [];
     for (var i in node.targets) {
         var newLastNode = computeNode(node.targets[i], lastNode);
         if (lastNode != node && !isVisible && lastNode != newLastNode)
             lastNode = newLastNode;
         if (newLastNode != node.targets[i]) {
-            var newAcc = computeGraph(node.targets[i], lastNode,true);
+            var newAcc = computeGraph(node.targets[i], lastNode, true);
             if (lastNode === null && newAcc.length > 0)
-            	lastNode = newAcc[newAcc.length-1];
+                lastNode = newAcc[newAcc.length - 1];
             for (var i in newAcc) {
                 acc.push(newAcc[i]);
             }
@@ -144,7 +169,7 @@ function computeNode(node, lastNode) {
 }
 
 function isShowable(node) {
-    if (filters.allowTypes.indexOf(node.type) != -1)
+    if (node.type == "" || filters.allowTypes.indexOf(node.type) != -1)
         if (filters.excludeNames.indexOf(node.label) === -1)
             if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd) {
                 return true;
@@ -154,7 +179,7 @@ function isShowable(node) {
 
 function computeOrigin() {
     var nodeOrigin = getNodeOrigin();
-    if (nodeOrigin === "") {
+    if (nodeOrigin === []) {
         //It's better if you give me an origin node
         nodeOrigin = treeNodes[0];
     }
@@ -181,5 +206,5 @@ function getNodeOrigin() {
     for (i in treeNodes)
         if (treeNodes[i].origin)
             return treeNodes[i];
-    return "";
+    return [];
 }

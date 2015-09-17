@@ -74,18 +74,6 @@ describe("CRUD on tree", function() {
                 expect(nodeT.sources.length).to.be.equal(1);
                 expect(nodeT.targets).to.be.empty;
             });
-            it("target is origin", function() {
-                var nodeS = tree.createNode();
-                var nodeT = tree.createNode();
-                nodeT.origin = true;
-                tree.createLink(nodeS, nodeT);
-                expect(nodeS.sources).to.include(nodeT);
-                expect(nodeS.sources.length).to.be.equal(1);
-                expect(nodeS.targets).to.be.empty;
-                expect(nodeT.source).to.be.empty;
-                expect(nodeT.targets).to.include(nodeS);
-                expect(nodeT.targets.length).to.be.equal(1);
-            });
         });
     });
     describe("Node delete", function() {

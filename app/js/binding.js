@@ -18,7 +18,7 @@ Vue.directive('content', {
     }
 });
 
-Vue.directive('colorized', {
+Vue.directive('fill', {
     update: function(value) {
         this.el.style.fill = value
     }

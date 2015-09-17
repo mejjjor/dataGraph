@@ -32,8 +32,8 @@ var svg = d3.select("#graph")
         }))
     .on("dblclick.zoom", null)
     .append('svg:g')
-    .on("mousemove", mousemove)
-    .on("mouseup", mouseup)
+    .on("mousemove", mouseMove)
+    .on("mouseup", mouseUp)
     .on("dblclick", createNode);
 
 svg.append('svg:rect')
@@ -71,6 +71,7 @@ var drag_line = svg.append("line")
     .attr("x2", 0)
     .attr("y2", 0);
 
+tree.init(nodes, links);
 
 var formNodeContent = document.getElementById("formNode").innerHTML;
 document.getElementById("exchange").value = JSON.stringify(data);
@@ -79,7 +80,6 @@ document.getElementById("exchange").value = JSON.stringify(data);
 restart();
 
 function restart() {
-    getNodesOrigin();
 
     node = node.data(force.nodes(), function(d) {
         return d.id;
@@ -97,17 +97,18 @@ function restart() {
         .on("mouseup", function(d) {
             mouseup_node = d;
         })
-        .on("click", click_node)
+        .on("click", clickNode)
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
             modal.closeModal();
-            deleteNode(d);
+            tree.deleteNode(d);
+            tree.setGraph();
             restart();
         });
 
     elem.append("circle")
         .attr("class", "circle")
-        .attr("v-colorized", "color")
+        .attr("v-fill", "color")
         .attr("r", 58);
 
     elem.append("text")
@@ -151,7 +152,7 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    var l = nodesOrigin.length;
+    var l = 0;
     if (l > 0) {
         nodesOrigin[0].x = 0;
         nodesOrigin[l - 1].x = l * 150;
@@ -162,7 +163,7 @@ function tick(e) {
     });
 }
 
-function mousemove() {
+function mouseMove() {
     if (mousedown_node) {
         drag_line
             .attr("x1", mousedown_node.x)
@@ -172,7 +173,7 @@ function mousemove() {
     }
 }
 
-function mouseup() {
+function mouseUp() {
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
         createLink();
     }
@@ -182,7 +183,7 @@ function mouseup() {
     resetEvents();
 }
 
-function resetEvents(){
+function resetEvents() {
     mousedrag = null;
     mousedown_node = null;
     mouseup_node = null;
@@ -226,12 +227,12 @@ function computeOrigin() {
 }
 
 
-function click_node(node) {
+function clickNode(node) {
 
     d3.event.stopPropagation();
 
     document.getElementById("formNode").innerHTML = formNodeContent;
-    addNewTypes(node);
+    addNewTypes();
     colorSelectors = document.getElementsByClassName("colorSelector");
     selectColor(node);
 
@@ -242,9 +243,7 @@ function click_node(node) {
 
     var unwatchType = linkTypeAndColor(vm, node);
 
-    var unwatchOrigin = vm.$watch('origin', function(newVal, oldVal) {
-        treeDirection(node, null);
-    });
+    var unwatchOrigin = watchOrigin(vm, node);
 
     modal.setBeforeCloseModal(function() {
         unwatchType();
@@ -384,24 +383,6 @@ function setFilters() {
 
 /////////UTILS//////////
 
-
-
-function isLinkInAllLinks(link) {
-    for (var j in allLinks)
-        if (link === allLinks[j]) {
-            return true;
-        }
-    return false;
-}
-
-function getLinkInAllLinksByST(link) {
-    for (var j in allLinks)
-        if (link.source === allLinks[j].source && link.target === allLinks[j].target) {
-            return allLinks[j];
-        }
-    return -1;
-}
-
 function balanceTree() {
     var originsWeight = [];
     var upCounter = 0;
@@ -482,24 +463,13 @@ function getNodesOrigin() {
 
 }
 
-function buildNodesTypes() {
-    nodesTypes = [];
-    for (var i in allNodes) {
-        if (allNodes[i].type != "" && $.inArray(allNodes[i].type, nodesTypes.map(function(elem) {
-                return elem.type;
-            })) == -1)
-            nodesTypes.push(allNodes[i]);
-    }
-}
-
 function addNewTypes() {
-    buildNodesTypes();
+    var nodesTypes = tree.getNodesTypes();
     //kk
     document.getElementById("types").innerHTML = '';
-    for (var i = 0 in nodesTypes) {
-        var s = '<option value="' + nodesTypes[i].type + '"/>';
-        document.getElementById("types").innerHTML += s;
-    }
+    for (var i in nodesTypes)
+        document.getElementById("types").innerHTML += '<option value="' + nodesTypes[i] + '"/>';
+
 }
 
 function selectColor(node) {
@@ -535,5 +505,12 @@ function linkTypeAndColor(vm, node) {
                 colorSelectors[k].className += " colorSelected";
             else
                 colorSelectors[k].className = colorSelectors[k].className.replace("colorSelected", "");
+    });
+}
+
+function watchOrigin(vm, node) {
+   return vm.$watch('origin', function(newVal, oldVal) {
+        if (newVal)
+            tree.setNodeOrigin(node);
     });
 }
