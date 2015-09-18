@@ -1,5 +1,5 @@
-svg{
-    background:black;
+svg {
+    background: black;
     font-family: 'Fugaz One', cursive;
     font-size: 12px;
 }
@@ -10,7 +10,7 @@ svg{
     margin-top: -5px;
 }
 
-#graph rect{
+#graph rect {
     fill: #073642;
 }
 
@@ -37,34 +37,106 @@ svg{
     stroke: #073642;
 }
 
-#colorYellow {
+#color1 {
     background-color: #B58900;
 }
 
-#colorOrange {
+#color2 {
+    background-color: #EB8A0E;
+}
+
+#color3 {
     background-color: #CB4B16;
 }
 
-#colorRed {
-    background-color: #DC322F;
+#color4 {
+    background-color: #C30A1E;
 }
 
-#colorMagenta {
-    background-color: #D33682;
+#color5 {
+    background-color: #773352;
 }
 
-#colorViolet {
-    background-color: #6C71C4;
+#color6 {
+    background-color: #00589A;
 }
 
-#colorBlue {
-    background-color: #268BD2;
+#color7 {
+    background-color: #00895D;
 }
 
-#colorCyan {
-    background-color: #2AA198;
+#color8 {
+    background-color: #3894B2;
 }
 
-#colorGreen {
+#color9 {
     background-color: #859900;
+}
+
+#color10 {
+    background-color: #0082C5;
+}
+
+#color11 {
+    background-color: #555B61;
+}
+
+#color12 {
+    background-color: #0D1D45;
+}
+
+#color13 {
+    background-color: #074474;
+}
+
+#color14 {
+    background-color: #7293A8;
+}
+
+#color15 {
+    background-color: #2B96A1;
+}
+
+#color16 {
+    background-color: #7BA448;
+}
+
+#color17 {
+    background-color: #929A96;
+}
+
+#color18 {
+    background-color: #939031;
+}
+
+#color19 {
+    background-color: #5D737F;
+}
+
+#color20 {
+    background-color: #334159;
+}
+
+#color21 {
+    background-color: #3B5449;
+}
+
+#color22 {
+    background-color: #B2BABB;
+}
+
+#color23 {
+    background-color: #136D74;
+}
+
+#color24 {
+    background-color: #F39EAB;
+}
+
+#color25 {
+    background-color: #F3D440;
+}
+
+#color26 {
+    background-color: #625F71;
 }

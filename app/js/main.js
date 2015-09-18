@@ -102,7 +102,6 @@ function restart() {
             d3.event.stopPropagation();
             modal.closeModal();
             tree.deleteNode(d);
-            tree.setGraph();
             restart();
         });
 
@@ -131,7 +130,7 @@ function restart() {
         })
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
-            links.splice(links.indexOf(d), 1);
+            tree.deleteLink(d);
             restart();
         });
     link.exit().remove();
@@ -152,11 +151,7 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    var l = 0;
-    if (l > 0) {
-        nodesOrigin[0].x = 0;
-        nodesOrigin[l - 1].x = l * 150;
-    }
+
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -175,7 +170,8 @@ function mouseMove() {
 
 function mouseUp() {
     if (mouseup_node && mousedown_node && mouseup_node != mousedown_node) {
-        createLink();
+        tree.createLink(mousedown_node, mouseup_node);
+        restart();
     }
     if (!mousedown_node && !mousedown_link && !mousedrag) {
         restart();
@@ -201,36 +197,23 @@ function createNode() {
     restart();
 }
 
-function createLink() {
-    links.push(tree.createLink(mousedown_node, mouseup_node));
-    restart();
-}
-
-function deleteNode(node) {
-    for (i in node.sources) {
-        node.sources[i].targets.splice(node.sources[i].targets.indexOf(node), 1);
-        if (node.origin && node.sources[i].origin)
-            node.sources[i].sources.splice(node.sources[i].sources.indexOf(node), 1);
-    }
-    for (i in node.targets) {
-        node.targets[i].sources.splice(node.targets[i].sources.indexOf(node), 1);
-    }
-    spliceLinksForNode(node);
-    treeNodes.splice(treeNodes.indexOf(node), 1);
-    nodes.splice(nodes.indexOf(node), 1);
-}
-
-
-
-function computeOrigin() {
-
-}
-
+// function deleteNode(node) {
+//     for (i in node.sources) {
+//         node.sources[i].targets.splice(node.sources[i].targets.indexOf(node), 1);
+//         if (node.origin && node.sources[i].origin)
+//             node.sources[i].sources.splice(node.sources[i].sources.indexOf(node), 1);
+//     }
+//     for (i in node.targets) {
+//         node.targets[i].sources.splice(node.targets[i].sources.indexOf(node), 1);
+//     }
+//     spliceLinksForNode(node);
+//     treeNodes.splice(treeNodes.indexOf(node), 1);
+//     nodes.splice(nodes.indexOf(node), 1);
+// }
 
 function clickNode(node) {
 
     d3.event.stopPropagation();
-
     document.getElementById("formNode").innerHTML = formNodeContent;
     addNewTypes();
     colorSelectors = document.getElementsByClassName("colorSelector");
@@ -240,9 +223,7 @@ function clickNode(node) {
         el: '#formNode',
         data: node
     });
-
     var unwatchType = linkTypeAndColor(vm, node);
-
     var unwatchOrigin = watchOrigin(vm, node);
 
     modal.setBeforeCloseModal(function() {
@@ -254,91 +235,23 @@ function clickNode(node) {
 }
 
 $('#reload').click(function(e) {
-    setFilters();
+    tree.showAllNodes();
+    restart();
 })
 
 ///// IMPORT / EXPORT ////////////
 
 $('#import').click(function(e) {
-    dataImport = JSON.parse(document.getElementById("exchange").value);
-
-    for (var j in dataImport.nodes) {
-        var tempNode = dataImport.nodes[j];
-        if (node_id <= tempNode.id)
-            node_id = tempNode.id + 1;
-        if (tempNode.dateBegin != "")
-            tempNode.dateBegin = new Date(tempNode.dateBegin);
-        //kk
-        else
-            tempNode.dateBegin = "";
-        if (tempNode.dateEnd != "")
-            tempNode.dateEnd = new Date(tempNode.dateEnd);
-        else
-            tempNode.dateEnd = "";
-
-        if (tempNode.toggle)
-            nodes.push(tempNode);
-        else
-            nodesDiff.push(tempNode)
-        allNodes.push(tempNode);
-    }
-
-    for (var i in dataImport.links) {
-
-        var tempLink = {
-            source: getNodesById(dataImport.links[i].source),
-            target: getNodesById(dataImport.links[i].target),
-            base: dataImport.links[i].base
-        };
-        if (tempLink.source.toggle && tempLink.target.toggle)
-            links.push(tempLink);
-        else if (tempLink.base)
-            linksDiff.push(tempLink);
-        allLinks.push(tempLink);
-    }
-
-    getNodesOrigin();
-    balanceTree();
-
-    setFilters();
-
+    var dataImport = document.getElementById("exchange").value;
+    tree.importData(dataImport);
+    //balanceTree();
     restart();
 });
 
 $('#export').click(function(e) {
-    var dataExport = {
-        nodes: [],
-        links: []
-    };
-
-    for (var i in allNodes) {
-        var tempNode = {
-            // ?? x:0,y:0 
-            x: i * 10 % width,
-            y: i * 10 % height,
-            id: allNodes[i].id,
-            label: allNodes[i].label,
-            type: allNodes[i].type,
-            color: allNodes[i].color,
-            description: allNodes[i].description,
-            dateBegin: allNodes[i].dateBegin,
-            dateEnd: allNodes[i].dateEnd,
-            origin: allNodes[i].origin,
-            toggle: allNodes[i].toggle
-        }
-        dataExport.nodes.push(tempNode);
-    }
-    for (var j in allLinks) {
-        var tempLink = {
-            source: links[j].source.id,
-            target: links[j].target.id,
-            base: links[j].base
-        }
-        dataExport.links.push(tempLink);
-    }
-
-    var jsonString = JSON.stringify(dataExport);
-    document.getElementById("exchange").value = jsonString;
+    var dataExport = tree.exportData();
+    document.getElementById("exchange").value = dataExport;
+    restart();
 });
 
 ////////// FILTERS ////////////
@@ -349,15 +262,15 @@ function setFilters() {
     var offsetX = radius + 20;
     var offsetY = radius + 5;
 
-    buildNodesTypes();
-
     var filters = d3.select('#filters');
     filters.selectAll('*').remove();
+    //height est calculé en fonction du nombre de filtre et la longueur disponible
     filters.attr("width", width)
         .attr("height", (((Math.floor(((nodesTypes.length * spacing) + offsetX) / (width - offsetY))) + 1) * spacing));
     for (var i in nodesTypes) {
         var gs = filters.append('g')
             .attr("transform", function(d) {
+                //Permet de repartir les cercles dans l'espace alloué
                 return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
             })
             .on('click', function() {
@@ -365,11 +278,13 @@ function setFilters() {
                 if (getTypeFilter(this.childNodes[1].innerHTML).toggle) {
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
                     this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
-                    hideType(this.childNodes[1].innerHTML);
+                    //tree.removeAllowType(this.childNodes[1].innerHTML);
+                    //hideType(this.childNodes[1].innerHTML);
+
                 } else {
                     this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
                     this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
-                    showType(this.childNodes[1].innerHTML);
+                    //showType(this.childNodes[1].innerHTML);
                 }
             });
         gs.append('circle')
@@ -414,54 +329,40 @@ function setBranchDirection(node, s, i) {
 function nodeCounter(node, c) {
     for (var j in links) {
         if (links[j].source.id === node.id && !links[j].target.origin) {
-            c++
+            c++;
             nodeCounter(links[j].target, c);
         }
     }
     return c;
 }
 
-function spliceLinksForNode(node) {
-    toSplice = links.filter(
-        function(l) {
-            return (l.source === node) || (l.target === node);
-        });
-    toSplice.map(
-        function(l) {
-            links.splice(links.indexOf(l), 1);
-        });
-}
+// function spliceLinksForNode(node) {
+//     toSplice = links.filter(
+//         function(l) {
+//             return (l.source === node) || (l.target === node);
+//         });
+//     toSplice.map(
+//         function(l) {
+//             links.splice(links.indexOf(l), 1);
+//         });
+// }
 
-function treeDirection(node, previousNode) {
-    for (var i in links) {
-        if (links[i].source === node || links[i].target === node) {
-            if (!links[i].source.origin && !links[i].target.origin) {
-                if (links[i].target === node && links[i].source != previousNode) {
-                    links[i].target = links[i].source;
-                    links[i].source = node;
-                }
-                if (links[i].source != previousNode)
-                    treeDirection(links[i].target, node);
-            }
-        }
-    }
-}
 
-function getNodesOrigin() {
-    nodesOrigin = [];
-    for (i in nodes) {
-        if (nodes[i].origin) {
-            nodesOrigin.push(nodes[i]);
-        }
-    }
-    nodesOrigin = nodesOrigin.sort(function(a, b) {
-        if (a.dateBegin < b.dateBegin)
-            return -1;
-        return 1;
+// function getNodesOrigin() {
+//     nodesOrigin = [];
+//     for (i in nodes) {
+//         if (nodes[i].origin) {
+//             nodesOrigin.push(nodes[i]);
+//         }
+//     }
+//     nodesOrigin = nodesOrigin.sort(function(a, b) {
+//         if (a.dateBegin < b.dateBegin)
+//             return -1;
+//         return 1;
 
-    });
+//     });
 
-}
+// }
 
 function addNewTypes() {
     var nodesTypes = tree.getNodesTypes();
@@ -509,7 +410,7 @@ function linkTypeAndColor(vm, node) {
 }
 
 function watchOrigin(vm, node) {
-   return vm.$watch('origin', function(newVal, oldVal) {
+    return vm.$watch('origin', function(newVal, oldVal) {
         if (newVal)
             tree.setNodeOrigin(node);
     });
