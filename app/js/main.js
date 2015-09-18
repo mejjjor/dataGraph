@@ -45,7 +45,7 @@ svg.append('svg:rect')
 
 d3.select('#filters')
     .attr('width', width)
-    .attr('height', 0);
+    .attr('height', 90);
 
 var force = d3.layout.force()
     .charge(function(d) {
@@ -254,6 +254,7 @@ $('#import').click(function(e) {
 $('#export').click(function(e) {
     var dataExport = tree.exportData();
     document.getElementById("exchange").value = dataExport;
+    setFilters();
 });
 
 ////////// FILTERS ////////////
@@ -263,6 +264,8 @@ function setFilters() {
     var spacing = radius * 2 + 10;
     var offsetX = radius + 20;
     var offsetY = radius + 5;
+
+    var nodesTypes = tree.getNodesTypes();
 
     var filters = d3.select('#filters');
     filters.selectAll('*').remove();
@@ -371,7 +374,7 @@ function addNewTypes() {
     //kk
     document.getElementById("types").innerHTML = '';
     for (var i in nodesTypes)
-        document.getElementById("types").innerHTML += '<option value="' + nodesTypes[i] + '"/>';
+        document.getElementById("types").innerHTML += '<option value="' + nodesTypes[i].type + '"/>';
 
 }
 
@@ -384,7 +387,7 @@ function selectColor(node) {
         colorSelectors[i].onclick = function(event) {
             //Unselect all color
             for (var j = 0; j < colorSelectors.length; j++)
-                colorSelectors[j].className = colorSelectors[j].className.replace("colorSelected", "");
+                colorSelectors[j].className = colorSelectors[j].className.replace(" colorSelected", "");
             //Select color clicked
             event.target.className += " colorSelected";
             //Change every node color with this type
@@ -401,13 +404,15 @@ function linkTypeAndColor(vm, node) {
     //sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
     return vm.$watch('type', function(newVal, oldVal) {
         for (var j in nodes)
-            if (nodes[j].type === newVal)
+            if (nodes[j].type === newVal){
                 node.color = nodes[j].color;
+                //break;
+            }
         for (var k = 0; k < colorSelectors.length; k++)
-            if (getComputedStyle(colorSelectors[k]).backgroundColor === nodes[j].color)
+            if (getComputedStyle(colorSelectors[k]).backgroundColor === node.color)
                 colorSelectors[k].className += " colorSelected";
             else
-                colorSelectors[k].className = colorSelectors[k].className.replace("colorSelected", "");
+                colorSelectors[k].className = colorSelectors[k].className.replace(" colorSelected", "");
     });
 }
 

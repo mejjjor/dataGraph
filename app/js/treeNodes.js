@@ -138,7 +138,7 @@ module.exports = {
         nodesTypes = [];
         for (var i in treeNodes) {
             if (treeNodes[i].type != "" && !_.contains(nodesTypes, treeNodes[i].type))
-                nodesTypes.push(treeNodes[i].type);
+                nodesTypes.push({type:treeNodes[i].type,color:treeNodes[i].color});
         }
         return nodesTypes;
     },
