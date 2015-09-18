@@ -49,18 +49,14 @@ module.exports = {
             if (nodesTypes[i].type === type)
                 nodesTypes[i].activate = false;
         }
-        filters.allowTypes = _.map(nodesTypes, function(e) {
-            if (e.activate) return e.type;
-        });
+        allowTypes();
     },
     showType: function(type) {
         for (var i = 0; i < nodesTypes.length; i++) {
             if (nodesTypes[i].type === type)
                 nodesTypes[i].activate = true;
         }
-        filters.allowTypes = _.map(nodesTypes, function(e) {
-            if (e.activate) return e.type;
-        });
+        allowTypes();
     },
 
     createNode: function() {
@@ -72,6 +68,7 @@ module.exports = {
             x: x,
             y: y,
             origin: false,
+            end: false,
             sources: [],
             targets: [],
             label: "label " + nodeNextId,
@@ -181,7 +178,7 @@ module.exports = {
     exportData: function() {
         var data = {
             nodes: [],
-            filters: filters
+            filters: nodesTypes
         };
         for (var i = 0; i < treeNodes.length; i++) {
             var sources = [];
@@ -212,8 +209,8 @@ module.exports = {
     },
     importData: function(data) {
         var dataImport = JSON.parse(data);
-        filters = dataImport.filters;
-
+        nodesTypes = dataImport.filters;
+        allowTypes();
         for (var i = 0; i < dataImport.nodes.length; i++) {
             var tempNode = dataImport.nodes[i];
             if (nodeNextId <= tempNode.id)
@@ -357,4 +354,10 @@ function getNodeOrigin() {
         if (treeNodes[i].origin)
             return treeNodes[i];
     return [];
+}
+
+function allowTypes(){
+	filters.allowTypes = _.map(nodesTypes, function(e) {
+            if (e.activate) return e.type;
+        });
 }

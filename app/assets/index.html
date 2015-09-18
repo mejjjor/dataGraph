@@ -15,7 +15,7 @@
 
 <body>
     <div>
-        <button id="reload">Reload</button>
+        <button id="reload">show hidden nodes</button>
         <button id="export">Export</button>
         <input type="text" id="exchange" />
         <button id="import">Import</button>
@@ -66,7 +66,7 @@
                     <label for="formNodeStart">Start :</label>
                     <input id="formNodeStart" type="checkbox" v-model="origin" />
                     <label for="formNodeEnd">End :</label>
-                    <input id="formNodeEnd" type="checkbox" />
+                    <input id="formNodeEnd" type="checkbox" v-model="end" />
                     <button id="helpEndNode" class="help">?</button>
                 </div>
                 <label class="fullWidth" for="formNodeDescription">Description :</label>

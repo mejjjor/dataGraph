@@ -158,6 +158,12 @@ function tick(e) {
             return d.target.y;
         });
 
+        for(var i=0;i<nodes.length;i++){
+            if(nodes[i].origin)
+                nodes[i].x = 0;
+            if(nodes[i].end)
+                nodes[i].x = 100;
+        }
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -236,9 +242,10 @@ $('#reload').click(function(e) {
 $('#import').click(function(e) {
     var dataImport = document.getElementById("exchange").value;
     tree.importData(dataImport);
-    tree.showAllNodes();
+    //tree.showAllNodes();
     //balanceTree();
     restart();
+    setFilters();
 });
 
 $('#export').click(function(e) {
@@ -277,20 +284,23 @@ function setFilters() {
         .on('click', function(d) {
             //kk A mettre dans le css
             if (d.activate) {
-                d.color = d3.rgb(d.color).darker(2);
+                d.color = d3.rgb(d.color).darker(2).toString() ;
                 this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
                 tree.hideType(this.childNodes[1].innerHTML);
                 tree.setGraph();
 
             } else {
-                //BUG ! it's not the inverse of darker(2) for all colors !
-                //d.color = d3.rgb(d.color).brighter(2);
+                
                 this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
                 tree.showType(this.childNodes[1].innerHTML);
                 tree.setGraph();
+                //BUG ! it's not the inverse of darker(2) for all colors !
+                //d.color = d3.rgb(d.color).brighter(2).toString();
                 for(var i=0; i<nodes.length;i++){
-                    if(nodes[i].type === d.type)
+                    if(nodes[i].type === d.type){
                         d.color = nodes[i].color;
+                        break;
+                    }
                 }
             }
             restart();
