@@ -3,6 +3,7 @@ var nodeNextId = 1;
 var treeNodes = [];
 var links = [];
 var nodes = [];
+var nodesTypes = [];
 var filters = {
     allowTypes: [],
     excludeNames: [],
@@ -34,10 +35,6 @@ module.exports = {
                 nodes.push(treeNodes[i]);
         }
     },
-
-    setFilterAllowTypes: function(types) {
-        filters.allowTypes = types;
-    },
     setFilterExcludeNames: function(names) {
         filters.allowNames = names;
     },
@@ -46,6 +43,18 @@ module.exports = {
     },
     setFilterDateEnd: function(dateEnd) {
         filters.dateEnd = dateEnd;
+    },
+    hideType: function(type) {
+        for (var i = 0; i < nodesTypes.length; i++) {
+            if (nodesTypes[i].type === type)
+                nodesTypes[i].activate = false;
+        }
+    },
+    showType: function(type) {
+        for (var i = 0; i < nodesTypes.length; i++) {
+            if (nodesTypes[i].type === type)
+                nodesTypes[i].activate = true;
+        }
     },
 
     createNode: function() {
@@ -61,7 +70,7 @@ module.exports = {
             targets: [],
             label: "label " + nodeNextId,
             type: "",
-            color: "",
+            color: "rgb(114, 147, 168)",
             description: "",
             dateBegin: "",
             dateEnd: ""
@@ -109,17 +118,13 @@ module.exports = {
             }), 1);
             node.sources[0].targets.splice(node.sources[0].targets.indexOf(node), 1);
         }
-        var linksToRemove = [];
         for (var i = 0; i < node.targets.length; i++) {
-            for (var j = links.length-1; j >=0; j--) {
+            for (var j = links.length - 1; j >= 0; j--) {
                 if (links[j].source === node && links[j].target === node.targets[i]) {
-                    links.splice(j,1);
+                    links.splice(j, 1);
                 }
             }
-            // links.splice(links.indexOf({
-            //     source: node,
-            //     target: node.targets[i]
-            // }), 1);
+            node.targets[i].sources.splice(0, 1);
         }
         nodes.splice(nodes.indexOf(node), 1);
         treeNodes.splice(treeNodes.indexOf(node), 1);
@@ -135,10 +140,30 @@ module.exports = {
         _setGraph();
     },
     getNodesTypes: function() {
-        nodesTypes = [];
-        for (var i in treeNodes) {
-            if (treeNodes[i].type != "" && !_.contains(nodesTypes, treeNodes[i].type))
-                nodesTypes.push({type:treeNodes[i].type,color:treeNodes[i].color});
+        var tempNodesTypes = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (treeNodes[i].type != "" && !_.contains(tempNodesTypes, treeNodes[i].type))
+                tempNodesTypes.push({
+                    type: treeNodes[i].type,
+                    color: treeNodes[i].color,
+                    activate: true
+                });
+        }
+        var tempNodesTypesType = _.map(tempNodesTypes, function(e) {
+            return e.type
+        });
+
+        for (j = nodesTypes.length - 1; j >= 0; j--) {
+            if (!_.contains(tempNodesTypesType, nodesTypes[j].type))
+                nodesTypes.splice(j, 1);
+        }
+        var nodesTypesType = _.map(nodesTypes, function(e) {
+            return e.type
+        });
+        for (j = tempNodesTypes.length - 1; j >= 0; j--) {
+
+            if (!_.contains(nodesTypesType, tempNodesTypes[j].type))
+                nodesTypes.push(tempNodesTypes[j]);
         }
         return nodesTypes;
     },
@@ -281,11 +306,12 @@ function computeNode(node, lastNode) {
 }
 
 function isShowable(node) {
-    if (node.type == "" || filters.allowTypes.indexOf(node.type) != -1)
-        if (filters.excludeNames.indexOf(node.label) === -1)
-            if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd) {
-                return true;
-            }
+    if (node.type == "" || _.map(nodesTypes, function(e) {
+            if (e.type === node.type) return e.activate;
+        })[0])
+    // if (filters.excludeNames.indexOf(node.label) === -1)
+    //     if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd)
+        return true;
     return false;
 }
 

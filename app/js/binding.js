@@ -9,12 +9,6 @@ Vue.directive('content', {
             this.el.innerHTML += '<tspan x="0" dy="' + j + 'em">' + valSplited[i] + '</tspan>';
         }
         this.el.setAttribute("y", valSplited.length == 0 ? 4 : (-6 * (valSplited.length - 1)));
-        var sibling = this.el.previousSibling;
-        var dim = this.el.getBBox();
-        sibling.style.width = dim.width;
-        sibling.style.height = dim.height;
-        sibling.style.x = dim.x;
-        sibling.style.y = dim.y;
     }
 });
 

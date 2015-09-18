@@ -5,6 +5,7 @@
 
 var d3 = require('../../node_modules/d3/d3.min.js');
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
+var _ = require('../../node_modules/underscore/underscore-min.js');
 var Vue = require('../../node_modules/vue/dist/vue.min.js');
 
 var modal = require('./modal.js');
@@ -23,6 +24,7 @@ var mousedown_link = null;
 var mousedrag = null;
 var nodesOrigin;
 var colorSelectors;
+var nodesTypes;
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -43,7 +45,7 @@ svg.append('svg:rect')
     .attr('height', height * 2)
     .attr('transform', 'translate(-600,-600)');
 
-d3.select('#filters')
+var filters = d3.select('#filters')
     .attr('width', width)
     .attr('height', 90);
 
@@ -64,7 +66,8 @@ var force = d3.layout.force()
 var nodes = force.nodes(),
     links = force.links(),
     node = svg.selectAll("g"),
-    link = svg.selectAll(".link");
+    link = svg.selectAll(".link"),
+    filter = filters.selectAll("g");
 
 var drag_line = svg.append("line")
     .attr("class", "drag_line")
@@ -104,6 +107,7 @@ function restart() {
             d3.event.stopPropagation();
             modal.closeModal();
             tree.deleteNode(d);
+            setFilters();
             restart();
         });
 
@@ -199,20 +203,6 @@ function createNode() {
     restart();
 }
 
-// function deleteNode(node) {
-//     for (i in node.sources) {
-//         node.sources[i].targets.splice(node.sources[i].targets.indexOf(node), 1);
-//         if (node.origin && node.sources[i].origin)
-//             node.sources[i].sources.splice(node.sources[i].sources.indexOf(node), 1);
-//     }
-//     for (i in node.targets) {
-//         node.targets[i].sources.splice(node.targets[i].sources.indexOf(node), 1);
-//     }
-//     spliceLinksForNode(node);
-//     treeNodes.splice(treeNodes.indexOf(node), 1);
-//     nodes.splice(nodes.indexOf(node), 1);
-// }
-
 function clickNode(node) {
 
     d3.event.stopPropagation();
@@ -265,40 +255,59 @@ function setFilters() {
     var offsetX = radius + 20;
     var offsetY = radius + 5;
 
-    var nodesTypes = tree.getNodesTypes();
+    nodesTypes = tree.getNodesTypes();
+    filter = filter.data([]);
+    filter.exit().remove();
+    filter = filter.data(nodesTypes);
 
-    var filters = d3.select('#filters');
-    filters.selectAll('*').remove();
     //height est calculé en fonction du nombre de filtre et la longueur disponible
     filters.attr("width", width)
         .attr("height", (((Math.floor(((nodesTypes.length * spacing) + offsetX) / (width - offsetY))) + 1) * spacing));
-    for (var i in nodesTypes) {
-        var gs = filters.append('g')
-            .attr("transform", function(d) {
-                //Permet de repartir les cercles dans l'espace alloué
-                return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
-            })
-            .on('click', function() {
-                //kk A mettre dans le css
-                if (getTypeFilter(this.childNodes[1].innerHTML).toggle) {
-                    this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
-                    this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
-                    //tree.removeAllowType(this.childNodes[1].innerHTML);
-                    //hideType(this.childNodes[1].innerHTML);
+    //for (var i in nodesTypes) {
 
-                } else {
-                    this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
-                    this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
-                    //showType(this.childNodes[1].innerHTML);
-                }
+    filter.exit().remove();
+    var elem = filter.enter().append('g')
+        .attr('id', function(d) {
+            return 'type_' + d.type
+        })
+        .attr("transform", function(d, i) {
+            //Permet de repartir les cercles dans l'espace alloué
+            return "translate(" + (((i * spacing) + offsetX) % (Math.floor((width - spacing) / spacing) * spacing)) + "," + ((Math.floor(((i * spacing) + offsetX) / (width - spacing))) * spacing + offsetY) + ")";
+        })
+        .on('click', function(d) {
+            //kk A mettre dans le css
+            if (d.activate) {
+                //this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
+                this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
+                tree.hideType(this.childNodes[1].innerHTML);
+                tree.setGraph();
+
+            } else {
+                //this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
+                this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
+                tree.showType(this.childNodes[1].innerHTML);
+                tree.setGraph();
+            }
+            restart();
+        });
+    elem.append('circle')
+        .attr('r', radius)
+        .attr('v-fill', 'color')
+        .each(function(d) {
+            new Vue({
+                el: "#type_" + d.type,
+                data: d
             });
-        gs.append('circle')
-            .attr('r', radius)
-            .style('fill', nodesTypes[i].color);
-        gs.append('text')
-            .text(nodesTypes[i].type)
-            .attr("text-anchor", "middle");
-    }
+        });
+
+    elem.append('text')
+        .text(function(d) {
+            return d.type;
+        })
+        .attr("text-anchor", "middle")
+        .style('fill', function(d) {
+            return d.activate ? 'rgb(0,0,0)' : 'rgb(89,89,89)';
+        });
 }
 
 /////////UTILS//////////
@@ -341,36 +350,8 @@ function nodeCounter(node, c) {
     return c;
 }
 
-// function spliceLinksForNode(node) {
-//     toSplice = links.filter(
-//         function(l) {
-//             return (l.source === node) || (l.target === node);
-//         });
-//     toSplice.map(
-//         function(l) {
-//             links.splice(links.indexOf(l), 1);
-//         });
-// }
-
-
-// function getNodesOrigin() {
-//     nodesOrigin = [];
-//     for (i in nodes) {
-//         if (nodes[i].origin) {
-//             nodesOrigin.push(nodes[i]);
-//         }
-//     }
-//     nodesOrigin = nodesOrigin.sort(function(a, b) {
-//         if (a.dateBegin < b.dateBegin)
-//             return -1;
-//         return 1;
-
-//     });
-
-// }
-
 function addNewTypes() {
-    var nodesTypes = tree.getNodesTypes();
+    nodesTypes = tree.getNodesTypes();
     //kk
     document.getElementById("types").innerHTML = '';
     for (var i in nodesTypes)
@@ -394,17 +375,23 @@ function selectColor(node) {
             for (var j in nodes)
                 if (nodes[j].type === node.type)
                     nodes[j].color = getComputedStyle(event.target).backgroundColor;
+                //change filters color
+            nodesTypes = tree.getNodesTypes();
+            for (var j = 0; j < nodesTypes.length; j++) {
+                if (nodesTypes[j].type === node.type) {
+                    nodesTypes[j].color = getComputedStyle(event.target).backgroundColor;
+                    break;
+                }
+            }
         };
     }
 }
 
 function linkTypeAndColor(vm, node) {
-    //BUG: sur 1 node -> 1 type, une couleur
-    //sur un autre node -> 1 autre type, une autre couleur
-    //sur le 1er node, on choisit le type du 2eme node puis on change la couleur => 2 couleurs selectionnées
     return vm.$watch('type', function(newVal, oldVal) {
+        setFilters();
         for (var j in nodes)
-            if (nodes[j].type === newVal){
+            if (nodes[j].type === newVal) {
                 node.color = nodes[j].color;
                 //break;
             }

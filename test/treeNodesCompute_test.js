@@ -2,10 +2,6 @@ var expect = require('chai').expect;
 var tree = require('../app/js/treeNodes.js');
 
 describe("computeGraph", function() {
-    before(function() {
-        tree.setFilterAllowTypes(["visible", "showable"]);
-        tree.setFilterExcludeNames(["hidden", "notSee"]);
-    });
     beforeEach(function() {
         tree.removeAllNodesFromTreeNodes();
     });
