@@ -277,16 +277,21 @@ function setFilters() {
         .on('click', function(d) {
             //kk A mettre dans le css
             if (d.activate) {
-                //this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).darker(2));
+                d.color = d3.rgb(d.color).darker(2);
                 this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
                 tree.hideType(this.childNodes[1].innerHTML);
                 tree.setGraph();
 
             } else {
-                //this.childNodes[0].style.setProperty('fill', d3.rgb(this.childNodes[0].style.getPropertyValue('fill')).brighter(2));
+                //BUG ! it's not the inverse of darker(2) for all colors !
+                //d.color = d3.rgb(d.color).brighter(2);
                 this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
                 tree.showType(this.childNodes[1].innerHTML);
                 tree.setGraph();
+                for(var i=0; i<nodes.length;i++){
+                    if(nodes[i].type === d.type)
+                        d.color = nodes[i].color;
+                }
             }
             restart();
         });

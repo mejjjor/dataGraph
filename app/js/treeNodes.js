@@ -49,12 +49,18 @@ module.exports = {
             if (nodesTypes[i].type === type)
                 nodesTypes[i].activate = false;
         }
+        filters.allowTypes = _.map(nodesTypes, function(e) {
+            if (e.activate) return e.type;
+        });
     },
     showType: function(type) {
         for (var i = 0; i < nodesTypes.length; i++) {
             if (nodesTypes[i].type === type)
                 nodesTypes[i].activate = true;
         }
+        filters.allowTypes = _.map(nodesTypes, function(e) {
+            if (e.activate) return e.type;
+        });
     },
 
     createNode: function() {
@@ -306,9 +312,8 @@ function computeNode(node, lastNode) {
 }
 
 function isShowable(node) {
-    if (node.type == "" || _.map(nodesTypes, function(e) {
-            if (e.type === node.type) return e.activate;
-        })[0])
+
+    if (node.type == "" || _.contains(filters.allowTypes, node.type))
     // if (filters.excludeNames.indexOf(node.label) === -1)
     //     if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd)
         return true;
