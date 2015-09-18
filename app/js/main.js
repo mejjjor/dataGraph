@@ -14,6 +14,8 @@ var data = require('./data/data_s.json');
 
 var width = 1200,
     height = 800;
+// // var width = window.innerWidth-20,
+//     height = window.innerHeight-70;
 
 var mousedown_node = null;
 var mouseup_node = null;
@@ -244,6 +246,7 @@ $('#reload').click(function(e) {
 $('#import').click(function(e) {
     var dataImport = document.getElementById("exchange").value;
     tree.importData(dataImport);
+    tree.showAllNodes();
     //balanceTree();
     restart();
 });
@@ -251,7 +254,6 @@ $('#import').click(function(e) {
 $('#export').click(function(e) {
     var dataExport = tree.exportData();
     document.getElementById("exchange").value = dataExport;
-    restart();
 });
 
 ////////// FILTERS ////////////
