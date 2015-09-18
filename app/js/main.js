@@ -158,11 +158,12 @@ function tick(e) {
             return d.target.y;
         });
 
+        var l = tree.computeOssature();
         for(var i=0;i<nodes.length;i++){
             if(nodes[i].origin)
-                nodes[i].x = 0;
+                nodes[i].x = 200;
             if(nodes[i].end)
-                nodes[i].x = 100;
+                nodes[i].x = 200+l*200;
         }
 
     node.attr("transform", function(d) {

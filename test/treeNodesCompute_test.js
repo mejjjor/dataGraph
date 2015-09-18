@@ -281,6 +281,32 @@ describe("computeGraph", function() {
         });
         expect(graph.links.length).to.be.equal(1);
     });
+    it("1VO-2H-3V / 2H-4V", function() {
+        var node1 = tree.createNode();
+        var node2 = tree.createNode();
+        var node3 = tree.createNode();
+        var node4 = tree.createNode();
+        node1.origin = true;
+        node2.type = "hidden";
+        tree.createLink(node1, node2);
+        tree.createLink(node2, node3);
+        tree.createLink(node2, node4);
+        tree.setGraph();
+        var graph = tree.getData();
+        expect(graph.nodes).to.contains(node1);
+        expect(graph.nodes).to.contains(node3);
+        expect(graph.nodes).to.contains(node4);
+        expect(graph.nodes.length).to.be.equal(3);
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node3
+        });
+        expect(graph.links).to.contains({
+            source: node3,
+            target: node4
+        });
+        expect(graph.links.length).to.be.equal(2);
+    });
     it("1VO-2H-3V / 1VO-4H / 4H-5V", function() {
         var node1 = tree.createNode();
         var node2 = tree.createNode();
@@ -343,7 +369,7 @@ describe("computeGraph", function() {
         });
         expect(graph.links.length).to.be.equal(3);
     });
-it("1HO-2V-3H / 1HO-4V / 1H-5V / 4V-6V", function() {
+    it("1HO-2V-3H / 1HO-4V / 1H-5V / 4V-6V", function() {
         var node1 = tree.createNode();
         var node2 = tree.createNode();
         var node3 = tree.createNode();

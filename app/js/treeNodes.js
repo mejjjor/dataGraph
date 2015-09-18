@@ -94,8 +94,16 @@ module.exports = {
             computeOrigin();
         } catch (e) {
             console.error("DON'T build graph, BUILD TREE !! (or it's a very big tree with more than 1OOO nodes !!)")
-            nodeS.targets.splice(nodeS.targets.indexOf(nodeT), 1);
-            nodeT.targets.splice(nodeT.targets.indexOf(nodeS), 1);
+            var i = nodeS.targets.indexOf(nodeT);
+            if (i != -1)
+                nodeS.targets.splice(nodeS.targets.indexOf(nodeT), 1);
+            else
+                nodeS.sources.splice(0, 1);
+            i = nodeT.targets.indexOf(nodeS);
+            if (i != -1)
+                nodeT.targets.splice(nodeT.targets.indexOf(nodeS), 1);
+            else
+                nodeT.sources.splice(0, 1);
             return null;
         }
 
@@ -249,6 +257,9 @@ module.exports = {
             }
         }
         _setGraph();
+    },
+    computeOssature: function() {
+        return computeEnd();
     }
 }
 
@@ -356,8 +367,26 @@ function getNodeOrigin() {
     return [];
 }
 
-function allowTypes(){
-	filters.allowTypes = _.map(nodesTypes, function(e) {
-            if (e.activate) return e.type;
-        });
+function allowTypes() {
+    filters.allowTypes = _.map(nodesTypes, function(e) {
+        if (e.activate) return e.type;
+    });
+}
+
+function computeEnd() {
+    var endNode;
+    for (i in treeNodes)
+        if (treeNodes[i].end)
+            endNode = treeNodes[i];
+    if (endNode != undefined)
+        return countUntilOrigin(endNode, 0);
+}
+
+function countUntilOrigin(node, cpt) {
+    if (_.contains(nodes, node))
+        cpt++;
+    if (node.sources.length > 0) {
+        cpt = countUntilOrigin(node.sources[0], cpt)
+    }
+    return cpt;
 }
