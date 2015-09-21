@@ -140,7 +140,6 @@ function restart() {
             restart();
         });
     link.exit().remove();
-
     force.start();
 }
 
@@ -158,13 +157,7 @@ function tick(e) {
             return d.target.y;
         });
 
-        var l = tree.computeOssature();
-        for(var i=0;i<nodes.length;i++){
-            if(nodes[i].origin)
-                nodes[i].x = 200;
-            if(nodes[i].end)
-                nodes[i].x = 200+l*200;
-        }
+
 
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -224,10 +217,12 @@ function clickNode(node) {
     });
     var unwatchType = linkTypeAndColor(vm, node);
     var unwatchOrigin = watchOrigin(vm, node);
+    var unwatchEnd = watchEnd(vm,node);
 
     modal.setBeforeCloseModal(function() {
         unwatchType();
         unwatchOrigin();
+        unwatchEnd();
     });
 
     modal.openModal(d3.event.clientX, d3.event.clientY);
@@ -423,5 +418,14 @@ function watchOrigin(vm, node) {
     return vm.$watch('origin', function(newVal, oldVal) {
         if (newVal)
             tree.setNodeOrigin(node);
+    });
+}
+
+function watchEnd(vm,node){
+     return vm.$watch('origin', function(newVal, oldVal) {
+        if (newVal)
+            tree.computeEnd(node);
+        else
+            tree.uncomputeEnd(node);
     });
 }

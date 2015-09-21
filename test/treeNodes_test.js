@@ -198,4 +198,96 @@ describe("CRUD on tree", function() {
             expect(nodeT.targets).to.be.empty;
         });
     });
+    describe("compute end", function() {
+        it("should put nodes in brothers", function() {
+            var node1 = tree.createNode();
+            var node2 = tree.createNode();
+            var node3 = tree.createNode();
+            node1.origin = true;
+            node3.end = true;
+            tree.createLink(node1, node2);
+            tree.createLink(node2, node3);
+            tree.computeEnd(node3);
+            expect(node1.targets).to.be.empty;
+            expect(node2.targets).to.be.empty;
+            expect(node3.targets).to.be.empty;
+
+            expect(node1.brothers).contains(node2);
+            expect(node1.brothers.length).to.be.equal(1);
+            expect(node2.brothers).contains(node3);
+            expect(node2.brothers.length).to.be.equal(1);
+            expect(node3.brothers).to.be.empty;
+        });
+        it("should put only nodes of spine", function() {
+            var node1 = tree.createNode();
+            var node2 = tree.createNode();
+            var node3 = tree.createNode();
+            var node4 = tree.createNode();
+            var node5 = tree.createNode();
+            node1.origin = true;
+            node3.end = true;
+            tree.createLink(node1, node2);
+            tree.createLink(node2, node3);
+            tree.createLink(node1, node4);
+            tree.createLink(node2, node5);
+            tree.computeEnd(node3);
+            expect(node1.targets.length).to.be.equal(1);
+            expect(node1.targets).contains(node4);
+            expect(node2.targets.length).to.be.equal(1);
+            expect(node2.targets).contains(node5);
+            expect(node3.targets).to.be.empty;
+
+            expect(node1.brothers).contains(node2);
+            expect(node1.brothers.length).to.be.equal(1);
+            expect(node2.brothers).contains(node3);
+            expect(node2.brothers.length).to.be.equal(1);
+            expect(node3.brothers).to.be.empty;
+        });
+    });
+    describe("uncompute end", function() {
+        it("should put nodes in targets", function() {
+            var node1 = tree.createNode();
+            var node2 = tree.createNode();
+            var node3 = tree.createNode();
+            node1.origin = true;
+            node3.end = true;
+            tree.createLink(node1, node2);
+            tree.createLink(node2, node3);
+            tree.computeEnd(node3);
+            tree.uncomputeEnd(node3);
+
+            expect(node1.targets.length).to.be.equal(1);
+            expect(node2.targets.length).to.be.equal(1);
+            expect(node3.targets).to.be.empty;
+            expect(node1.brothers).to.be.empty;
+            expect(node2.brothers).to.be.empty;
+            expect(node3.brothers).to.be.empty;
+        });
+        it("should destruct spine", function() {
+            var node1 = tree.createNode();
+            var node2 = tree.createNode();
+            var node3 = tree.createNode();
+            var node4 = tree.createNode();
+            var node5 = tree.createNode();
+            node1.origin = true;
+            node3.end = true;
+            tree.createLink(node1, node2);
+            tree.createLink(node2, node3);
+            tree.createLink(node1, node4);
+            tree.createLink(node2, node5);
+            tree.computeEnd(node3);
+            tree.uncomputeEnd(node3);
+            expect(node1.targets.length).to.be.equal(2);
+            expect(node1.targets).contains(node4);
+            expect(node1.targets).contains(node2);
+            expect(node2.targets.length).to.be.equal(2);
+            expect(node2.targets).contains(node3);
+            expect(node2.targets).contains(node5);
+            expect(node3.targets).to.be.empty;
+
+            expect(node1.brothers).to.be.empty;
+            expect(node2.brothers).to.be.empty;
+            expect(node3.brothers).to.be.empty;
+        });
+    });
 });

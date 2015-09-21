@@ -11,6 +11,8 @@ var filters = {
     dateEnd: "",
     OriginNodes: []
 }
+
+var spineCount;
 module.exports = {
     init: function(d3Nodes, d3Links) {
         nodes = d3Nodes;
@@ -71,6 +73,7 @@ module.exports = {
             end: false,
             sources: [],
             targets: [],
+            brothers: [],
             label: "label " + nodeNextId,
             type: "",
             color: "rgb(114, 147, 168)",
@@ -256,10 +259,14 @@ module.exports = {
                 }
             }
         }
+        computeOrigin();
         _setGraph();
     },
-    computeOssature: function() {
-        return computeEnd();
+    computeEnd: function(node) {
+        computeEnd(node.sources[0], node);
+    },
+    uncomputeEnd: function(node) {
+        uncomputeEnd(node.sources[0], node);
     }
 }
 
@@ -287,16 +294,17 @@ function _setGraph() {
 
 function computeGraph(node, lastNode, isVisible) {
     var acc = [];
-    for (var i in node.targets) {
+    for (var i = 0; i < node.targets.length; i++) {
         var newLastNode = computeNode(node.targets[i], lastNode);
-        if (lastNode != node && !isVisible && lastNode != newLastNode)
+        if (lastNode != node && !isVisible && lastNode != newLastNode) {
             lastNode = newLastNode;
+        }
         if (newLastNode != node.targets[i]) {
             var newAcc = computeGraph(node.targets[i], lastNode, true);
             if (lastNode === null && newAcc.length > 0)
                 lastNode = newAcc[newAcc.length - 1];
-            for (var i in newAcc) {
-                acc.push(newAcc[i]);
+            for (var j = 0; j < newAcc.length; j++) {
+                acc.push(newAcc[j]);
             }
         } else {
             acc.push(newLastNode);
@@ -373,13 +381,23 @@ function allowTypes() {
     });
 }
 
-function computeEnd() {
-    var endNode;
-    for (i in treeNodes)
-        if (treeNodes[i].end)
-            endNode = treeNodes[i];
-    if (endNode != undefined)
-        return countUntilOrigin(endNode, 0);
+function computeEnd(node, previousNode) {
+    node.end = false;
+    var index = node.targets.indexOf(previousNode);
+    if (index != -1) {
+        node.brothers.push(node.targets.splice(index, 1)[0]);
+        if (node.sources.length > 0)
+            computeEnd(node.sources[0], node);
+    }
+}
+
+function uncomputeEnd(node, previousNode) {
+    if (!node.end && node.brothers.length > 0) {
+        var index = node.brothers.indexOf(previousNode);
+        node.targets.push(node.brothers.splice(index, 1)[0]);
+        if (node.sources.length > 0)
+            uncomputeEnd(node.sources[0], node);
+    }
 }
 
 function countUntilOrigin(node, cpt) {
