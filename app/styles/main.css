@@ -1,14 +1,44 @@
-svg {
+svg,
+#filtersDate {
     background: black;
     font-family: 'Fugaz One', cursive;
     font-size: 12px;
-    
+}
+
+#filtersType{
+     margin-top: -4px;
+     margin-bottom: -4px;
+}
+#filtersExclude{
+    height :53px;
+
+}
+#filtersDate {
+    padding-top: 10px;
+    padding-right: 18px;
+    padding-bottom: 10px;
+    padding-left: 18px;
+    float: left;
+    height :35px;
 }
 
 #graph {
     background: #073642;
     font-size: 15px;
-    margin-top: -5px;
+}
+
+#event-start,
+#event-end {
+    margin-top: 8px;
+    color: #B2BABB;
+}
+
+#event-start {
+    float: left;
+}
+
+#event-end {
+    float: right;
 }
 
 #graph rect {

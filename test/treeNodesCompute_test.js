@@ -618,4 +618,129 @@ describe("computeGraph", function() {
         });
         expect(graph.links.length).to.be.equal(8);
     });
+    it("1VisibleOrigin-2BrotherHidden / 2BH-3V / 2BH-4BrotherEndVisible", function() {
+        var node1 = tree.createNode();
+        var node2 = tree.createNode();
+        var node3 = tree.createNode();
+        var node4 = tree.createNode();
+        node1.origin = true;
+        node2.type = "hidden";
+        tree.createLink(node1, node2);
+        tree.createLink(node2, node3);
+        tree.createLink(node2, node4);
+        tree.computeEnd(node4);
+        tree.setGraph();
+        var graph = tree.getData();
+        expect(graph.nodes).to.contains(node1);
+        expect(graph.nodes).to.contains(node3);
+        expect(graph.nodes).to.contains(node4);
+        expect(graph.nodes.length).to.be.equal(3);
+        expect(node1.isSpine).to.be.equal(true);
+        expect(node3.isSpine).to.be.equal(true);
+        expect(node4.isSpine).to.be.equal(true);
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node3
+        });
+        expect(graph.links).to.contains({
+            source: node3,
+            target: node4
+        });
+        expect(graph.links.length).to.be.equal(2);
+    });
+    it("1VO-2BH / 1V0-3V / 2BH-4V / 2BH-5BEV", function() {
+        var node1 = tree.createNode();
+        var node2 = tree.createNode();
+        var node3 = tree.createNode();
+        var node4 = tree.createNode();
+        var node5 = tree.createNode();
+        node1.origin = true;
+        node2.type = "hidden";
+        tree.createLink(node1, node2);
+        tree.createLink(node1, node3);
+        tree.createLink(node2, node4);
+        tree.createLink(node2, node5);
+        tree.computeEnd(node5);
+        tree.setGraph();
+        var graph = tree.getData();
+        expect(graph.nodes).to.contains(node1);
+        expect(graph.nodes).to.contains(node3);
+        expect(graph.nodes).to.contains(node4);
+        expect(graph.nodes).to.contains(node5);
+        expect(graph.nodes.length).to.be.equal(4);
+        expect(node1.isSpine).to.be.equal(true);
+        expect(node4.isSpine).to.be.equal(true);
+        expect(node5.isSpine).to.be.equal(true);
+        expect(node2.isSpine).to.be.equal(false);
+        expect(node3.isSpine).to.be.equal(false);
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node3
+        });
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node4
+        });
+        expect(graph.links).to.contains({
+            source: node4,
+            target: node5
+        });
+        expect(graph.links.length).to.be.equal(3);
+    });
+    it("1VO-2BH / 1V0-3V / 3V-6V / 2BH-4V / 2BH-5BEV / 5BEV-7V", function() {
+        var node1 = tree.createNode();
+        var node2 = tree.createNode();
+        var node3 = tree.createNode();
+        var node4 = tree.createNode();
+        var node5 = tree.createNode();
+        var node6 = tree.createNode();
+        var node7 = tree.createNode();
+        node1.origin = true;
+        node2.type = "hidden";
+        tree.createLink(node1, node2);
+        tree.createLink(node1, node3);
+        tree.createLink(node2, node4);
+        tree.createLink(node2, node5);
+        tree.createLink(node3, node6);
+        tree.createLink(node5, node7);
+        tree.computeEnd(node5);
+        tree.setGraph();
+        var graph = tree.getData();
+        expect(graph.nodes).to.contains(node1);
+        expect(graph.nodes).to.contains(node3);
+        expect(graph.nodes).to.contains(node4);
+        expect(graph.nodes).to.contains(node5);
+        expect(graph.nodes).to.contains(node6);
+        expect(graph.nodes).to.contains(node7);
+        expect(graph.nodes.length).to.be.equal(6);
+        expect(node1.isSpine).to.be.equal(true);
+        expect(node4.isSpine).to.be.equal(true);
+        expect(node5.isSpine).to.be.equal(true);
+
+        expect(node2.isSpine).to.be.equal(false);
+        expect(node3.isSpine).to.be.equal(false);
+        expect(node6.isSpine).to.be.equal(false);
+        expect(node7.isSpine).to.be.equal(false);
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node3
+        });
+        expect(graph.links).to.contains({
+            source: node1,
+            target: node4
+        });
+        expect(graph.links).to.contains({
+            source: node4,
+            target: node5
+        });
+        expect(graph.links).to.contains({
+            source: node3,
+            target: node6
+        });
+        expect(graph.links).to.contains({
+            source: node5,
+            target: node7
+        });
+        expect(graph.links.length).to.be.equal(5);
+    });
 });

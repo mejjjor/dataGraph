@@ -6,10 +6,8 @@ var nodes = [];
 var nodesTypes = [];
 var filters = {
     allowTypes: [],
-    excludeNames: [],
     dateBegin: "",
-    dateEnd: "",
-    OriginNodes: []
+    dateEnd: ""
 }
 
 var spineCount;
@@ -37,15 +35,31 @@ module.exports = {
                 nodes.push(treeNodes[i]);
         }
     },
-    setFilterExcludeNames: function(names) {
-        filters.allowNames = names;
+    setDateFilters: function(values) {
+        filters.dateBegin = values[0];
+        filters.dateEnd = values[1];
     },
-    setFilterDateBegin: function(dateBegin) {
-        filters.dateBegin = dateBegin;
+    getDateFilterStart: function() {
+        return filters.dateBegin;
     },
-    setFilterDateEnd: function(dateEnd) {
-        filters.dateEnd = dateEnd;
+    getDateFilterEnd: function() {
+        return filters.dateEnd;
     },
+    getDateRange: function() {
+        var min = treeNodes[0].dateBegin;
+        var max = treeNodes[0].dateEnd;
+        for (var i = 1; i < treeNodes.length; i++) {
+            if (treeNodes[i].dateBegin < min)
+                min = treeNodes[i].dateBegin;
+            if (treeNodes[i].dateEnd > max)
+                max = treeNodes[i].dateEnd;
+        }
+        return {
+            min: min,
+            max: max
+        };
+    },
+
     hideType: function(type) {
         for (var i = 0; i < nodesTypes.length; i++) {
             if (nodesTypes[i].type === type)
@@ -71,6 +85,7 @@ module.exports = {
             y: y,
             origin: false,
             end: false,
+            isSpine: false,
             sources: [],
             targets: [],
             brothers: [],
@@ -189,24 +204,32 @@ module.exports = {
     exportData: function() {
         var data = {
             nodes: [],
-            filters: nodesTypes
+            typeFilters: nodesTypes,
+            dateBegin: filters.dateBegin,
+            dateEnd: filters.dateEnd
         };
         for (var i = 0; i < treeNodes.length; i++) {
             var sources = [];
             var targets = [];
+            var brothers = [];
             for (var j = 0; j < treeNodes[i].sources.length; j++) {
                 sources.push(treeNodes[i].sources[j].id);
             }
             for (var j = 0; j < treeNodes[i].targets.length; j++) {
                 targets.push(treeNodes[i].targets[j].id);
             }
+            for (var j = 0; j < treeNodes[i].brothers.length; j++) {
+                brothers.push(treeNodes[i].brothers[j].id);
+            }
             var tempNode = {
                 id: treeNodes[i].id,
                 x: 0,
                 y: 0,
                 origin: treeNodes[i].origin,
+                end: treeNodes[i].end,
                 sources: sources,
                 targets: targets,
+                brothers: brothers,
                 label: treeNodes[i].label,
                 type: treeNodes[i].type,
                 color: treeNodes[i].color,
@@ -220,8 +243,16 @@ module.exports = {
     },
     importData: function(data) {
         var dataImport = JSON.parse(data);
-        nodesTypes = dataImport.filters;
-        allowTypes();
+        nodesTypes = dataImport.typeFilters;
+        if (dataImport.dateBegin != "")
+            filters.dateBegin = new Date(parseFloat(dataImport.dateBegin));
+        else
+            filters.dateBegin = "";
+        if (dataImport.dateEnd != "")
+            filters.dateEnd = new Date(parseFloat(dataImport.dateEnd));
+        else
+            filters.dateEnd = "",
+            allowTypes();
         for (var i = 0; i < dataImport.nodes.length; i++) {
             var tempNode = dataImport.nodes[i];
             if (nodeNextId <= tempNode.id)
@@ -258,6 +289,16 @@ module.exports = {
                     }
                 }
             }
+            var brothersIds = _.map(treeNodes[i].brothers, _.clone);
+            treeNodes[i].brothers = [];
+            for (var j = 0; j < brothersIds.length; j++) {
+                for (var k = 0; k < treeNodes.length; k++) {
+                    if (treeNodes[k].id === brothersIds[j]) {
+                        treeNodes[i].brothers.push(treeNodes[k]);
+                        break;
+                    }
+                }
+            }
         }
         computeOrigin();
         _setGraph();
@@ -276,64 +317,68 @@ function _setGraph() {
     while (links.length > 0)
         links.pop();
     if (treeNodes.length != 0) {
-        var acc = [getNodeOrigin()];
-        var lastNode = computeNode(acc[0], null);
-        var isVisible = (lastNode != null)
-        while (acc.length != 0) {
-            var node = acc.splice(0, 1)[0];
-            var newAcc = computeGraph(node, lastNode, isVisible);
-            isVisible = true;
-            for (var i in newAcc) {
-                acc.push(newAcc[i]);
-            }
-            if (acc.length > 0)
-                lastNode = acc[0];
+        var node = getNodeOrigin();
+        var lastNode = null;
+        while (node != null) {
+            lastNode = computeNode(node, lastNode, true);
+            if (node.brothers.length > 0)
+                node = node.brothers[0];
+            else
+                node = null;
         }
     }
 }
 
-function computeGraph(node, lastNode, isVisible) {
-    var acc = [];
+function computeNode(node, lastNode, isSpine) {
+    var firstNode = null;
+    var status = getStatus(node);
+    if (status.isVisible) {
+        showNode(node, lastNode);
+        lastNode = node;
+        if (isSpine) {
+            node.isSpine = true;
+            isSpine = false;
+        }
+    } else if (status.isEnd) {
+        return;
+    }
     for (var i = 0; i < node.targets.length; i++) {
-        var newLastNode = computeNode(node.targets[i], lastNode);
-        if (lastNode != node && !isVisible && lastNode != newLastNode) {
+        var newLastNode = computeNode(node.targets[i], lastNode, isSpine);
+        if (!status.isVisible && isSpine)
             lastNode = newLastNode;
-        }
-        if (newLastNode != node.targets[i]) {
-            var newAcc = computeGraph(node.targets[i], lastNode, true);
-            if (lastNode === null && newAcc.length > 0)
-                lastNode = newAcc[newAcc.length - 1];
-            for (var j = 0; j < newAcc.length; j++) {
-                acc.push(newAcc[j]);
-            }
-        } else {
-            acc.push(newLastNode);
-        }
-    }
-    return acc;
-}
-
-function computeNode(node, lastNode) {
-    if (isShowable(node)) {
-        nodes.push(node);
-        if (lastNode != null) {
-            links.push({
-                source: lastNode,
-                target: node
-            });
-        }
-        return node;
     }
     return lastNode;
+
 }
 
-function isShowable(node) {
+function showNode(node, lastNode) {
+    nodes.push(node);
+    if (lastNode != null) {
+        links.push({
+            source: lastNode,
+            target: node
+        });
+    }
+}
 
-    if (node.type == "" || _.contains(filters.allowTypes, node.type))
-    // if (filters.excludeNames.indexOf(node.label) === -1)
-    //     if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd)
-        return true;
-    return false;
+function getStatus(node) {
+    var status = {
+        isEnd: true,
+        isVisible: true
+    };
+    if (node.type == "" || _.contains(filters.allowTypes, node.type)) {
+        if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd) {
+            status.isEnd = false;
+            status.isVisible = true;
+        } else {
+            status.isEnd = true;
+            status.isVisible = false;
+        }
+    } else {
+        status.isEnd = false;
+        status.isVisible = false;
+    }
+    return status;
 }
 
 function computeOrigin() {

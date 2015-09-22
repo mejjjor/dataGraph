@@ -11,6 +11,7 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var modal = require('./modal.js');
 require('./binding.js');
 var tree = require('./treeNodes.js');
+var slider = require('./slider.js');
 var data = require('./data/data_s.json');
 
 var width = 1200,
@@ -25,6 +26,15 @@ var mousedrag = null;
 var nodesOrigin;
 var colorSelectors;
 var nodesTypes;
+
+var filtersDate = document.getElementById("filtersDate");
+filtersDate.style.width = width * 30 / 100 + "px";
+var filtersDate = document.getElementById("filtersExclude");
+filtersDate.style.width = width * 67 / 100 + "px";
+var filtersDate = document.getElementById("filtersDateExclude");
+filtersDate.style.width = width + "px";
+
+
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -45,7 +55,7 @@ svg.append('svg:rect')
     .attr('height', height * 2)
     .attr('transform', 'translate(-600,-600)');
 
-var filters = d3.select('#filters')
+var filters = d3.select('#filtersType')
     .attr('width', width)
     .attr('height', 90);
 
@@ -217,7 +227,7 @@ function clickNode(node) {
     });
     var unwatchType = linkTypeAndColor(vm, node);
     var unwatchOrigin = watchOrigin(vm, node);
-    var unwatchEnd = watchEnd(vm,node);
+    var unwatchEnd = watchEnd(vm, node);
 
     modal.setBeforeCloseModal(function() {
         unwatchType();
@@ -233,11 +243,22 @@ $('#reload').click(function(e) {
     restart();
 })
 
+var dateFiltersHook = function(values){
+     tree.setDateFilters(values)
+     tree.setGraph();
+     restart();
+}
+
 ///// IMPORT / EXPORT ////////////
 
 $('#import').click(function(e) {
     var dataImport = document.getElementById("exchange").value;
     tree.importData(dataImport);
+    var dateRange = tree.getDateRange();
+    slider.setDateRange(dateRange.min,dateRange.max);
+    slider.setDateStart(tree.getDateFilterStart(),tree.getDateFilterEnd());
+    slider.updateHook(dateFiltersHook);
+    slider.refreshSlider();
     //tree.showAllNodes();
     //balanceTree();
     restart();
@@ -280,20 +301,20 @@ function setFilters() {
         .on('click', function(d) {
             //kk A mettre dans le css
             if (d.activate) {
-                d.color = d3.rgb(d.color).darker(2).toString() ;
+                d.color = d3.rgb(d.color).darker(2).toString();
                 this.childNodes[1].style.setProperty('fill', 'rgb(89,89,89)');
                 tree.hideType(this.childNodes[1].innerHTML);
                 tree.setGraph();
 
             } else {
-                
+
                 this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
                 tree.showType(this.childNodes[1].innerHTML);
                 tree.setGraph();
                 //BUG ! it's not the inverse of darker(2) for all colors !
                 //d.color = d3.rgb(d.color).brighter(2).toString();
-                for(var i=0; i<nodes.length;i++){
-                    if(nodes[i].type === d.type){
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i].type === d.type) {
                         d.color = nodes[i].color;
                         break;
                     }
@@ -421,8 +442,8 @@ function watchOrigin(vm, node) {
     });
 }
 
-function watchEnd(vm,node){
-     return vm.$watch('origin', function(newVal, oldVal) {
+function watchEnd(vm, node) {
+    return vm.$watch('end', function(newVal, oldVal) {
         if (newVal)
             tree.computeEnd(node);
         else
