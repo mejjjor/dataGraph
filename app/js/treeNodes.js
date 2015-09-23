@@ -49,9 +49,9 @@ module.exports = {
         var min = treeNodes[0].dateBegin;
         var max = treeNodes[0].dateEnd;
         for (var i = 1; i < treeNodes.length; i++) {
-            if (treeNodes[i].dateBegin < min)
+            if (treeNodes[i].dateBegin != "" && treeNodes[i].dateBegin < min)
                 min = treeNodes[i].dateBegin;
-            if (treeNodes[i].dateEnd > max)
+            if (treeNodes[i].dateEnd != "" && treeNodes[i].dateEnd > max)
                 max = treeNodes[i].dateEnd;
         }
         return {
@@ -190,7 +190,6 @@ module.exports = {
             return e.type
         });
         for (j = tempNodesTypes.length - 1; j >= 0; j--) {
-
             if (!_.contains(nodesTypesType, tempNodesTypes[j].type))
                 nodesTypes.push(tempNodesTypes[j]);
         }
@@ -223,8 +222,8 @@ module.exports = {
             }
             var tempNode = {
                 id: treeNodes[i].id,
-                x: 0,
-                y: 0,
+                x: i * 100 % 1000,
+                y: i * 100 % 1000,
                 origin: treeNodes[i].origin,
                 end: treeNodes[i].end,
                 sources: sources,
@@ -330,6 +329,7 @@ function _setGraph() {
 }
 
 function computeNode(node, lastNode, isSpine) {
+    node.isSpine = false;
     var firstNode = null;
     var status = getStatus(node);
     if (status.isVisible) {
@@ -340,7 +340,7 @@ function computeNode(node, lastNode, isSpine) {
             isSpine = false;
         }
     } else if (status.isEnd) {
-        return;
+        return lastNode;
     }
     for (var i = 0; i < node.targets.length; i++) {
         var newLastNode = computeNode(node.targets[i], lastNode, isSpine);
@@ -363,19 +363,19 @@ function showNode(node, lastNode) {
 
 function getStatus(node) {
     var status = {
-        isEnd: true,
+        isEnd: false,
         isVisible: true
     };
-    if (node.type == "" || _.contains(filters.allowTypes, node.type)) {
-        if (filters.dateBegin <= node.dateBegin && filters.dateEnd >= node.dateEnd) {
+    if ((node.dateBegin == "" || filters.dateEnd >= node.dateBegin) && (node.dateEnd == "" || filters.dateBegin <= node.dateEnd)) {
+        if (node.type == "" || _.contains(filters.allowTypes, node.type)) {
             status.isEnd = false;
             status.isVisible = true;
         } else {
-            status.isEnd = true;
+            status.isEnd = false;
             status.isVisible = false;
         }
     } else {
-        status.isEnd = false;
+        status.isEnd = true;
         status.isVisible = false;
     }
     return status;
@@ -394,6 +394,9 @@ function computeOrigin() {
     for (var j in nodeOrigin.targets) {
         setNodeDirection(nodeOrigin.targets[j], nodeOrigin, 0);
     }
+    for (var j in nodeOrigin.brothers) {
+        setNodeDirection(nodeOrigin.brothers[j], nodeOrigin, 0);
+    }
 
 }
 
@@ -411,6 +414,8 @@ function setNodeDirection(node, previousNode, cpt) {
             index = i;
     }
     node.sources.push(node.targets.splice(index, 1)[0]);
+    if (node.brothers.length > 0)
+        setNodeDirection(node.brothers[0], node, ++cpt);
 }
 
 function getNodeOrigin() {

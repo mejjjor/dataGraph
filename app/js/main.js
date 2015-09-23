@@ -61,14 +61,12 @@ var filters = d3.select('#filtersType')
 
 var force = d3.layout.force()
     .charge(function(d) {
-        if (d.origin)
-            return -5000;
-        return -3000;
+        return -2000;
     })
-    //.chargeDistance(1000)
+    .chargeDistance(400)
     .linkDistance(110)
-    .linkStrength(0.5)
-    .gravity(0.25)
+    .linkStrength(0.7)
+    .gravity(0)
     .theta(0)
     .size([width, height])
     .on("tick", tick);
@@ -166,15 +164,21 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-
-
-
+    var cptSpine = 0;
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].isSpine) {
+            nodes[i].x = cptSpine * 200;
+            cptSpine++;
+            nodes[i].y = 100;
+        }
+    }
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
 }
 
 function mouseMove() {
+    // console.log(d3.mouse(this)[0]+" / "+d3.mouse(this)[1]);
     if (mousedown_node) {
         drag_line
             .attr("x1", mousedown_node.x)
@@ -242,11 +246,17 @@ $('#reload').click(function(e) {
     tree.showAllNodes();
     restart();
 })
+$('#refresh').click(function(e) {
+    tree.setGraph();
+    restart();
+})
 
-var dateFiltersHook = function(values){
-     tree.setDateFilters(values)
-     tree.setGraph();
-     restart();
+
+
+var dateFiltersHook = function(values) {
+    tree.setDateFilters(values)
+    tree.setGraph();
+    restart();
 }
 
 ///// IMPORT / EXPORT ////////////
@@ -255,10 +265,12 @@ $('#import').click(function(e) {
     var dataImport = document.getElementById("exchange").value;
     tree.importData(dataImport);
     var dateRange = tree.getDateRange();
-    slider.setDateRange(dateRange.min,dateRange.max);
-    slider.setDateStart(tree.getDateFilterStart(),tree.getDateFilterEnd());
-    slider.updateHook(dateFiltersHook);
-    slider.refreshSlider();
+    if (dateRange.min != "" || dateRange.max != "") {
+        slider.setDateRange(dateRange.min, dateRange.max);
+        slider.setDateStart(tree.getDateFilterStart(), tree.getDateFilterEnd());
+        slider.updateHook(dateFiltersHook);
+        slider.refreshSlider();
+    }
     //tree.showAllNodes();
     //balanceTree();
     restart();
@@ -307,15 +319,15 @@ function setFilters() {
                 tree.setGraph();
 
             } else {
-
                 this.childNodes[1].style.setProperty('fill', 'rgb(0,0,0)');
                 tree.showType(this.childNodes[1].innerHTML);
                 tree.setGraph();
                 //BUG ! it's not the inverse of darker(2) for all colors !
                 //d.color = d3.rgb(d.color).brighter(2).toString();
-                for (var i = 0; i < nodes.length; i++) {
-                    if (nodes[i].type === d.type) {
-                        d.color = nodes[i].color;
+                var tempNodes = tree.getTreeNodes();
+                for (var i = 0; i < tempNodes.length; i++) {
+                    if (tempNodes[i].type === d.type) {
+                        d.color = tempNodes[i].color;
                         break;
                     }
                 }
