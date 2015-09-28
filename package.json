@@ -36,7 +36,8 @@
     "watch:styles": "chokidar 'app/styles/**/*.css' -c 'echo `date` && npm run build:styles -s'",
     "watch:scripts": "chokidar 'app/js/**/*.js' -c 'echo `date` && npm run build:scripts -s'",
     "dev": "npm run build && npm run watch",
-    "sync": "browser-sync start --server public --files \"public/*/*, public/*\""
+    "sync": "browser-sync start --server public --files \"public/*/*, public/*\"",
+    "deploy": "cd public/ && git add . && git commit -m 'mep' && git push -u origin"
   },
   "author": "mejjjor <mejjjor@gmail.com>",
   "private": true,
