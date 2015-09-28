@@ -145,7 +145,11 @@ module.exports = {
                 source: node.sources[0],
                 target: node
             }), 1);
-            node.sources[0].targets.splice(node.sources[0].targets.indexOf(node), 1);
+            var index = node.sources[0].targets.indexOf(node);
+            if (index != -1)
+                node.sources[0].targets.splice(index, 1);
+            else
+                node.sources[0].brothers.splice(0, 1);
         }
         for (var i = 0; i < node.targets.length; i++) {
             for (var j = links.length - 1; j >= 0; j--) {
@@ -155,6 +159,15 @@ module.exports = {
             }
             node.targets[i].sources.splice(0, 1);
         }
+        if (node.brothers.length > 0) {
+            for (var j = links.length - 1; j >= 0; j--) {
+                if (links[j].source === node && links[j].target === node.brothers[0]) {
+                    links.splice(j, 1);
+                }
+            }
+            node.brothers[0].sources.splice(0, 1);
+        }
+       
         nodes.splice(nodes.indexOf(node), 1);
         treeNodes.splice(treeNodes.indexOf(node), 1);
 
@@ -162,7 +175,11 @@ module.exports = {
     },
     deleteLink: function(link) {
         link.target.sources.splice(0, 1);
-        link.source.targets.splice(link.source.targets.indexOf(link.target), 1);
+        var index = link.source.targets.indexOf(link.target);
+        if (index != -1)
+            link.source.targets.splice(index, 1);
+        else
+            link.source.brothers.splice(0, 1);
         links.splice(links.indexOf(link), 1);
     },
     setGraph: function() {
@@ -250,8 +267,8 @@ module.exports = {
         if (dataImport.dateEnd != "")
             filters.dateEnd = new Date(parseFloat(dataImport.dateEnd));
         else
-            filters.dateEnd = "",
-            allowTypes();
+            filters.dateEnd = "";
+        allowTypes();
         for (var i = 0; i < dataImport.nodes.length; i++) {
             var tempNode = dataImport.nodes[i];
             if (nodeNextId <= tempNode.id)

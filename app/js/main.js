@@ -61,12 +61,12 @@ var filters = d3.select('#filtersType')
 
 var force = d3.layout.force()
     .charge(function(d) {
-        return -2000;
+        return -3500;
     })
     .chargeDistance(400)
     .linkDistance(110)
     .linkStrength(0.7)
-    .gravity(0)
+    .gravity(0.2)
     .theta(0)
     .size([width, height])
     .on("tick", tick);
@@ -164,14 +164,14 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-    var cptSpine = 0;
-    for (var i = 0; i < nodes.length; i++) {
+  //  var cptSpine = 0;
+   /* for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].isSpine) {
             nodes[i].x = cptSpine * 200;
             cptSpine++;
             nodes[i].y = 100;
         }
-    }
+    }*/
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
