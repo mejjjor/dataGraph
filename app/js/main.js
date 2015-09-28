@@ -66,7 +66,7 @@ var force = d3.layout.force()
     .chargeDistance(400)
     .linkDistance(110)
     .linkStrength(0.7)
-    .gravity(0.2)
+    .gravity(0.1)
     .theta(0)
     .size([width, height])
     .on("tick", tick);
