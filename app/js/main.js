@@ -66,8 +66,8 @@ var force = d3.layout.force()
     .chargeDistance(400)
     .linkDistance(110)
     .linkStrength(0.7)
-    .gravity(0.2)
-    .theta(0)
+    .gravity(-0.01)
+    .theta(0.2)
     .size([width, height])
     .on("tick", tick);
 
@@ -122,7 +122,9 @@ function restart() {
     elem.append("circle")
         .attr("class", "circle")
         .attr("v-fill", "color")
-        .attr("r", 58);
+        .attr("r", 58)
+        
+        
 
     elem.append("text")
         .attr("v-content", "label")
@@ -164,21 +166,22 @@ function tick(e) {
         .attr("y2", function(d) {
             return d.target.y;
         });
-  //  var cptSpine = 0;
-   /* for (var i = 0; i < nodes.length; i++) {
+
+
+    var cptSpine = 0;
+    for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].isSpine) {
             nodes[i].x = cptSpine * 200;
             cptSpine++;
             nodes[i].y = 100;
         }
-    }*/
+    }
     node.attr("transform", function(d) {
         return "translate(" + d.x + "," + d.y + ")";
     });
 }
 
 function mouseMove() {
-    // console.log(d3.mouse(this)[0]+" / "+d3.mouse(this)[1]);
     if (mousedown_node) {
         drag_line
             .attr("x1", mousedown_node.x)
