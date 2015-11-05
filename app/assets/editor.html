@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Fugaz+One' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <div>
+        <button id="reload">show hidden nodes</button>
+        <button id="refresh">Compute !</button>
+        <button id="export">Export</button>
+        <input type="text" id="exchange" />
+        <button id="import">Import</button>
+    </div>
+    <datalist id="types">
+    </datalist>
+    <svg id="graph" class="disable-selection" />
+    <div id="modal" draggable="true">
+        <div id="ModalHandle">
+        </div>
+        <div id="modalContent">
+            <button id="btnCloseModal" title="Close" class="close">X</button>
+            <form id="formNode">
+                <label for="formNodeLabel">Label :</label>
+                <input type="text" id="formNodeLabel" v-model="label" />
+                <label for="formNodeType">Type :</label>
+                <input id="formNodeType" list="types" v-model="type" />
+                <div id="formNodeColorSelector">
+                    <div id="color1" class="colorSelector"></div>
+                    <div id="color2" class="colorSelector"></div>
+                    <div id="color3" class="colorSelector"></div>
+                    <div id="color4" class="colorSelector"></div>
+                    <div id="color5" class="colorSelector"></div>
+                    <div id="color6" class="colorSelector"></div>
+                    <div id="color7" class="colorSelector"></div>
+                    <div id="color8" class="colorSelector"></div>
+                    <div id="color9" class="colorSelector"></div>
+                    <div id="color10" class="colorSelector"></div>
+                    <div id="color11" class="colorSelector"></div>
+                    <div id="color12" class="colorSelector"></div>
+                    <div id="color13" class="colorSelector"></div>
+                    <div id="color14" class="colorSelector"></div>
+                    <div id="color15" class="colorSelector"></div>
+                    <div id="color16" class="colorSelector"></div>
+                    <div id="color17" class="colorSelector"></div>
+                    <div id="color18" class="colorSelector"></div>
+                    <div id="color19" class="colorSelector"></div>
+                    <div id="color20" class="colorSelector"></div>
+                    <div id="color21" class="colorSelector"></div>
+                    <div id="color22" class="colorSelector"></div>
+                    <div id="color23" class="colorSelector"></div>
+                    <div id="color24" class="colorSelector"></div>
+                    <div id="color25" class="colorSelector"></div>
+                    <div id="color26" class="colorSelector"></div>
+                </div>
+                <div>
+                    <label for="formNodeStart">Start :</label>
+                    <input id="formNodeStart" type="checkbox" v-model="origin" />
+                    <label for="formNodeEnd">End :</label>
+                    <input id="formNodeEnd" type="checkbox" v-model="end" />
+                    <button id="helpEndNode" class="help">?</button>
+                </div>
+                <label class="fullWidth" for="formNodeDescription">Description :</label>
+                <textarea id="formNodeDescription" v-model="description" placeHolder="Markdown available !"></textarea>
+                <label for="formNodeDateBegin">Date begin :</label>
+                <input id="formNodeDateBegin" type="text" v-date="dateBegin" placeHolder="mm/yyyy" />
+                <label for="formNodeDateEnd">Date end :</label>
+                <input id="formNodeDateEnd" type="text" v-date="dateEnd" placeHolder="mm/yyyy" />
+            </form>
+        </div>
+    </div>
+    <script src="js/editor.js"></script>
+</body>
+
+</html>
