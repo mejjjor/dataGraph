@@ -62,6 +62,14 @@ module.exports = {
         node1.brothers.splice(index1, 1);
         node2.brothers.splice(index2, 1);
     },
+    getNodesTypes: function(){
+    	var nodesTypes = [];
+    	for (var i=0;i<treeNodes.length;i++){
+    		if (nodesTypes.indexOf(treeNodes[i].type) === -1)
+    			nodesTypes.push(treeNodes[i].type);
+    	}
+    	return nodesTypes;
+    },
     exportData: function() {
         return core.exportData(treeNodes);
     },
