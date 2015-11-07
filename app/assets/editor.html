@@ -16,6 +16,9 @@
 <body>
     <datalist id="types">
     </datalist>
+    <button id="export">Export</button>
+    <input type="text" id="exchange" />
+    <button id="import">Import</button>
     <svg id="graph" class="disable-selection" />
     <div id="modal" draggable="true">
         <div id="ModalHandle">
@@ -60,7 +63,6 @@
                     <input id="formNodeStart" type="checkbox" v-model="origin" />
                     <label for="formNodeEnd">End :</label>
                     <input id="formNodeEnd" type="checkbox" v-model="end" />
-                    <button id="helpEndNode" class="help">?</button>
                 </div>
                 <label class="fullWidth" for="formNodeDescription">Description :</label>
                 <textarea id="formNodeDescription" v-model="description" placeHolder="Markdown available !"></textarea>

@@ -123,11 +123,15 @@ describe("CRUD on tree", function() {
             tree.removeAllNodesFromTreeNodes();
             expect(tree.getTreeNodes().length).to.equal(0);
             tree.importData(string);
-            
+
             treeNodes = tree.getTreeNodes();
             expect(treeNodes[0].id).to.equal(node1.id);
             expect(treeNodes[1].id).to.equal(node2.id);
             expect(treeNodes.length).to.equal(2);
+            expect(treeNodes[0].brothers[0]).to.equal(treeNodes[1]);
+            expect(treeNodes[0].brothers.length).to.equal(1);
+            expect(treeNodes[1].brothers[0]).to.equal(treeNodes[0]);
+            expect(treeNodes[1].brothers.length).to.equal(1);
         });
         it("should keep max id", function() {
             var node1 = tree.createNode();
@@ -137,9 +141,25 @@ describe("CRUD on tree", function() {
             var node3 = tree.createNode();
             tree.removeAllNodesFromTreeNodes();
             tree.importData(string);
-            
+
             var node4 = tree.createNode();
             expect(node4.id).to.equal(2);
+        });
+        it("should return all links", function() {
+            var node1 = tree.createNode();
+            var node2 = tree.createNode();
+            var node3 = tree.createNode();
+            var link = tree.createLink(node1, node2);
+            var link = tree.createLink(node1, node3);
+            var string = tree.exportData();
+            tree.removeAllNodesFromTreeNodes();
+            expect(tree.getTreeNodes().length).to.equal(0);
+            tree.importData(string);
+            var links = tree.getLinks();
+            expect(links.length).to.equal(2);
+            expect(links).to.contains({source:node1,target:node2});
+            expect(links).to.contains({source:node1,target:node3});
+
         });
     })
 })

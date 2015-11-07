@@ -30,19 +30,6 @@
     -moz-border-radius: 12px;
     border-radius: 12px;
 }
-.help{
-    background: #073642;
-    color: #FFFFFF;
-    border: 0px;
-    line-height: 25px;
-    text-align: center;
-    width: 24px;
-    text-decoration: none;
-    font-weight: bold;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    border-radius: 12px;
-}
 
 .help .close:hover {
     background: #002B36;

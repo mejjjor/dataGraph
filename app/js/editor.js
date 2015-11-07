@@ -21,7 +21,6 @@ var mousedown_node = null;
 var mouseup_node = null;
 var mousedown_link = null;
 var mousedrag = null;
-var nodesTypes;
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -44,8 +43,8 @@ svg.append('svg:rect')
 
 var force = d3.layout.force()
     .charge(-2000)
-    .linkDistance(100)
-    .linkStrength(0.7)
+    .linkDistance(130)
+    .linkStrength(0.5)
     .gravity(0.1)
     .theta(0.2)
     .size([width, height])
@@ -81,21 +80,21 @@ function restart() {
         .on("mouseup", function(d) {
             mouseup_node = d;
         })
-          .on("click", clickNode);
-        // .on("dblclick", function(d) {
-        //     d3.event.stopPropagation();
-        //     modal.closeModal();
-        //     tree.deleteNode(d);
-        //     setFilters();
-        //     restart();
-        // });
+        .on("click", clickNode);
+    // .on("dblclick", function(d) {
+    //     d3.event.stopPropagation();
+    //     modal.closeModal();
+    //     tree.deleteNode(d);
+    //     setFilters();
+    //     restart();
+    // });
 
     elem.append("circle")
         .attr("class", "circle")
         .attr("v-fill", "color")
         .attr("r", 58)
-        
-        
+
+
 
     elem.append("text")
         .attr("v-content", "label")
@@ -161,15 +160,11 @@ function clickNode(node) {
         el: '#formNode',
         data: node
     });
-     var unwatchType = linkTypeAndColor(vm, node);
-    // var unwatchOrigin = watchOrigin(vm, node);
-    // var unwatchEnd = watchEnd(vm, node);
+    var unwatchType = linkTypeAndColor(vm, node);
 
-    // modal.setBeforeCloseModal(function() {
-    //     unwatchType();
-    //     unwatchOrigin();
-    //     unwatchEnd();
-    // });
+    modal.setBeforeCloseModal(function() {
+        unwatchType();
+    });
 
     modal.openModal(d3.event.clientX, d3.event.clientY);
 }
@@ -250,3 +245,21 @@ function resetEvents() {
         .attr("x2", 0)
         .attr("y2", 0);
 }
+
+
+///// IMPORT / EXPORT ////////////
+
+$('#import').click(function(e) {
+    var newNodes = tree.importData(document.getElementById("exchange").value);
+    for (var i = 0; i < newNodes.length; i++){
+        nodes.push(newNodes[i]);
+    }
+    var newLinks = tree.getLinks();
+    for (var i=0;i<newLinks.length;i++)
+    	links.push(newLinks[i]);
+    restart();
+});
+
+$('#export').click(function(e) {
+    document.getElementById("exchange").value = tree.exportData();
+});

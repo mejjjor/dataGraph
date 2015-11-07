@@ -11,10 +11,10 @@ module.exports = {
         return treeNodes;
     },
     createNode: function(x, y) {
-    	if(x === undefined)
-    		x = 0;
-    	if(y === undefined)
-    		y = 0;
+        if (x === undefined)
+            x = 0;
+        if (y === undefined)
+            y = 0;
         var elem = {
             id: nodeNextId,
             x: x,
@@ -62,13 +62,13 @@ module.exports = {
         node1.brothers.splice(index1, 1);
         node2.brothers.splice(index2, 1);
     },
-    getNodesTypes: function(){
-    	var nodesTypes = [];
-    	for (var i=0;i<treeNodes.length;i++){
-    		if (nodesTypes.indexOf(treeNodes[i].type) === -1)
-    			nodesTypes.push(treeNodes[i].type);
-    	}
-    	return nodesTypes;
+    getNodesTypes: function() {
+        var nodesTypes = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (nodesTypes.indexOf(treeNodes[i].type) === -1)
+                nodesTypes.push(treeNodes[i].type);
+        }
+        return nodesTypes;
     },
     exportData: function() {
         return core.exportData(treeNodes);
@@ -77,5 +77,34 @@ module.exports = {
         var dataImport = core.importData(data)
         treeNodes = dataImport.treeNodes;
         nodeNextId = dataImport.nodeNextId;
+        return treeNodes;
+    },
+    getLinks: function() {
+        var nodesDone = [];
+        var links = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (nodesDone.indexOf(treeNodes[i].id) === -1) {
+                var result = computeNode(treeNodes[i], nodesDone, links, null);
+            }
+        }
+        return links;
     }
+}
+
+function computeNode(node, nodesDone, links, previousNode) {
+    nodesDone.push(node.id);
+    for (var i = 0; i < node.brothers.length; i++) {
+        if (previousNode != node.brothers[i]) {
+            links.push({
+                source: node,
+                target: node.brothers[i]
+            });
+            computeNode(node.brothers[i], nodesDone, links, node);
+        }
+    }
+    return {
+        nodesDone: nodesDone,
+        links: links
+    };
+
 }
