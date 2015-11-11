@@ -80,14 +80,13 @@ function restart() {
         .on("mouseup", function(d) {
             mouseup_node = d;
         })
-        .on("click", clickNode);
-    // .on("dblclick", function(d) {
-    //     d3.event.stopPropagation();
-    //     modal.closeModal();
-    //     tree.deleteNode(d);
-    //     setFilters();
-    //     restart();
-    // });
+        .on("click", clickNode)
+        .on("dblclick", function(d) {
+            d3.event.stopPropagation();
+            modal.closeModal();
+            tree.deleteNode(d);
+            restart();
+        });
 
     elem.append("circle")
         .attr("class", "circle")
@@ -174,7 +173,7 @@ function addNewTypes() {
     //kk
     document.getElementById("types").innerHTML = '';
     for (var i in nodesTypes)
-        document.getElementById("types").innerHTML += '<option value="' + nodesTypes[i] + '"/>';
+        document.getElementById("types").innerHTML += '<option value="' + nodesTypes[i].label + '"/>';
 
 }
 
@@ -251,12 +250,12 @@ function resetEvents() {
 
 $('#import').click(function(e) {
     var newNodes = tree.importData(document.getElementById("exchange").value);
-    for (var i = 0; i < newNodes.length; i++){
+    for (var i = 0; i < newNodes.length; i++) {
         nodes.push(newNodes[i]);
     }
     var newLinks = tree.getLinks();
-    for (var i=0;i<newLinks.length;i++)
-    	links.push(newLinks[i]);
+    for (var i = 0; i < newLinks.length; i++)
+        links.push(newLinks[i]);
     restart();
 });
 

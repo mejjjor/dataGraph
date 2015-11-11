@@ -1,6 +1,13 @@
 var core = require('./treeNodesCore.js');
+var _ = require('../../node_modules/underscore/underscore-min.js');
 var treeNodes = [];
 var nodeNextId = 1;
+var filters = {
+    allowTypes: [],
+    allowIds: [],
+    dateBegin: "",
+    dateEnd: ""
+}
 
 module.exports = {
     removeAllNodesFromTreeNodes: function() {
@@ -63,48 +70,27 @@ module.exports = {
         node2.brothers.splice(index2, 1);
     },
     getNodesTypes: function() {
-        var nodesTypes = [];
-        for (var i = 0; i < treeNodes.length; i++) {
-            if (nodesTypes.indexOf(treeNodes[i].type) === -1)
-                nodesTypes.push(treeNodes[i].type);
-        }
-        return nodesTypes;
+        return core.getNodesTypes(treeNodes);
     },
     exportData: function() {
-        return core.exportData(treeNodes);
+        initFilters()
+        return core.exportData(treeNodes,filters);
     },
     importData: function(data) {
         var dataImport = core.importData(data)
         treeNodes = dataImport.treeNodes;
         nodeNextId = dataImport.nodeNextId;
+        initFilters();
         return treeNodes;
     },
     getLinks: function() {
-        var nodesDone = [];
-        var links = [];
-        for (var i = 0; i < treeNodes.length; i++) {
-            if (nodesDone.indexOf(treeNodes[i].id) === -1) {
-                var result = computeNode(treeNodes[i], nodesDone, links, null);
-            }
-        }
-        return links;
+        return core.getLinks(treeNodes);
     }
 }
 
-function computeNode(node, nodesDone, links, previousNode) {
-    nodesDone.push(node.id);
-    for (var i = 0; i < node.brothers.length; i++) {
-        if (previousNode != node.brothers[i]) {
-            links.push({
-                source: node,
-                target: node.brothers[i]
-            });
-            computeNode(node.brothers[i], nodesDone, links, node);
-        }
-    }
-    return {
-        nodesDone: nodesDone,
-        links: links
-    };
-
+function initFilters(){
+    filters.allowTypes = core.getNodesTypes(treeNodes);
+    filters.allowIds = _.map(treeNodes,function(val){return val.id});
 }
+
+

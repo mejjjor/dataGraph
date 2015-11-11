@@ -10,14 +10,12 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 
 var modal = require('./modal.js');
 require('./binding.js');
-var tree = require('./treeNodes.js');
+var tree = require('./treeNodesViz.js');
 var slider = require('./slider.js');
 var data = require('./data/data_s.json');
 
-var width = 1200,
-    height = 800;
-// // var width = window.innerWidth-20,
-//     height = window.innerHeight-70;
+var width = window.innerWidth,
+    height = window.innerHeight - 10;
 
 var mousedown_node = null;
 var mouseup_node = null;
