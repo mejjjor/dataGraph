@@ -71,8 +71,18 @@ $(document).ready(function() {
         div.addEventListener("click", function() {
             if (tree.switchType(this.innerHTML))
                 this.style.backgroundColor = d3.rgb(this.style.backgroundColor).darker(2);
-            else
-                this.style.backgroundColor = d3.rgb(this.style.backgroundColor).brighter(2);
+            else {
+                var types = tree.getNodesTypes();
+                for (var i = 0; i < types.length; i++) {
+                    if (types[i].label == this.innerHTML) {
+                        this.style.backgroundColor = types[i].color;
+
+                    }
+                }
+
+            }
+
+            restart();
         }, false);
         divFilters.appendChild(div);
     }

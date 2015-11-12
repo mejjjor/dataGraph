@@ -38,8 +38,8 @@ var svg = d3.select("#graph")
 
 svg.append('svg:rect')
     .attr('width', width * 3)
-    .attr('height', height * 2)
-    .attr('transform', 'translate(-600,-600)');
+    .attr('height', height * 2);
+    // .attr('transform', 'translate(-600,-600)');
 
 var force = d3.layout.force()
     .charge(-2000)
@@ -85,6 +85,7 @@ function restart() {
             d3.event.stopPropagation();
             modal.closeModal();
             tree.deleteNode(d);
+            buildTree(tree.getTreeNodes());
             restart();
         });
 
@@ -115,7 +116,8 @@ function restart() {
         })
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
-            tree.deleteLink(d);
+            tree.deleteLink(d.source,d.target);
+            buildTree(tree.getTreeNodes());
             restart();
         });
     link.exit().remove();
@@ -250,15 +252,24 @@ function resetEvents() {
 
 $('#import').click(function(e) {
     var newNodes = tree.importData(document.getElementById("exchange").value);
-    for (var i = 0; i < newNodes.length; i++) {
-        nodes.push(newNodes[i]);
-    }
-    var newLinks = tree.getLinks();
-    for (var i = 0; i < newLinks.length; i++)
-        links.push(newLinks[i]);
+    buildTree(newNodes);
     restart();
 });
 
 $('#export').click(function(e) {
     document.getElementById("exchange").value = tree.exportData();
 });
+
+
+function buildTree(newNodes){
+    while (nodes.length > 0)
+        nodes.pop();
+    while (links.length > 0)
+        links.pop();
+    for (var i = 0; i < newNodes.length; i++) {
+        nodes.push(newNodes[i]);
+    }
+    var newLinks = tree.getLinks();
+    for (var i = 0; i < newLinks.length; i++)
+        links.push(newLinks[i]);
+}

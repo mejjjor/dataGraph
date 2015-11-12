@@ -16,7 +16,7 @@ module.exports = {
         links = d3Links;
     },
     exportData: function() {
-        return core.exportData(treeNodes,filters);
+        return core.exportData(treeNodes, filters);
     },
     importData: function(data) {
         var dataImport = core.importData(data)
@@ -31,15 +31,13 @@ module.exports = {
         return core.getNodesTypes(treeNodes);
     },
     switchType: function(type) {
-        var index = _.map(filters.allowTypes,function(val){return val.label}).indexOf(type);
-        if (index != -1)
-            filters.allowTypes.splice(index, 1);
-        else
-            filters.allowTypes.push(type)
-        getTree();
-        if (index === -1)
-            return false;
-        return true;
+        for (var i = 0; i < filters.allowTypes.length; i++) {
+            if (filters.allowTypes[i].label === type) {
+                filters.allowTypes[i].isActive = !filters.allowTypes[i].isActive;
+                getTree();
+                return filters.allowTypes[i].isActive;
+            }
+        }
     }
 }
 
@@ -50,7 +48,7 @@ function getTree() {
         links.pop();
     var spineNodes = getSpineNodes();
     if (spineNodes.length > 0)
-        computeTree(spineNodes[0], null);
+        computeTree(spineNodes[0], null, null);
 }
 
 function getSpineNodes() {
@@ -62,20 +60,22 @@ function getSpineNodes() {
     return spineNodes;
 }
 
-function computeTree(node, previousNode) {
+function computeTree(node, previousNode, lastLink) {
     if (isIdAllow(node) && isDateAllow(node)) {
-        if (isTypeAllow(node)) {
+        if (node.isSpine || isTypeAllow(node)) {
             nodes.push(node);
-            if (previousNode != null) {
+            if (lastLink != null) {
                 links.push({
                     source: node,
-                    target: previousNode
+                    target: lastLink
                 });
             }
+            lastLink = node;
         }
+
         for (var i = 0; i < node.brothers.length; i++) {
             if (node.brothers[i] != previousNode)
-                computeTree(node.brothers[i], node);
+                computeTree(node.brothers[i], node, lastLink);
         }
     } else {
         return;
@@ -88,7 +88,9 @@ function isIdAllow(node) {
 }
 
 function isTypeAllow(node) {
-    return (_.map(filters.allowTypes,function(val){return val.label}).indexOf(node.type) != -1);
+    for (var i = 0; i < filters.allowTypes.length; i++)
+        if (filters.allowTypes[i].label === node.type)
+            return !filters.allowTypes[i].isActive;
 }
 
 function isDateAllow(node) {

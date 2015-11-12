@@ -57,7 +57,7 @@ module.exports = {
         var nodesTypes = [];
         for (var i = 0; i < treeNodes.length; i++) {
             if (_.map(nodesTypes,function(val){return val.label}).indexOf(treeNodes[i].type) === -1){
-                nodesTypes.push({label:treeNodes[i].type,color:treeNodes[i].color});
+                nodesTypes.push({label:treeNodes[i].type,color:treeNodes[i].color,isActive:true});
             }
         }
         return nodesTypes;
