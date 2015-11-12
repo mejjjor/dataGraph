@@ -50,6 +50,10 @@ var nodes = force.nodes(),
 
 tree.init(nodes, links);
 
+var dateFiltersHook = function(dates) {
+    tree.changeDate(dates)
+    restart();
+}
 
 $(document).ready(function() {
     var newNodes = tree.importData(JSON.stringify(data));
@@ -85,6 +89,15 @@ $(document).ready(function() {
             restart();
         }, false);
         divFilters.appendChild(div);
+    }
+
+    //date filter
+    var dateRange = tree.getDateRange();
+    if (dateRange.min != "" || dateRange.max != "") {
+        slider.setDateRange(dateRange.min, dateRange.max);
+        slider.setDateStart(tree.getDateFilterStart(), tree.getDateFilterEnd());
+        slider.updateHook(dateFiltersHook);
+        slider.refreshSlider();
     }
     restart();
 });

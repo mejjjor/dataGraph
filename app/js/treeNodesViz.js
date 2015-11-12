@@ -35,9 +35,34 @@ module.exports = {
             if (filters.allowTypes[i].label === type) {
                 filters.allowTypes[i].isActive = !filters.allowTypes[i].isActive;
                 getTree();
-                return filters.allowTypes[i].isActive;
+                return !filters.allowTypes[i].isActive;
             }
         }
+    },
+    changeDate: function(dates) {
+        filters.dateBegin = dates[0];
+        filters.dateEnd = dates[1];
+        getTree();
+    },
+    getDateFilterStart: function() {
+        return filters.dateBegin;
+    },
+    getDateFilterEnd: function() {
+        return filters.dateEnd;
+    },
+    getDateRange: function() {
+        var min = treeNodes[0].dateBegin;
+        var max = treeNodes[0].dateEnd;
+        for (var i = 1; i < treeNodes.length; i++) {
+            if (treeNodes[i].dateBegin != "" && (treeNodes[i].dateBegin < min || min === ""))
+                min = treeNodes[i].dateBegin;
+            if (treeNodes[i].dateEnd != "" && (treeNodes[i].dateEnd > max || max === ""))
+                max = treeNodes[i].dateEnd;
+        }
+        return {
+            min: min,
+            max: max
+        };
     }
 }
 
@@ -78,7 +103,10 @@ function computeTree(node, previousNode, lastLink) {
                 computeTree(node.brothers[i], node, lastLink);
         }
     } else {
-        return;
+        for (var i = 0; i < node.brothers.length; i++) {
+            if (node.brothers[i] != previousNode && node.brothers[i].isSpine)
+                computeTree(node.brothers[i], node, lastLink);
+        }
     }
 };
 
@@ -90,10 +118,10 @@ function isIdAllow(node) {
 function isTypeAllow(node) {
     for (var i = 0; i < filters.allowTypes.length; i++)
         if (filters.allowTypes[i].label === node.type)
-            return !filters.allowTypes[i].isActive;
+            return filters.allowTypes[i].isActive;
 }
 
 function isDateAllow(node) {
-    //return ((node.dateBegin == "" || filters.dateEnd >= node.dateBegin) && (node.dateEnd == "" || filters.dateBegin <= node.dateEnd));
-    return true;
+    return ((node.dateBegin === "" || filters.dateEnd >= node.dateBegin) && (node.dateEnd === "" || filters.dateBegin <= node.dateEnd));
+
 }

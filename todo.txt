@@ -1,3 +1,5 @@
--zoom sur un slider vertical
-
+- filtre date
+- node fixe plus gros
+- gerer si nb filtres dépasse taille écran
+- design popup en mode viz
 http://florentsegouin.me/vesta/

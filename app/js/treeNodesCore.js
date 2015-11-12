@@ -35,6 +35,14 @@ module.exports = {
         var treeNodes = [];
 
         for (var i = 0; i < data.treeNodes.length; i++) {
+            if (data.treeNodes[i].dateBegin != "")
+                data.treeNodes[i].dateBegin = new Date(data.treeNodes[i].dateBegin);
+            else
+                data.treeNodes[i].dateBegin = "";
+            if (data.treeNodes[i].dateEnd != "")
+                data.treeNodes[i].dateEnd = new Date(data.treeNodes[i].dateEnd);
+            else
+                data.treeNodes[i].dateEnd = "";
             var brothers = [];
             for (var j = 0; j < data.treeNodes[i].brothers.length; j++) {
                 brothers.push(findNodeById(data.treeNodes[i].brothers[j], data.treeNodes));
