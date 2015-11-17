@@ -19,6 +19,8 @@ var formNodeContent = document.getElementById("formNode").innerHTML;
 var width = window.innerWidth,
     height = window.innerHeight - 10;
 
+var yFirst, yLast;
+
 var svg = d3.select("#graph")
     .attr("width", width)
     .attr("height", height)
@@ -34,11 +36,22 @@ var svg = d3.select("#graph")
 // .on("dblclick", createNode);
 
 var force = d3.layout.force()
-    .charge(-2000)
-    .linkDistance(130)
-    .linkStrength(0.5)
+    .charge(function(d) {
+        if (d.isSpine)
+            return -4000
+        return -3000;
+    })
+    .chargeDistance(1000)
+    .linkDistance(function(d) {
+        if (d.source.isSpine && d.target.isSpine)
+            return 120
+        if (d.source.isSpine || d.target.isSpine)
+            return 100;
+        return 80;
+    })
+    .linkStrength(0.8)
     .gravity(0.1)
-    .theta(0.2)
+    .theta(0.1)
     .size([width, height])
     .on("tick", tick);
 
@@ -57,6 +70,7 @@ var dateFiltersHook = function(dates) {
 
 $(document).ready(function() {
     var newNodes = tree.importData(JSON.stringify(data));
+    tree.orderNodes();
     for (var i = 0; i < newNodes.length; i++) {
         nodes.push(newNodes[i]);
     }
@@ -130,9 +144,17 @@ function restart() {
     // });
 
     elem.append("circle")
-        .attr("class", "circle")
+        .attr("class", function(d) {
+            if (d.isSpine)
+                return "strongCircle"
+            return "circle";
+        })
         .attr("v-fill", "color")
-        .attr("r", 58)
+        .attr("r", function(d) {
+            if (d.isSpine)
+                return 68;
+            return 58;
+        })
 
 
 
@@ -148,10 +170,16 @@ function restart() {
 
     node.exit().remove();
 
-    link = link.data(links);
-    link.enter().insert("line", "g")
-        .attr("class", "link");
+    link = link.data(force.links(), function(d) {
+        return "" + d.source.id + d.target.id;
+    });
     link.exit().remove();
+    link.enter().insert("line", "g")
+        .attr("class", function(d) {
+            if (d.source.isSpine && d.target.isSpine)
+                return "strongLink";
+            return "link";
+        });
     force.start();
 }
 
@@ -170,6 +198,27 @@ function tick(e) {
         });
 
     node.attr("transform", function(d) {
+        if (d.isSpine) {
+            if (d.order === 0) {
+                yFirst = d.y;
+                if (d.x > 100)
+                    d.x = 100;
+            } else if (d.order === (d.spineCount - 1)) {
+                yLast = d.y;
+                if (d.x < 100 + d.spineCount * 140)
+                    d.x = 100 + d.spineCount * 140;
+            } else {
+                var yDelta = yFirst - yLast;
+                console.log(d.label + " / " + d.order + " / " + yFirst + " / " + yDelta + " / " + (yDelta / d.spineCount) * d.order);
+                if (d.y > yFirst + (yDelta / d.spineCount) * d.order + 50) {
+                    d.y = yFirst + (yDelta / d.spineCount) * d.order + 50;
+                }
+                if (d.y < yFirst + (yDelta / d.spineCount) * d.order - 50) {
+                    d.y = yFirst + (yDelta / d.spineCount) * d.order - 50;
+                }
+            }
+
+        }
         return "translate(" + d.x + "," + d.y + ")";
     });
 }

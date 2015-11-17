@@ -97,11 +97,22 @@ svg,
     stroke: #586E75;
     stroke-width: 10px;
 }
+.strongLink {
+    stroke: #C30A1E;
+    stroke-width: 12px;
+}
+
 
 .circle {
     fill: #fff;
-    stroke-width: 6px;
+    stroke-width: 5px;
     stroke: #073642;
+}
+
+.strongCircle {
+    fill: #fff;
+    stroke-width: 6px;
+    stroke: #000;
 }
 
 #color1 {

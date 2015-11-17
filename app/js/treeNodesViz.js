@@ -63,6 +63,19 @@ module.exports = {
             min: min,
             max: max
         };
+    },
+    orderNodes: function() {
+        var tempNodes = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (treeNodes[i].isSpine) {
+                tempNodes.push(treeNodes[i])
+            }
+        }
+        var sortedTempNodes = _.sortBy(tempNodes, 'dateBegin');
+        for (var i = 0; i < sortedTempNodes.length; i++) {
+            sortedTempNodes[i].order = i;
+            sortedTempNodes[i].spineCount = sortedTempNodes.length;
+        }
     }
 }
 

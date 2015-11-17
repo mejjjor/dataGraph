@@ -28,6 +28,7 @@ module.exports = {
             }
             data.treeNodes.push(node);
         }
+        data.nodeNextId++;
         return JSON.stringify(data);
     },
     importData: function(dataImport) {
