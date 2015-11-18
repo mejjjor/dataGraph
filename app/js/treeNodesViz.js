@@ -107,6 +107,7 @@ function computeTree(node, previousNode, lastLink) {
                     source: node,
                     target: lastLink
                 });
+                node.previousNode = lastLink;
             }
             lastLink = node;
         }

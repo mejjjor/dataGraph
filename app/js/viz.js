@@ -20,6 +20,7 @@ var width = window.innerWidth,
     height = window.innerHeight - 10;
 
 var yFirst, yLast;
+var spineX=[];
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -35,21 +36,19 @@ var svg = d3.select("#graph")
 // .on("mouseup", mouseUp)
 // .on("dblclick", createNode);
 
+
+
 var force = d3.layout.force()
-    .charge(function(d) {
-        if (d.isSpine)
-            return -4000
-        return -3000;
-    })
+    .charge(-3000)
     .chargeDistance(1000)
     .linkDistance(function(d) {
         if (d.source.isSpine && d.target.isSpine)
-            return 120
+            return 140
         if (d.source.isSpine || d.target.isSpine)
             return 100;
         return 80;
     })
-    .linkStrength(0.8)
+    .linkStrength(0.5)
     .gravity(0.1)
     .theta(0.1)
     .size([width, height])
@@ -94,12 +93,9 @@ $(document).ready(function() {
                 for (var i = 0; i < types.length; i++) {
                     if (types[i].label == this.innerHTML) {
                         this.style.backgroundColor = types[i].color;
-
                     }
                 }
-
             }
-
             restart();
         }, false);
         divFilters.appendChild(div);
@@ -126,6 +122,14 @@ function restart() {
         .attr("id", function(d) {
             return "gVueId" + d.id
         })
+        // .attr("transform", function(d) {
+        //     if (d.previousNode != undefined) {
+        //         d.x = d.previousNode.x;
+        //         d.y = d.previousNode.y;
+        //         return "translate(" + d.previousNode.x + "," + d.previousNode.y + ")";
+        //     }
+        //     return "translate(" + width / 2 + "," + height / 2 + ")";
+        // })
         .on("mousedown", function(d) {
             // d3.event.stopPropagation();
             // mousedown_node = d;
@@ -143,6 +147,22 @@ function restart() {
     //     restart();
     // });
 
+    elem.append("rect", "g")
+        .attr("x", -3)
+        .attr("y", -150)
+        .attr("height", function(d) {
+            if (d.isSpine)
+                return 300
+            return 0;
+        })
+        .attr("width", function(d) {
+            if (d.isSpine)
+                return 6;   
+            return 0;
+        })
+        .attr("fill", "url(#grad)");
+
+
     elem.append("circle")
         .attr("class", function(d) {
             if (d.isSpine)
@@ -150,15 +170,35 @@ function restart() {
             return "circle";
         })
         .attr("v-fill", "color")
+        .attr("r", 0)
+        .transition()
+        .duration(600)
         .attr("r", function(d) {
             if (d.isSpine)
                 return 68;
             return 58;
-        })
-
-
+        });
 
     elem.append("text")
+        .text(function(d) {
+            if (d.isSpine)
+                return d.dateBegin.getFullYear();
+            return "";
+        })
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate(0,45)")
+        .attr("fill", function(d) {
+            return d.color;
+        })
+        .attr("display", "none")
+        .transition()
+        .delay(300)
+        .duration(500)
+        .attr("display", "inline")
+        .attr("fill", "#000");
+
+    elem.insert("text")
+        .attr("display", "none")
         .attr("v-content", "label")
         .attr("text-anchor", "middle")
         .each(function(d) {
@@ -166,7 +206,16 @@ function restart() {
                 el: "#gVueId" + d.id,
                 data: d
             });
-        });
+        })
+        .attr("fill", function(d) {
+            return d.color;
+        })
+        .transition()
+        .delay(300)
+        .duration(500)
+        .attr("display", "inline")
+        .attr("fill", "#000");
+
 
     node.exit().remove();
 
@@ -174,12 +223,18 @@ function restart() {
         return "" + d.source.id + d.target.id;
     });
     link.exit().remove();
+
     link.enter().insert("line", "g")
         .attr("class", function(d) {
             if (d.source.isSpine && d.target.isSpine)
                 return "strongLink";
             return "link";
         });
+
+
+
+
+
     force.start();
 }
 
@@ -209,15 +264,14 @@ function tick(e) {
                     d.x = 100 + d.spineCount * 140;
             } else {
                 var yDelta = yFirst - yLast;
-                console.log(d.label + " / " + d.order + " / " + yFirst + " / " + yDelta + " / " + (yDelta / d.spineCount) * d.order);
                 if (d.y > yFirst + (yDelta / d.spineCount) * d.order + 50) {
                     d.y = yFirst + (yDelta / d.spineCount) * d.order + 50;
                 }
-                if (d.y < yFirst + (yDelta / d.spineCount) * d.order - 50) {
-                    d.y = yFirst + (yDelta / d.spineCount) * d.order - 50;
+                if (d.y < yLast + (yDelta / d.spineCount) * d.order - 50) {
+                    d.y = yLast + (yDelta / d.spineCount) * d.order - 50;
                 }
             }
-
+            spineX[d.id] = d.x;
         }
         return "translate(" + d.x + "," + d.y + ")";
     });

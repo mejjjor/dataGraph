@@ -77,9 +77,6 @@ svg,
     float: right;
 }
 
-#graph rect {
-    fill: #073642;
-}
 
 .disable-selection {
     -webkit-user-select: none;
@@ -99,7 +96,12 @@ svg,
 }
 .strongLink {
     stroke: #C30A1E;
-    stroke-width: 12px;
+    stroke-width: 18px;
+}
+
+.dateSeparator{
+    //stroke: #000;   
+    stroke-width: 6px;
 }
 
 
