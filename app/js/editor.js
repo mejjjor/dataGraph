@@ -38,7 +38,8 @@ var svg = d3.select("#graph")
 
 svg.append('svg:rect')
     .attr('width', width * 3)
-    .attr('height', height * 2);
+    .attr('height', height * 2)
+    .attr("fill","#073642");
     // .attr('transform', 'translate(-600,-600)');
 
 var force = d3.layout.force()

@@ -1,3 +1,4 @@
 - gerer si nb filtres dépasse taille écran
 - design popup en mode viz
+- filtre par nom
 http://florentsegouin.me/vesta/

@@ -70,7 +70,15 @@ module.exports = {
             }
         }
         return nodesTypes;
+    },
+    getSpineNodes: function(treeNodes) {
+    var spineNodes = [];
+    for (var i = 0; i < treeNodes.length; i++) {
+        if (treeNodes[i].isSpine)
+            spineNodes.push(treeNodes[i]);
     }
+    return spineNodes;
+}
 }
 
 function findNodeById(id, treeNodes) {

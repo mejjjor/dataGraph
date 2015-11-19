@@ -3,6 +3,7 @@ var _ = require('../../node_modules/underscore/underscore-min.js');
 var treeNodes = [];
 var links = [];
 var nodes = [];
+var undoIds=[];
 var filters = {
     allowTypes: [],
     allowIds: [],
@@ -38,6 +39,19 @@ module.exports = {
                 return !filters.allowTypes[i].isActive;
             }
         }
+    },
+    switchId: function(id) {
+        var index = filters.allowIds.indexOf(id);
+        if(index === -1){
+            filters.allowIds.push(id);
+        }else{
+            undoIds.push(filters.allowIds.splice(index,1));
+        }
+        getTree();
+
+    },
+    getNextUndoId: function(){
+        return undoIds.pop();
     },
     changeDate: function(dates) {
         filters.dateBegin = dates[0];
@@ -76,6 +90,9 @@ module.exports = {
             sortedTempNodes[i].order = i;
             sortedTempNodes[i].spineCount = sortedTempNodes.length;
         }
+    },
+    getSpineNodes : function(){
+        return core.getSpineNodes(treeNodes);
     }
 }
 
@@ -84,18 +101,9 @@ function getTree() {
         nodes.pop();
     while (links.length > 0)
         links.pop();
-    var spineNodes = getSpineNodes();
+    var spineNodes = core.getSpineNodes(treeNodes);
     if (spineNodes.length > 0)
         computeTree(spineNodes[0], null, null);
-}
-
-function getSpineNodes() {
-    var spineNodes = [];
-    for (var i = 0; i < treeNodes.length; i++) {
-        if (treeNodes[i].isSpine)
-            spineNodes.push(treeNodes[i]);
-    }
-    return spineNodes;
 }
 
 function computeTree(node, previousNode, lastLink) {
@@ -125,8 +133,7 @@ function computeTree(node, previousNode, lastLink) {
 };
 
 function isIdAllow(node) {
-    //return (filters.allowIds.indexOf(node) != -1);
-    return true;
+    return (filters.allowIds.indexOf(node.id) != -1);
 }
 
 function isTypeAllow(node) {
