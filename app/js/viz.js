@@ -114,6 +114,32 @@ $(document).ready(function() {
     }
 
 
+    $("#leftArrow").click(function() {
+        var view = $("#filters");
+        var move = "100px";
+        var currentPosition = parseInt(view.css("left"));
+        if (currentPosition < 0)
+            view.stop(false, true).animate({
+                left: "+=" + move
+            }, {
+                duration: 400
+            });
+    });
+
+
+    $("#rightArrow").click(function() {
+
+        var view = $("#filters");
+        var move="100px";
+        var currentPosition = parseInt(view.css("left"));
+        view.stop(false, true).animate({
+            left: "-=" + move
+        }, {
+            duration: 400
+        })
+
+    });
+
     restart();
 });
 

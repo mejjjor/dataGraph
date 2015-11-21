@@ -1,4 +1,4 @@
-body{
+body {
     background-color: black;
     width: 100%;
     height: 100%;
@@ -6,32 +6,46 @@ body{
     font-size: 14px;
 }
 
-svg,
-{
+svg {
     background: black;
 }
 
-#menu{
+#menu {
     opacity: 0.3;
     height: 60px;
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
     width: 100%;
     background-color: black;
-
 }
-#menuFilters{
+
+#menuFilters {
     min-width: 100%;
     height: 60px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
-.filters{
+
+#filtersContainer {
+    overflow: hidden;
+    max-width: 60%;
+}
+
+#filters {
+    position: relative;
+    white-space: nowrap;
+    display: inline-block;
+    left:-100px;
+}
+
+.filters {
     display: inline-block;
     padding: 3px 10px;
     margin: 5px;
@@ -97,16 +111,16 @@ svg,
     stroke: #586E75;
     stroke-width: 10px;
 }
+
 .strongLink {
     stroke: #C30A1E;
     stroke-width: 18px;
 }
 
-.dateSeparator{
+.dateSeparator {
     //stroke: #000;   
     stroke-width: 6px;
 }
-
 
 .circle {
     fill: #fff;

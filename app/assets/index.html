@@ -17,9 +17,12 @@
     <div id="menu">
     </div>
     <div id="menuFilters">
-        <!--  <i class="fa fa-angle-left fa-4x"></i> -->
-        <div id="filters">
+        <i id="leftArrow" class="fa fa-angle-left fa-4x"></i>
+        <div id="filtersContainer">
+            <div id="filters">
+            </div>
         </div>
+        <i id="rightArrow" class="fa fa-angle-right fa-4x"></i>
         <div id="filtersDateExclude">
             <div id="filtersDate">
                 <div id="dateSlider"></div>
@@ -27,18 +30,16 @@
                 <div id="event-end"></div>
             </div>
         </div>
-        <!-- <i class="fa fa-angle-right fa-4x"></i> -->
     </div>
     <svg id="graph" class="disable-selection">
-    <defs>
-        <linearGradient id="grad"
-             x1="0" y1="0" x2="0" y2="100%">
-            <stop offset="0%" stop-color="#000" stop-opacity="0"/>
-            <stop offset="20%" stop-color="#000" />
-            <stop offset="80%" stop-color="#000" />
-            <stop offset="100%" stop-color="#000" stop-opacity="0"/>
-        </linearGradient>
-    </defs>
+        <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="0" y2="100%">
+                <stop offset="0%" stop-color="#000" stop-opacity="0" />
+                <stop offset="20%" stop-color="#000" />
+                <stop offset="80%" stop-color="#000" />
+                <stop offset="100%" stop-color="#000" stop-opacity="0" />
+            </linearGradient>
+        </defs>
     </svg>
     <div id="modal" draggable="true">
         <div id="ModalHandle">
