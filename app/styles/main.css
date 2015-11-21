@@ -42,7 +42,6 @@ svg {
     position: relative;
     white-space: nowrap;
     display: inline-block;
-    left:-100px;
 }
 
 .filters {
@@ -132,6 +131,27 @@ svg {
     fill: #fff;
     stroke-width: 6px;
     stroke: #000;
+}
+
+#modalContent {
+    text-align: left !important;
+    margin: 10px !important;
+}
+
+#modalContent h1 {
+    margin: 3px;
+}
+
+#modalContent h2 {
+    margin: 3px;
+}
+
+#modalContent h3 {
+    margin: 3px;
+}
+
+#modalContent h4 {
+    margin: 3px;
 }
 
 #color1 {

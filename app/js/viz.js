@@ -7,6 +7,7 @@ var d3 = require('../../node_modules/d3/d3.min.js');
 var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 var _ = require('../../node_modules/underscore/underscore-min.js');
 var Vue = require('../../node_modules/vue/dist/vue.min.js');
+var marked = require('../../node_modules/marked/marked.min.js');
 
 var modal = require('./modal.js');
 require('./binding.js');
@@ -20,8 +21,9 @@ var width = window.innerWidth,
     height = window.innerHeight - 10;
 
 var yFirst, yLast;
-var spineX = [];
-var once = true;
+var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+];
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -113,7 +115,6 @@ $(document).ready(function() {
         slider.refreshSlider();
     }
 
-
     $("#leftArrow").click(function() {
         var view = $("#filters");
         var move = "100px";
@@ -126,18 +127,15 @@ $(document).ready(function() {
             });
     });
 
-
     $("#rightArrow").click(function() {
-
         var view = $("#filters");
-        var move="100px";
+        var move = "100px";
         var currentPosition = parseInt(view.css("left"));
         view.stop(false, true).animate({
             left: "-=" + move
         }, {
             duration: 400
         })
-
     });
 
     restart();
@@ -269,10 +267,23 @@ function clickNode(node) {
 
     d3.event.stopPropagation();
     document.getElementById("formNode").innerHTML = formNodeContent;
-
+    var modalContent = document.getElementById("modalContent");
+    modalContent.style.color = d3.rgb(node.color).darker(3);
+    modalContent.getElementsByTagName("div")[0].style.color = "black";
     var vm = new Vue({
         el: '#modalContent',
-        data: node
+        data: node,
+        filters: {
+            marked: marked,
+            escape: function(d) {
+                return d.replace("||", " ");
+            },
+            date: function(value) {
+                if (value != "")
+                    return monthNames[value.getMonth() + 1] + " " + value.getFullYear();
+                return "";
+            }
+        }
     });
 
     modal.openModal(d3.event.clientX, d3.event.clientY);
@@ -280,6 +291,7 @@ function clickNode(node) {
 
 function dblClickNode(node) {
     d3.event.stopPropagation();
+    modal.closeModal();
     tree.switchId(node.id);
     restart();
 }

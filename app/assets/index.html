@@ -44,16 +44,15 @@
     <div id="modal" draggable="true">
         <div id="ModalHandle">
         </div>
-        <div id="modalContent">
-            <button id="btnCloseModal" title="Close" class="close">X</button>
-            <form id="formNode">
-                <h2>{{label}}</h2>
-                <h3>{{type}}</h3>
-                <div>{{description}}</div>
-                <h4>{{dateBegin}}</h4>
-                <h4>{{dateEnd}}</h4>
-            </form>
-        </div>
+        <button id="btnCloseModal" title="Close" class="close">X</button>
+        <form id="formNode">
+            <div id="modalContent">
+                <h4>{{type}}</h4>
+                <h3>{{label | escape}}</h3>
+                <div v-html="description | marked"></div>
+                <h4>{{dateBegin | date}} - {{dateEnd | date}}</h4>
+            </div>
+        </form>
     </div>
     <script src="js/viz.js"></script>
 </body>
