@@ -1,10 +1,10 @@
 var _ = require('../../node_modules/underscore/underscore-min.js');
 module.exports = {
-    exportData: function(treeNodes,filters) {
+    exportData: function(treeNodes, filters) {
         var data = {
             treeNodes: [],
             nodeNextId: 0,
-            filters:filters
+            filters: filters
         };
         for (var i = 0; i < treeNodes.length; i++) {
             if (treeNodes[i].id > data.nodeNextId)
@@ -32,7 +32,7 @@ module.exports = {
         return JSON.stringify(data);
     },
     importData: function(dataImport) {
-         var data = JSON.parse(dataImport);
+        var data = JSON.parse(dataImport);
         var treeNodes = [];
 
         for (var i = 0; i < data.treeNodes.length; i++) {
@@ -62,23 +62,29 @@ module.exports = {
         }
         return links;
     },
-    getNodesTypes: function(treeNodes){
+    getNodesTypes: function(treeNodes) {
         var nodesTypes = [];
         for (var i = 0; i < treeNodes.length; i++) {
-            if (_.map(nodesTypes,function(val){return val.label}).indexOf(treeNodes[i].type) === -1){
-                nodesTypes.push({label:treeNodes[i].type,color:treeNodes[i].color,isActive:true});
+            if (_.map(nodesTypes, function(val) {
+                    return val.label
+                }).indexOf(treeNodes[i].type) === -1) {
+                nodesTypes.push({
+                    label: treeNodes[i].type,
+                    color: treeNodes[i].color,
+                    isActive: true
+                });
             }
         }
         return nodesTypes;
     },
     getSpineNodes: function(treeNodes) {
-    var spineNodes = [];
-    for (var i = 0; i < treeNodes.length; i++) {
-        if (treeNodes[i].isSpine)
-            spineNodes.push(treeNodes[i]);
+        var spineNodes = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (treeNodes[i].isSpine)
+                spineNodes.push(treeNodes[i]);
+        }
+        return spineNodes;
     }
-    return spineNodes;
-}
 }
 
 function findNodeById(id, treeNodes) {

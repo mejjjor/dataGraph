@@ -50,8 +50,8 @@ var force = d3.layout.force()
         if (d.source.isSpine && d.target.isSpine)
             return 140
         if (d.source.isSpine || d.target.isSpine)
-            return 100;
-        return 80;
+            return 110;
+        return 90;
     })
     .linkStrength(0.5)
     .gravity(0.1)
@@ -86,25 +86,31 @@ $(document).ready(function() {
     var types = tree.getNodesTypes();
     var divFilters = document.getElementById("filters");
     for (var i = 0; i < types.length; i++) {
-        var div = document.createElement('div');
-        div.className = "filters";
-        div.id = "filtersType" + types[i].label;
-        div.style.background = types[i].color;
-        div.innerHTML = types[i].label;
-        div.addEventListener("click", function() {
-            if (tree.switchType(this.innerHTML))
-                this.style.backgroundColor = d3.rgb(this.style.backgroundColor).darker(2);
-            else {
-                var types = tree.getNodesTypes();
-                for (var i = 0; i < types.length; i++) {
-                    if (types[i].label == this.innerHTML) {
-                        this.style.backgroundColor = types[i].color;
+        if (types[i].label != "") {
+            var div = document.createElement('div');
+            div.className = "filters";
+            div.title = "montrer / cacher cette information";
+            div.id = "filtersType" + types[i].label;
+            if (types[i].isActive)
+                div.style.background = types[i].color;
+            else
+                div.style.background = d3.rgb(types[i].color).darker(2);
+            div.innerHTML = types[i].label;
+            div.addEventListener("click", function() {
+                if (tree.switchType(this.innerHTML))
+                    this.style.backgroundColor = d3.rgb(this.style.backgroundColor).darker(2);
+                else {
+                    var types = tree.getNodesTypes();
+                    for (var i = 0; i < types.length; i++) {
+                        if (types[i].label == this.innerHTML) {
+                            this.style.backgroundColor = types[i].color;
+                        }
                     }
                 }
-            }
-            restart();
-        }, false);
-        divFilters.appendChild(div);
+                restart();
+            }, false);
+            divFilters.appendChild(div);
+        }
     }
 
     //date filter
@@ -147,7 +153,7 @@ $(document).ready(function() {
         tree.activeAllType();
         var types = tree.getNodesTypes();
         for (var i = 0; i < types.length; i++) {
-            document.getElementById("filtersType"+types[i].label).style.backgroundColor = types[i].color;
+            document.getElementById("filtersType" + types[i].label).style.backgroundColor = types[i].color;
         }
         restart();
     });

@@ -29,7 +29,7 @@ module.exports = {
         return core.getLinks(treeNodes);
     },
     getNodesTypes: function() {
-        return core.getNodesTypes(treeNodes);
+        return filters.allowTypes;
     },
     switchType: function(type) {
         for (var i = 0; i < filters.allowTypes.length; i++) {
