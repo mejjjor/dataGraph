@@ -3,7 +3,7 @@ var _ = require('../../node_modules/underscore/underscore-min.js');
 var treeNodes = [];
 var links = [];
 var nodes = [];
-var undoIds=[];
+var undoIds = [];
 var filters = {
     allowTypes: [],
     allowIds: [],
@@ -40,17 +40,23 @@ module.exports = {
             }
         }
     },
+    activeAllType: function() {
+        for (var i = 0; i < filters.allowTypes.length; i++) {
+            filters.allowTypes[i].isActive = true;
+        }
+        getTree();
+    },
     switchId: function(id) {
         var index = filters.allowIds.indexOf(id);
-        if(index === -1){
+        if (index === -1) {
             filters.allowIds.push(id);
-        }else{
-            undoIds.push(filters.allowIds.splice(index,1));
+        } else {
+            undoIds.push(filters.allowIds.splice(index, 1));
         }
         getTree();
 
     },
-    getNextUndoId: function(){
+    getNextUndoId: function() {
         return undoIds.pop();
     },
     changeDate: function(dates) {
@@ -91,7 +97,7 @@ module.exports = {
             sortedTempNodes[i].spineCount = sortedTempNodes.length;
         }
     },
-    getSpineNodes : function(){
+    getSpineNodes: function() {
         return core.getSpineNodes(treeNodes);
     }
 }

@@ -88,6 +88,7 @@ $(document).ready(function() {
     for (var i = 0; i < types.length; i++) {
         var div = document.createElement('div');
         div.className = "filters";
+        div.id = "filtersType" + types[i].label;
         div.style.background = types[i].color;
         div.innerHTML = types[i].label;
         div.addEventListener("click", function() {
@@ -137,6 +138,20 @@ $(document).ready(function() {
             duration: 400
         })
     });
+    $("#showAll").click(function() {
+        var id = tree.getNextUndoId();
+        while (id != undefined) {
+            tree.switchId(id[0]);
+            id = tree.getNextUndoId();
+        }
+        tree.activeAllType();
+        var types = tree.getNodesTypes();
+        for (var i = 0; i < types.length; i++) {
+            document.getElementById("filtersType"+types[i].label).style.backgroundColor = types[i].color;
+        }
+        restart();
+    });
+
 
     restart();
 });

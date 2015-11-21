@@ -30,6 +30,7 @@
                 <div id="event-end"></div>
             </div>
         </div>
+        <i id="showAll" class="fa fa-arrows-alt fa-3x"></i>
     </div>
     <svg id="graph" class="disable-selection">
         <defs>
@@ -50,7 +51,7 @@
                 <h4>{{type}}</h4>
                 <h3>{{label | escape}}</h3>
                 <div v-html="description | marked"></div>
-                <h4>{{dateBegin | date}} - {{dateEnd | date}}</h4>
+                <h4 v-if="dateBegin != ''">{{dateBegin | date}} - {{dateEnd | date}}</h4>
             </div>
         </form>
     </div>
