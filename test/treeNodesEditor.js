@@ -143,7 +143,7 @@ describe("CRUD on tree", function() {
             tree.importData(string);
 
             var node4 = tree.createNode();
-            expect(node4.id).to.equal(2);
+            expect(node4.id).to.equal(3);
         });
         it("should return all links", function() {
             var node1 = tree.createNode();
