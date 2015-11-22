@@ -12,6 +12,10 @@ var filters = {
 }
 
 module.exports = {
+    removeAllNodesFromTreeNodes: function() {
+        treeNodes = [];
+        nodeNextId = 1;
+    },
     init: function(d3Nodes, d3Links) {
         nodes = d3Nodes;
         links = d3Links;
@@ -23,6 +27,7 @@ module.exports = {
         var dataImport = core.importData(data)
         treeNodes = dataImport.treeNodes;
         filters = dataImport.filters;
+        getTree();
         return treeNodes;
     },
     getLinks: function() {
@@ -109,31 +114,42 @@ function getTree() {
         links.pop();
     var spineNodes = core.getSpineNodes(treeNodes);
     if (spineNodes.length > 0)
-        computeTree(spineNodes[0], null, null);
+        computeTree(spineNodes[0], null, null, null);
 }
 
-function computeTree(node, previousNode, lastLink) {
+function computeTree(node, previousNode, lastLink, nodeNoTypePrevious) {
     if (isIdAllow(node) && isDateAllow(node)) {
         if (node.isSpine || isTypeAllow(node)) {
-            nodes.push(node);
-            if (lastLink != null) {
-                links.push({
-                    source: node,
-                    target: lastLink
-                });
-                node.previousNode = lastLink;
+            if (node.type != "") {
+                nodes.push(node);
+                if (lastLink != null) {
+                    if (lastLink.type === "" && nodes.indexOf(lastLink) === -1) {
+                        nodes.push(lastLink);
+                        links.push({
+                            source: lastLink,
+                            target: nodeNoTypePrevious
+                        });
+                    }
+                    links.push({
+                        source: node,
+                        target: lastLink
+                    });
+                    node.previousNode = lastLink;
+                }
+            } else {
+                nodeNoTypePrevious = lastLink;
             }
             lastLink = node;
         }
 
         for (var i = 0; i < node.brothers.length; i++) {
             if (node.brothers[i] != previousNode)
-                computeTree(node.brothers[i], node, lastLink);
+                computeTree(node.brothers[i], node, lastLink, nodeNoTypePrevious);
         }
     } else {
         for (var i = 0; i < node.brothers.length; i++) {
             if (node.brothers[i] != previousNode && node.brothers[i].isSpine)
-                computeTree(node.brothers[i], node, lastLink);
+                computeTree(node.brothers[i], node, lastLink, nodeNoTypePrevious);
         }
     }
 };

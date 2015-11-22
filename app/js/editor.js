@@ -31,10 +31,10 @@ var svg = d3.select("#graph")
             svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
         }))
     .on("dblclick.zoom", null)
-    .append('svg:g')
+    .on("dblclick", createNode)
     .on("mousemove", mouseMove)
     .on("mouseup", mouseUp)
-    .on("dblclick", createNode);
+    .append('svg:g');
 
 svg.append('svg:rect')
     .attr('width', width * 3)

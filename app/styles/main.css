@@ -11,7 +11,7 @@ svg {
 }
 
 #menu {
-    opacity: 0.3;
+    opacity: 0.5;
     height: 60px;
     position: absolute;
     top: 0;
@@ -42,6 +42,7 @@ svg {
     position: relative;
     white-space: nowrap;
     display: inline-block;
+    left: -25px;
 }
 
 .filters {
@@ -92,6 +93,24 @@ svg {
 
 #graph rect {
     background: #073642;
+}
+
+#menuImportExport {
+    opacity: 0.5;
+    height: 60px;
+    width: 255px;
+    position: absolute;
+    left: 0;
+    top: 60px;
+    background-color: black;
+}
+
+#importExport {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    display: flex;
+    padding: 15px;
 }
 
 .disable-selection {
@@ -154,7 +173,7 @@ svg {
     margin: 3px;
 }
 
-i{
+i {
     cursor: pointer;
 }
 

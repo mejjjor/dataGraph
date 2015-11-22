@@ -13,7 +13,7 @@ var modal = require('./modal.js');
 require('./binding.js');
 var tree = require('./treeNodesViz.js');
 var slider = require('./slider.js');
-var data = require('./data/data_s.json');
+var data = "";
 
 var formNodeContent = document.getElementById("formNode").innerHTML;
 
@@ -73,6 +73,7 @@ var dateFiltersHook = function(dates) {
 }
 
 function initData(newNodes) {
+
     tree.orderNodes();
     for (var i = 0; i < newNodes.length; i++) {
         nodes.push(newNodes[i]);
@@ -120,10 +121,6 @@ function initData(newNodes) {
         slider.updateHook(dateFiltersHook);
         slider.refreshSlider();
     }
-}
-$(document).ready(function() {
-    var newNodes = tree.importData(JSON.stringify(data));
-    initData(newNodes);
     $("#leftArrow").click(function() {
         var view = $("#filters");
         var move = "100px";
@@ -173,17 +170,24 @@ $(document).ready(function() {
         document.getElementById("exchange").value = tree.exportData();
     })
     $("#btnImportData").click(function() {
-        while (nodes.length > 0)
-            nodes.pop();
-        while (links.length > 0)
-            links.pop();
-        var newNodes = tree.importData(document.getElementById("exchange").value);
+        data = document.getElementById("exchange").value;
+        document.getElementById("importExport").style.display = "none";
+        document.getElementById("menuImportExport").style.display = "none";
+        var newNodes = tree.importData(data);
         initData(newNodes);
-        buildTree(newNodes);
-        restart();
     })
 
     restart();
+}
+$(document).ready(function() {
+
+    $("#btnImportData").click(function() {
+        data = document.getElementById("exchange").value;
+        document.getElementById("importExport").style.display = "none";
+        document.getElementById("menuImportExport").style.display = "none";
+        var newNodes = tree.importData(data);
+        initData(newNodes);
+    });
 });
 
 function restart() {

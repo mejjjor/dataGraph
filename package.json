@@ -5,6 +5,7 @@
   "dependencies": {
     "d3": "^3.5.6",
     "font-awesome": "^4.4.0",
+    "intro.js": "^1.1.1",
     "jquery": "^2.1.4",
     "marked": "^0.3.5",
     "normalize.css": "^3.0.3",
@@ -28,7 +29,7 @@
     "prebuild": "mkdir -p public/ && npm run clean -s",
     "build": "npm run build:assets -s && npm run build:styles -s && npm run build:scripts -s ",
     "build:assets": "cp -r app/assets/* public",
-    "build:scripts": "mkdir -p public/js && browserify -d app/js/viz.js -o public/js/viz.js && browserify -d app/js/editor.js -o public/js/editor.js",
+    "build:scripts": "mkdir -p public/js && browserify -d app/js/viz.js -o public/js/viz.js && browserify -d app/js/viz_clean.js -o public/js/viz_clean.js && browserify -d app/js/editor.js -o public/js/editor.js",
     "build:styles": "mkdir -p public/css && npm run build:styles:normalize; npm run build:styles:all; npm run build:styles:cleancss",
     "build:styles:normalize": "cat node_modules/normalize.css/normalize.css > public/css/app.css",
     "build:styles:all": "find  app/styles/ -name \"*.css\" -exec cat {} \\; >> public/css/app.css",
