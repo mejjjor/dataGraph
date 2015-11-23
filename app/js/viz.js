@@ -35,12 +35,12 @@ var svg = d3.select("#graph")
         .scaleExtent([0.1, 3])
         .on("zoom", function() {
             mousedrag = true;
-            svg.attr("transform", "translate(" + (d3.event.translate[0]+300)+","+(d3.event.translate[1]+150) + ")" + " scale(" + d3.event.scale*0.6 + ")");
+            svg.attr("transform", "translate(" + (d3.event.translate[0]+300)+","+(d3.event.translate[1]+280) + ")" + " scale(" + d3.event.scale*0.6 + ")");
         }))
     .on("dblclick.zoom", null)
     .on("dblclick", undoSwitchId)
     .append('svg:g')
-    .attr("transform","translate(300,150) scale(0.6)");
+    .attr("transform","translate(300,280) scale(0.6)");
 svg.append('svg:rect')
     .attr('width', width * 3)
     .attr('height', height * 2)
@@ -48,16 +48,20 @@ svg.append('svg:rect')
 
 
 var force = d3.layout.force()
-    .charge(-3000)
-    .chargeDistance(1000)
+    .charge(function(d){
+        if (d.isSpine)
+            return -6000;
+        return -4500;
+    })
+    .chargeDistance(800)
     .linkDistance(function(d) {
         if (d.source.isSpine && d.target.isSpine)
             return 140
         if (d.source.isSpine || d.target.isSpine)
-            return 80;
-        return 60;
+            return 100;
+        return 70;
     })
-    .linkStrength(0.5)
+    .linkStrength(0.8)
     .gravity(0.1)
     .theta(0.1)
     .size([width, height])
@@ -175,9 +179,6 @@ $(document).ready(function() {
     $("#help").click(function() {
         introJs.introJs().start();
     });
-
-    d3.behavior.zoom().scale(0.6);
-
 
     restart();
 });
