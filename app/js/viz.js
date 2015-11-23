@@ -8,6 +8,7 @@ var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 var _ = require('../../node_modules/underscore/underscore-min.js');
 var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var marked = require('../../node_modules/marked/marked.min.js');
+var introJs = require('../../node_modules/intro.js/minified/intro.min.js')
 
 var modal = require('./modal.js');
 require('./binding.js');
@@ -24,19 +25,22 @@ var yFirst, yLast;
 var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
     "juillet", "août", "septembre", "octobre", "novembre", "décembre"
 ];
+var introSpineNode = false;
+var introClassicNode = false;
 
 var svg = d3.select("#graph")
     .attr("width", width)
     .attr("height", height)
     .call(d3.behavior.zoom()
+        .scaleExtent([0.1, 3])
         .on("zoom", function() {
             mousedrag = true;
-            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+            svg.attr("transform", "translate(" + (d3.event.translate[0]+300)+","+(d3.event.translate[1]+150) + ")" + " scale(" + d3.event.scale*0.6 + ")");
         }))
     .on("dblclick.zoom", null)
     .on("dblclick", undoSwitchId)
-    .append('svg:g');
-
+    .append('svg:g')
+    .attr("transform","translate(300,150) scale(0.6)");
 svg.append('svg:rect')
     .attr('width', width * 3)
     .attr('height', height * 2)
@@ -50,8 +54,8 @@ var force = d3.layout.force()
         if (d.source.isSpine && d.target.isSpine)
             return 140
         if (d.source.isSpine || d.target.isSpine)
-            return 110;
-        return 90;
+            return 80;
+        return 60;
     })
     .linkStrength(0.5)
     .gravity(0.1)
@@ -84,9 +88,14 @@ function initData(newNodes) {
     //add filters
     var types = tree.getNodesTypes();
     var divFilters = document.getElementById("filters");
+    var done = false;
     for (var i = 0; i < types.length; i++) {
         if (types[i].label != "") {
             var div = document.createElement('div');
+            if (done === false && (i != 0 ^ types.length === 1)) {
+                div.setAttribute("data-intro", "Filtre par type: Permet d'afficher / masquer tous les noeuds de ce type. Les noeuds cerclés de noir ne peuvent pas être masqués.");
+                done = true;
+            }
             div.className = "filters";
             div.title = "montrer / cacher cette information";
             div.id = "filtersType" + types[i].label;
@@ -163,25 +172,12 @@ $(document).ready(function() {
         restart();
     });
 
-    $("#impExpIcon").click(function() {
-        switchImportExport();
+    $("#help").click(function() {
+        introJs.introJs().start();
     });
-    $("#graph").click(function() {
-        hideImportExport(document.getElementById("importExport"));
-    });
-    $("#btnExportData").click(function() {
-        document.getElementById("exchange").value = tree.exportData();
-    })
-    $("#btnImportData").click(function() {
-        while (nodes.length > 0)
-            nodes.pop();
-        while (links.length > 0)
-            links.pop();
-        var newNodes = tree.importData(document.getElementById("exchange").value);
-        initData(newNodes);
-        buildTree(newNodes);
-        restart();
-    })
+
+    d3.behavior.zoom().scale(0.6);
+
 
     restart();
 });
@@ -325,7 +321,7 @@ function clickNode(node) {
             },
             date: function(value) {
                 if (value != "")
-                    return monthNames[value.getMonth() + 1] + " " + value.getFullYear();
+                    return monthNames[value.getMonth()] + " " + value.getFullYear();
                 return "";
             }
         }

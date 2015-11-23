@@ -10,8 +10,17 @@ svg {
     background: black;
 }
 
+#introHack {
+    position: absolute;
+    opacity: 0;
+    height: 200px;
+    width: 200px;
+    left: 300px;
+    top: 100px;
+}
+
 #menu {
-    opacity: 0.5;
+    opacity: 0.3;
     height: 60px;
     position: absolute;
     top: 0;

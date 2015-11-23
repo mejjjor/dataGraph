@@ -31,16 +31,16 @@ var svg = d3.select("#graph")
             svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
         }))
     .on("dblclick.zoom", null)
+    .append('svg:g')
     .on("dblclick", createNode)
     .on("mousemove", mouseMove)
-    .on("mouseup", mouseUp)
-    .append('svg:g');
+    .on("mouseup", mouseUp);
 
 svg.append('svg:rect')
     .attr('width', width * 3)
     .attr('height', height * 2)
-    .attr("fill","#073642");
-    // .attr('transform', 'translate(-600,-600)');
+    .attr("fill", "#073642");
+// .attr('transform', 'translate(-600,-600)');
 
 var force = d3.layout.force()
     .charge(-2000)
@@ -117,7 +117,7 @@ function restart() {
         })
         .on("dblclick", function(d) {
             d3.event.stopPropagation();
-            tree.deleteLink(d.source,d.target);
+            tree.deleteLink(d.source, d.target);
             buildTree(tree.getTreeNodes());
             restart();
         });
@@ -262,7 +262,7 @@ $('#export').click(function(e) {
 });
 
 
-function buildTree(newNodes){
+function buildTree(newNodes) {
     while (nodes.length > 0)
         nodes.pop();
     while (links.length > 0)
