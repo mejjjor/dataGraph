@@ -55,6 +55,7 @@ module.exports = {
         var index = filters.allowIds.indexOf(id);
         if (index === -1) {
             filters.allowIds.push(id);
+            undoIds.splice(undoIds.indexOf(id),1);
         } else {
             undoIds.push(filters.allowIds.splice(index, 1));
         }
@@ -62,7 +63,7 @@ module.exports = {
 
     },
     getNextUndoId: function() {
-        return undoIds.pop();
+        return undoIds[undoIds.length-1];
     },
     changeDate: function(dates) {
         filters.dateBegin = dates[0];

@@ -35,12 +35,12 @@ var svg = d3.select("#graph")
         .scaleExtent([0.1, 3])
         .on("zoom", function() {
             mousedrag = true;
-            svg.attr("transform", "translate(" + (d3.event.translate[0]+300)+","+(d3.event.translate[1]+280) + ")" + " scale(" + d3.event.scale*0.6 + ")");
+            svg.attr("transform", "translate(" + (d3.event.translate[0] + 300) + "," + (d3.event.translate[1] + 280) + ")" + " scale(" + d3.event.scale * 0.6 + ")");
         }))
     .on("dblclick.zoom", null)
     .on("dblclick", undoSwitchId)
     .append('svg:g')
-    .attr("transform","translate(300,280) scale(0.6)");
+    .attr("transform", "translate(300,280) scale(0.6)");
 svg.append('svg:rect')
     .attr('width', width * 3)
     .attr('height', height * 2)
@@ -48,7 +48,7 @@ svg.append('svg:rect')
 
 
 var force = d3.layout.force()
-    .charge(function(d){
+    .charge(function(d) {
         if (d.isSpine)
             return -6000;
         return -4500;
@@ -155,16 +155,43 @@ $(document).ready(function() {
         var view = $("#filters");
         var move = "100px";
         var currentPosition = parseInt(view.css("left"));
+        if (currentPosition > -tree.getNodesTypes().length * 90) {
+            view.stop(false, true).animate({
+                left: "-=" + move
+            }, {
+                duration: 400
+            })
+        }
+    });
+
+    $("#upArrow").click(function() {
+        var view = $("#filtersId");
+        var move = "120px";
+        var currentPosition = parseInt(view.css("top"));
+        if (currentPosition < 0)
+            view.stop(false, true).animate({
+                top: "+=" + move
+            }, {
+                duration: 400
+            });
+    });
+
+    $("#downArrow").click(function() {
+        var view = $("#filtersId");
+        var move = "120px";
         view.stop(false, true).animate({
-            left: "-=" + move
+            top: "-=" + move
         }, {
             duration: 400
         })
     });
+
     $("#showAll").click(function() {
         var id = tree.getNextUndoId();
         while (id != undefined) {
             tree.switchId(id[0]);
+         document.getElementById("filtersId")
+            .removeChild(document.getElementById("filtersType" + id[0]));
             id = tree.getNextUndoId();
         }
         tree.activeAllType();
@@ -331,10 +358,36 @@ function clickNode(node) {
     modal.openModal(d3.event.clientX, d3.event.clientY);
 }
 
+function addNodeToFilters(node) {
+    var divFilters = document.getElementById("filtersId");
+    var div = document.createElement('div');
+    var divText = document.createElement('div');
+    div.id = "filtersType" + node.id;
+    div.style.marginBottom = "8px";
+    div.title = "montrer / cacher cette information";
+    if (node.isSpine)
+        divText.className = "filtersIdStrong";
+    else
+        divText.className = "filtersId";
+    divText.innerHTML = node.label.replace('||', ' ');
+    divText.style.backgroundColor = node.color;
+    div.addEventListener("dblclick", function() {
+        document.getElementById("filtersId")
+            .removeChild(document.getElementById("filtersType" + node.id));
+        tree.switchId(node.id);
+        restart();
+    }, false);
+    div.appendChild(divText);
+    divFilters.insertBefore(div, divFilters.firstElementChild);
+
+
+}
+
 function dblClickNode(node) {
     d3.event.stopPropagation();
     modal.closeModal();
     tree.switchId(node.id);
+    addNodeToFilters(node);
     restart();
 }
 
@@ -342,6 +395,8 @@ function undoSwitchId() {
     var id = tree.getNextUndoId();
     if (id != undefined) {
         tree.switchId(id[0]);
+         document.getElementById("filtersId")
+            .removeChild(document.getElementById("filtersType" + id[0]));
         restart();
     }
 }
