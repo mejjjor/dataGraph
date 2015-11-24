@@ -26,6 +26,7 @@ var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
     "juillet", "août", "septembre", "octobre", "novembre", "décembre"
 ];
 var chronoRestart = Date.now();
+var introFiltersId = [true, true];
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -50,16 +51,16 @@ svg.append('svg:rect')
 var force = d3.layout.force()
     .charge(function(d) {
         if (d.isSpine)
-            return -6000;
-        return -5000;
+            return -7000;
+        return -6000;
     })
-    .chargeDistance(800)
+    .chargeDistance(1000)
     .linkDistance(function(d) {
         if (d.source.isSpine && d.target.isSpine)
             return 140
         if (d.source.isSpine || d.target.isSpine)
-            return 100;
-        return 80;
+            return 120;
+        return 90;
     })
     .linkStrength(0.8)
     .gravity(0.1)
@@ -97,7 +98,7 @@ function initData(newNodes) {
         if (types[i].label != "") {
             var div = document.createElement('div');
             if (done === false && (i != 0 ^ types.length === 1)) {
-                div.setAttribute("data-intro", "Filtre par type: Permet d'afficher / masquer tous les noeuds de ce type. Les noeuds cerclés de noir ne peuvent pas être masqués.");
+                div.setAttribute("data-intro", "Filtre par type: Permet d'afficher / masquer tous les noeuds de ce type. Les noeuds cerclés de noir masquent tous leurs noeuds enfants.");
                 done = true;
             }
             div.className = "filters";
@@ -135,84 +136,108 @@ function initData(newNodes) {
         slider.updateHook(dateFiltersHook);
         slider.refreshSlider();
     }
+
+    var unallowIds = tree.getUnallowIds();
+    for (var i = 0; i < unallowIds.length; i++) {
+        addNodeToFilters(unallowIds[i]);
+        tree.setNextUndoId(unallowIds[i].id);
+    }
+
+}
+
+function checkBrowser() {
+    var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+    var isFirefox = typeof InstallTrigger !== 'undefined'; // Firefox 1.0+
+    var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+    // At least Safari 3+: "[object HTMLElementConstructor]"
+    var isChrome = !!window.chrome && !isOpera; // Chrome 1+
+    var isIE = /*@cc_on!@*/ false || !!document.documentMode; // At least IE6
+
+    return isChrome;
 }
 $(document).ready(function() {
-    var newNodes = tree.importData(JSON.stringify(data));
-    initData(newNodes);
-    $("#leftArrow").click(function() {
-        var view = $("#filters");
-        var move = "100px";
-        var currentPosition = parseInt(view.css("left"));
-        if (currentPosition > -100 && currentPosition <= 0)
-            move = -currentPosition + "px";
-        if (currentPosition < 0)
-            view.stop(false, true).animate({
-                left: "+=" + move
-            }, {
-                duration: 400
-            });
-    });
 
-    $("#rightArrow").click(function() {
-        var view = $("#filters");
-        var move = "100px";
-        var currentPosition = parseInt(view.css("left"));
-        if (currentPosition > -tree.getNodesTypes().length * 90) {
-            view.stop(false, true).animate({
-                left: "-=" + move
-            }, {
-                duration: 400
-            })
-        }
-    });
+    if (!checkBrowser())
+        document.getElementById("masterPopup").style.display = "block";
+    else {
+        var newNodes = tree.importData(JSON.stringify(data));
+        initData(newNodes);
+        $("#leftArrow").click(function() {
+            var view = $("#filters");
+            var move = "100px";
+            var currentPosition = parseInt(view.css("left"));
+            if (currentPosition > -100 && currentPosition <= 0)
+                move = -currentPosition + "px";
+            if (currentPosition < 0)
+                view.stop(false, true).animate({
+                    left: "+=" + move
+                }, {
+                    duration: 400
+                });
+        });
 
-    $("#upArrow").click(function() {
-        var view = $("#filtersId");
-        var move = "120px";
-        var currentPosition = parseInt(view.css("top"));
-        if (currentPosition < 0)
-            view.stop(false, true).animate({
-                top: "+=" + move
-            }, {
-                duration: 400
-            });
-    });
+        $("#rightArrow").click(function() {
+            var view = $("#filters");
+            var move = "100px";
+            var currentPosition = parseInt(view.css("left"));
+            if (currentPosition > -tree.getNodesTypes().length * 90) {
+                view.stop(false, true).animate({
+                    left: "-=" + move
+                }, {
+                    duration: 400
+                })
+            }
+        });
 
-    $("#downArrow").click(function() {
-        var view = $("#filtersId");
-        var move = "120px";
-        var currentPosition = parseInt(view.css("top"));
-        if (currentPosition > 180 - document.getElementById("filtersId").clientHeight) {
-            view.stop(false, true).animate({
-                top: "-=" + move
-            }, {
-                duration: 400
-            })
-        }
-    });
+        $("#upArrow").click(function() {
+            var view = $("#filtersId");
+            var move = "120px";
+            var currentPosition = parseInt(view.css("top"));
+            if (currentPosition < 0)
+                view.stop(false, true).animate({
+                    top: "+=" + move
+                }, {
+                    duration: 400
+                });
+        });
 
-    $("#showAll").click(function() {
-        var id = tree.getNextUndoId();
-        while (id != undefined) {
-            tree.switchId(id);
-            document.getElementById("filtersId")
-                .removeChild(document.getElementById("filtersType" + id));
-            id = tree.getNextUndoId();
-        }
-        tree.activeAllType();
-        var types = tree.getNodesTypes();
-        for (var i = 0; i < types.length; i++) {
-            if (types[i].label != "")
-                document.getElementById("filtersType" + types[i].label).style.backgroundColor = types[i].color;
-        }
+        $("#downArrow").click(function() {
+            var view = $("#filtersId");
+            var move = "120px";
+            var currentPosition = parseInt(view.css("top"));
+            if (currentPosition > 180 - document.getElementById("filtersId").clientHeight) {
+                view.stop(false, true).animate({
+                    top: "-=" + move
+                }, {
+                    duration: 400
+                })
+            }
+        });
+
+        $("#showAll").click(function() {
+            var id = tree.getNextUndoId();
+            while (id != undefined) {
+                tree.switchId(id);
+                document.getElementById("filtersId")
+                    .removeChild(document.getElementById("filtersType" + id));
+                id = tree.getNextUndoId();
+            }
+            tree.activeAllType();
+            var types = tree.getNodesTypes();
+            for (var i = 0; i < types.length; i++) {
+                if (types[i].label != "")
+                    document.getElementById("filtersType" + types[i].label).style.backgroundColor = types[i].color;
+            }
+            restart();
+        });
+
+        $("#help").click(function() {
+            introJs.introJs().start();
+        });
+
         restart();
-    });
-
-    $("#help").click(function() {
-        introJs.introJs().start();
-    });
-
-    restart();
+    }
 });
 
 function restart() {
@@ -385,16 +410,25 @@ function addNodeToFilters(node) {
     div.id = "filtersType" + node.id;
     div.style.marginBottom = "8px";
     div.title = "montrer / cacher cette information";
-    if (node.isSpine)
+    if (node.isSpine) {
         divText.className = "filtersIdStrong";
-    else
+        if (introFiltersId[0]) {
+            introFiltersId[0] = false;
+            divText.setAttribute("data-intro", "Les noeuds cerclés de noire sont l'ossature du graph, il indique le sens de lecture et ont un comportement particulier...");
+            divText.setAttribute("data-position", "right");
+        }
+    } else {
         divText.className = "filtersId";
+        if (introFiltersId[1]) {
+            introFiltersId[1] = false;
+            divText.setAttribute("data-intro", "Filtre par noeud: permet de masquer le noeud ainsi que tous ses noeud enfants. Double-cliquez pour afficher ou masquer un noeud.");
+            divText.setAttribute("data-position", "right");
+        }
+    }
     divText.innerHTML = node.label.replace('||', ' ');
     divText.style.backgroundColor = node.color;
-    div.className = "initAddNode ";
-    setTimeout(function() {
-        document.getElementById("filtersId").firstElementChild.className += " addNode";
-    }, 40);
+    div.className = "initAddNode addNode";
+
     div.addEventListener("dblclick", function() {
         tree.switchId(node.id);
         var filtersId = document.getElementById("filtersId");

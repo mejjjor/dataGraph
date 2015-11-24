@@ -65,6 +65,9 @@ module.exports = {
     getNextUndoId: function() {
         return undoIds[undoIds.length - 1];
     },
+    setNextUndoId: function(id) {
+        return undoIds.push(id);
+    },
     changeDate: function(dates) {
         filters.dateBegin = dates[0];
         filters.dateEnd = dates[1];
@@ -105,6 +108,14 @@ module.exports = {
     },
     getSpineNodes: function() {
         return core.getSpineNodes(treeNodes);
+    },
+    getUnallowIds: function() {
+        var unallowIds = [];
+        for (var i = 0; i < treeNodes.length; i++) {
+            if (filters.allowIds.indexOf(treeNodes[i].id) === -1)
+                unallowIds.push(treeNodes[i])
+        }
+        return unallowIds;
     }
 }
 

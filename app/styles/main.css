@@ -271,6 +271,18 @@ i {
     cursor: pointer;
 }
 
+#masterPopup{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-color: black;
+    font-size: 30px;
+    color: red;
+    display: none;
+    text-align: center;
+    padding-top: 20%;
+}
+
 #color1 {
     background-color: #B58900;
 }

@@ -42,7 +42,7 @@ function refreshSlider() {
                 'max': maxDate.getTime()
             },
             step: 32 * 24 * 60 * 60 * 1000,
-            start: [startDate != "" ? startDate.getTime() : minDate.getTime(), endDate != "" ? endDate.getTime() : maxDate.getTime()],
+            start: [startDate != "" ? startDate : minDate, endDate != "" ? endDate : maxDate],
         });
     } else {
         noUiSlider.create(dateSlider, {
