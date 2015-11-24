@@ -4,6 +4,7 @@ body {
     height: 100%;
     font-family: 'Fugaz One', cursive;
     font-size: 14px;
+    letter-spacing: 0.03rem;
 }
 
 svg {
@@ -42,13 +43,12 @@ svg {
     position: relative;
     white-space: nowrap;
     display: inline-block;
-    left: -25px;
 }
 
 .filters {
     display: inline-block;
     padding: 3px 10px;
-    margin: 5px;
+    margin: 2px;
     border: 2px black solid;
     border-radius: 100px;
     cursor: pointer;
@@ -137,6 +137,9 @@ svg {
     background: #073642;
     font-size: 15px;
 }
+#graphBackground{
+    fill:#073642;
+}
 
 #event-start,
 #event-end {
@@ -172,6 +175,13 @@ svg {
     top: 60px;
     display: flex;
     padding: 15px;
+}
+
+#leftArrow,
+#rightArrow,
+#downArrow,
+#upArrow {
+    color: #fff;
 }
 
 .disable-selection {
@@ -216,6 +226,11 @@ svg {
 #modalContent {
     text-align: left !important;
     margin: 10px !important;
+}
+
+#modalContent p {
+    padding: 0 10px;
+    margin: 5px 0;
 }
 
 #modalContent h1 {

@@ -32,7 +32,7 @@ var svg = d3.select("#graph")
     .attr("width", width)
     .attr("height", height)
     .call(d3.behavior.zoom()
-        .scaleExtent([0.1, 3])
+        .scaleExtent([0.4, 2])
         .on("zoom", function() {
             mousedrag = true;
             svg.attr("transform", "translate(" + (d3.event.translate[0] + 300) + "," + (d3.event.translate[1] + 280) + ")" + " scale(" + d3.event.scale * 0.6 + ")");
@@ -42,16 +42,17 @@ var svg = d3.select("#graph")
     .append('svg:g')
     .attr("transform", "translate(300,280) scale(0.6)");
 svg.append('svg:rect')
-    .attr('width', width * 3)
-    .attr('height', height * 2)
-    .attr("fill", "#073642");
+    .attr("id","graphBackground")
+    .attr('width', width *6)
+    .attr('height', height *6)
+    .attr("transform","translate("+width*-3+","+height*-3+")");
 
 
 var force = d3.layout.force()
     .charge(function(d) {
         if (d.isSpine)
             return -6000;
-        return -4500;
+        return -5000;
     })
     .chargeDistance(800)
     .linkDistance(function(d) {
@@ -59,7 +60,7 @@ var force = d3.layout.force()
             return 140
         if (d.source.isSpine || d.target.isSpine)
             return 100;
-        return 70;
+        return 80;
     })
     .linkStrength(0.8)
     .gravity(0.1)
@@ -189,9 +190,9 @@ $(document).ready(function() {
     $("#showAll").click(function() {
         var id = tree.getNextUndoId();
         while (id != undefined) {
-            tree.switchId(id[0]);
+            tree.switchId(id);
          document.getElementById("filtersId")
-            .removeChild(document.getElementById("filtersType" + id[0]));
+            .removeChild(document.getElementById("filtersType" + id));
             id = tree.getNextUndoId();
         }
         tree.activeAllType();
@@ -256,6 +257,8 @@ function restart() {
         .duration(500)
         .attr("display", "inline")
         .attr("fill", "#000");
+
+ 
 
     elem.insert("text")
         .attr("display", "none")
@@ -338,7 +341,7 @@ function clickNode(node) {
     document.getElementById("formNode").innerHTML = formNodeContent;
     var modalContent = document.getElementById("modalContent");
     modalContent.style.color = d3.rgb(node.color).darker(3);
-    modalContent.getElementsByTagName("div")[0].style.color = "black";
+    modalContent.getElementsByTagName("p")[0].style.color = "black";
     var vm = new Vue({
         el: '#modalContent',
         data: node,
@@ -394,9 +397,9 @@ function dblClickNode(node) {
 function undoSwitchId() {
     var id = tree.getNextUndoId();
     if (id != undefined) {
-        tree.switchId(id[0]);
+        tree.switchId(id);
          document.getElementById("filtersId")
-            .removeChild(document.getElementById("filtersType" + id[0]));
+            .removeChild(document.getElementById("filtersType" + id));
         restart();
     }
 }

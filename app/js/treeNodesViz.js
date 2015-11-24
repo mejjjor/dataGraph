@@ -57,7 +57,7 @@ module.exports = {
             filters.allowIds.push(id);
             undoIds.splice(undoIds.indexOf(id),1);
         } else {
-            undoIds.push(filters.allowIds.splice(index, 1));
+            undoIds.push(filters.allowIds.splice(index, 1)[0]);
         }
         getTree();
 

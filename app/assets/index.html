@@ -59,9 +59,9 @@
         <button id="btnCloseModal" title="Close" class="close">X</button>
         <form id="formNode">
             <div id="modalContent">
-                <h4>{{type}}</h4>
-                <h3>{{label | escape}}</h3>
-                <div v-html="description | marked"></div>
+                <h4>{{label | escape}}</h4>
+                <h2>{{type}}</h2>
+                <p v-html="description | marked"></p>
                 <h4 v-if="dateBegin != ''">{{dateBegin | date}} - {{dateEnd | date}}</h4>
             </div>
         </form>
