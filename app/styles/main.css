@@ -43,6 +43,7 @@ svg {
     position: relative;
     white-space: nowrap;
     display: inline-block;
+    left: 0;
 }
 
 .filters {
@@ -100,7 +101,6 @@ svg {
     text-align: center;
     vertical-align: middle;
     font-size: 12px;
-    
     margin: 20px;
 }
 
@@ -134,11 +134,15 @@ svg {
 }
 
 #graph {
-    background: #073642;
+    background: -moz-radial-gradient(center, ellipse cover, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
+    background: radial-gradient(ellipse at center, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#80346a77', endColorstr='#001216', GradientType=1);
     font-size: 15px;
 }
-#graphBackground{
-    fill:#073642;
+
+#graphBackground {
+    opacity: 0;
 }
 
 #event-start,
@@ -180,8 +184,14 @@ svg {
 #leftArrow,
 #rightArrow,
 #downArrow,
-#upArrow {
+#upArrow,
+#showAll,
+#help {
     color: #fff;
+}
+
+.darkerHelper {
+    opacity: 0.4;
 }
 
 .disable-selection {
@@ -213,8 +223,6 @@ svg {
 
 .circle {
     fill: #fff;
-    stroke-width: 5px;
-    stroke: #073642;
 }
 
 .strongCircle {
@@ -247,6 +255,19 @@ svg {
 
 #modalContent h4 {
     margin: 3px;
+}
+
+.removeNode {
+    opacity:0;
+    transition: opacity 0.3s linear;
+}
+
+.initAddNode{
+    opacity: 0;
+}
+.addNode {
+    opacity:1;
+    transition: opacity 0.6s linear;
 }
 
 i {

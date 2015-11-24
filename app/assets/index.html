@@ -24,13 +24,12 @@
         </div>
         <i id="rightArrow" title="faire défiler à droite" class="fa fa-angle-right fa-4x"></i>
         <div id="filtersDateExclude">
-            <div id="filtersDate" data-intro="Filtres par date: Permet de masquer tous les noeuds antérieur ou supérieur à une date.">
+            <div id="filtersDate" data-intro="Filtres par date: Permet de masquer tous les noeuds antérieur ou supérieur à une date." data-highlightClass="darkerHelper">
                 <div id="dateSlider"></div>
                 <div id="event-start"></div>
                 <div id="event-end"></div>
             </div>
         </div>
-        <i id="showAll" data-intro="Permet d'annuler les filtres et d'afficher tous les noeuds." data-position="left" title="montrer toutes les compétences" class="fa fa-arrows-alt fa-3x"></i>
         <i id="help" title="aide" class="fa fa-question-circle fa-3x"></i>
     </div>
     <div id="menuVertical">
@@ -42,16 +41,17 @@
             </div>
         </div>
         <i id="downArrow" title="faire défiler à gauche" class="fa fa-angle-down fa-4x"></i>
+        <i id="showAll" data-intro="Permet d'annuler les filtres et d'afficher tous les noeuds." data-position="right" data-highlightClass="darkerHelper" title="montrer toutes les compétences" class="fa fa-arrows-alt fa-3x"></i>
     </div>
     <svg id="graph" class="disable-selection">
-        <defs>
+      <!--   <defs>
             <linearGradient id="grad" x1="0" y1="0" x2="0" y2="100%">
                 <stop offset="0%" stop-color="#000" stop-opacity="0" />
                 <stop offset="20%" stop-color="#000" />
                 <stop offset="80%" stop-color="#000" />
                 <stop offset="100%" stop-color="#000" stop-opacity="0" />
             </linearGradient>
-        </defs>
+        </defs> -->
     </svg>
     <div id="modal" draggable="true">
         <div id="ModalHandle">

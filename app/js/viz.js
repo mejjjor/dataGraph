@@ -42,10 +42,10 @@ var svg = d3.select("#graph")
     .append('svg:g')
     .attr("transform", "translate(300,280) scale(0.6)");
 svg.append('svg:rect')
-    .attr("id","graphBackground")
-    .attr('width', width *6)
-    .attr('height', height *6)
-    .attr("transform","translate("+width*-3+","+height*-3+")");
+    .attr("id", "graphBackground")
+    .attr('width', width * 6)
+    .attr('height', height * 6)
+    .attr("transform", "translate(" + width * -3 + "," + height * -3 + ")");
 
 
 var force = d3.layout.force()
@@ -180,19 +180,22 @@ $(document).ready(function() {
     $("#downArrow").click(function() {
         var view = $("#filtersId");
         var move = "120px";
-        view.stop(false, true).animate({
-            top: "-=" + move
-        }, {
-            duration: 400
-        })
+        var currentPosition = parseInt(view.css("top"));
+        if (currentPosition > 180 - document.getElementById("filtersId").clientHeight) {
+            view.stop(false, true).animate({
+                top: "-=" + move
+            }, {
+                duration: 400
+            })
+        }
     });
 
     $("#showAll").click(function() {
         var id = tree.getNextUndoId();
         while (id != undefined) {
             tree.switchId(id);
-         document.getElementById("filtersId")
-            .removeChild(document.getElementById("filtersType" + id));
+            document.getElementById("filtersId")
+                .removeChild(document.getElementById("filtersType" + id));
             id = tree.getNextUndoId();
         }
         tree.activeAllType();
@@ -258,7 +261,7 @@ function restart() {
         .attr("display", "inline")
         .attr("fill", "#000");
 
- 
+
 
     elem.insert("text")
         .attr("display", "none")
@@ -279,8 +282,23 @@ function restart() {
         .attr("display", "inline")
         .attr("fill", "#000");
 
+    node.exit().selectAll('text')
+        .transition()
+        .duration(250)
+        .attr("fill", function(d) {
+            return d.color;
+        })
+        .remove();
 
-    node.exit().remove();
+    node.exit().selectAll('circle')
+        .transition()
+        .duration(500)
+        .attr("r", 0);
+
+    node.exit()
+        .transition()
+        .delay(400)
+        .remove();
 
     link = link.data(force.links(), function(d) {
         return "" + d.source.id + d.target.id;
@@ -374,13 +392,24 @@ function addNodeToFilters(node) {
         divText.className = "filtersId";
     divText.innerHTML = node.label.replace('||', ' ');
     divText.style.backgroundColor = node.color;
+    div.className = "initAddNode ";
+    setTimeout(function() {
+            document.getElementById("filtersId").firstElementChild.className += " addNode"; 
+        }, 40);
     div.addEventListener("dblclick", function() {
-        document.getElementById("filtersId")
-            .removeChild(document.getElementById("filtersType" + node.id));
         tree.switchId(node.id);
+        var filtersId = document.getElementById("filtersId");
+        var nodeId = document.getElementById("filtersType" + node.id);
+        nodeId.className = "removeNode";
+        setTimeout(function() {
+            filtersId.removeChild(nodeId)
+        }, 300);
+        if (parseInt(filtersId.style.top) <= -120)
+            filtersId.style.top = (parseInt(filtersId.style.top) + 120) + "px";
         restart();
     }, false);
     div.appendChild(divText);
+
     divFilters.insertBefore(div, divFilters.firstElementChild);
 
 
@@ -398,7 +427,7 @@ function undoSwitchId() {
     var id = tree.getNextUndoId();
     if (id != undefined) {
         tree.switchId(id);
-         document.getElementById("filtersId")
+        document.getElementById("filtersId")
             .removeChild(document.getElementById("filtersType" + id));
         restart();
     }
