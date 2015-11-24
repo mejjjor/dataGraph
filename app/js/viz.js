@@ -25,8 +25,7 @@ var yFirst, yLast;
 var monthNames = ["janvier", "février", "mars", "avril", "mai", "juin",
     "juillet", "août", "septembre", "octobre", "novembre", "décembre"
 ];
-var introSpineNode = false;
-var introClassicNode = false;
+var chronoRestart = Date.now();
 
 var svg = d3.select("#graph")
     .attr("width", width)
@@ -77,7 +76,7 @@ var nodes = force.nodes(),
 tree.init(nodes, links);
 
 var dateFiltersHook = function(dates) {
-    tree.changeDate(dates)
+    tree.changeDate(dates);
     restart();
 }
 
@@ -110,17 +109,19 @@ function initData(newNodes) {
                 div.style.background = d3.rgb(types[i].color).darker(2);
             div.innerHTML = types[i].label;
             div.addEventListener("click", function() {
-                if (tree.switchType(this.innerHTML))
-                    this.style.backgroundColor = d3.rgb(this.style.backgroundColor).darker(2);
-                else {
-                    var types = tree.getNodesTypes();
-                    for (var i = 0; i < types.length; i++) {
-                        if (types[i].label == this.innerHTML) {
-                            this.style.backgroundColor = types[i].color;
+                if (chronoRestart + 300 < Date.now()) {
+                    if (tree.switchType(this.innerHTML))
+                        this.style.backgroundColor = d3.rgb(this.style.backgroundColor).darker(2);
+                    else {
+                        var types = tree.getNodesTypes();
+                        for (var i = 0; i < types.length; i++) {
+                            if (types[i].label == this.innerHTML) {
+                                this.style.backgroundColor = types[i].color;
+                            }
                         }
                     }
+                    restart();
                 }
-                restart();
             }, false);
             divFilters.appendChild(div);
         }
@@ -216,6 +217,7 @@ $(document).ready(function() {
 
 function restart() {
 
+    chronoRestart = Date.now();
     node = node.data(force.nodes(), function(d) {
         return d.id;
     });
@@ -261,8 +263,6 @@ function restart() {
         .attr("display", "inline")
         .attr("fill", "#000");
 
-
-
     elem.insert("text")
         .attr("display", "none")
         .attr("v-content", "label")
@@ -297,7 +297,6 @@ function restart() {
 
     node.exit()
         .transition()
-        .delay(400)
         .remove();
 
     link = link.data(force.links(), function(d) {
@@ -394,8 +393,8 @@ function addNodeToFilters(node) {
     divText.style.backgroundColor = node.color;
     div.className = "initAddNode ";
     setTimeout(function() {
-            document.getElementById("filtersId").firstElementChild.className += " addNode"; 
-        }, 40);
+        document.getElementById("filtersId").firstElementChild.className += " addNode";
+    }, 40);
     div.addEventListener("dblclick", function() {
         tree.switchId(node.id);
         var filtersId = document.getElementById("filtersId");

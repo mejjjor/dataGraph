@@ -65,7 +65,7 @@ module.exports = {
     getNodesTypes: function(treeNodes) {
         var nodesTypes = [];
         for (var i = 0; i < treeNodes.length; i++) {
-            if (!treeNodes[i].isSpine && _.map(nodesTypes, function(val) {
+            if (treeNodes[i].type != "" && _.map(nodesTypes, function(val) {
                     return val.label
                 }).indexOf(treeNodes[i].type) === -1) {
                 nodesTypes.push({
@@ -75,9 +75,6 @@ module.exports = {
                 });
             }
         }
-        nodesTypes.sort(function(a,b){
-            return a.label > b.label;
-        });
         return nodesTypes;
     },
     getSpineNodes: function(treeNodes) {

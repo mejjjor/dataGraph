@@ -7,10 +7,10 @@ var dateValues = [
     document.getElementById('event-end')
 ];
 var months = [
-    "January", "February", "March",
-    "April", "May", "June", "July",
-    "August", "September", "October",
-    "November", "December"
+    "Janvier", "Février", "Mars",
+    "Avril", "Mai", "Juin", "Juillet",
+    "Août", "Septembre", "Octobre",
+    "Novembre", "Décembre"
 ];
 var updateHook;
 module.exports = {
@@ -33,15 +33,27 @@ module.exports = {
 
 function refreshSlider() {
     dateSlider.innerHTML = "";
-    noUiSlider.create(dateSlider, {
-        range: {
-            min: minDate.getTime(),
-            max: maxDate.getTime()
-        },
-        step: 32 * 24 * 60 * 60 * 1000,
-        start: [startDate != "" ? startDate.getTime() : minDate.getTime(), endDate != "" ? endDate.getTime() : maxDate.getTime()],
-    });
-
+    if (minDate.getTime() < 1230764400000 && 1230764400000 < maxDate.getTime()) {
+        noUiSlider.create(dateSlider, {
+            range: {
+                //10% GROS HACK for my graph!
+                '10%': new Date("2009/01").getTime(),
+                'min': minDate.getTime(),
+                'max': maxDate.getTime()
+            },
+            step: 32 * 24 * 60 * 60 * 1000,
+            start: [startDate != "" ? startDate.getTime() : minDate.getTime(), endDate != "" ? endDate.getTime() : maxDate.getTime()],
+        });
+    } else {
+        noUiSlider.create(dateSlider, {
+            range: {
+                'min': minDate.getTime(),
+                'max': maxDate.getTime()
+            },
+            step: 32 * 24 * 60 * 60 * 1000,
+            start: [startDate != "" ? startDate.getTime() : minDate.getTime(), endDate != "" ? endDate.getTime() : maxDate.getTime()],
+        });
+    }
     dateSlider.noUiSlider.on('update', function(values, handle) {
         dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
         updateHook(values);

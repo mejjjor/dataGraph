@@ -55,7 +55,7 @@ module.exports = {
         var index = filters.allowIds.indexOf(id);
         if (index === -1) {
             filters.allowIds.push(id);
-            undoIds.splice(undoIds.indexOf(id),1);
+            undoIds.splice(undoIds.indexOf(id), 1);
         } else {
             undoIds.push(filters.allowIds.splice(index, 1)[0]);
         }
@@ -63,7 +63,7 @@ module.exports = {
 
     },
     getNextUndoId: function() {
-        return undoIds[undoIds.length-1];
+        return undoIds[undoIds.length - 1];
     },
     changeDate: function(dates) {
         filters.dateBegin = dates[0];
@@ -119,7 +119,7 @@ function getTree() {
 }
 
 function computeTree(node, previousNode, lastLink, nodeNoTypePrevious) {
-    if (isIdAllow(node) && isDateAllow(node)) {
+    if (isIdAllow(node) && isDateAllow(node) && (!node.isSpine || isTypeAllow(node))) {
         if (node.isSpine || isTypeAllow(node)) {
             if (node.type != "") {
                 nodes.push(node);
@@ -160,6 +160,8 @@ function isIdAllow(node) {
 }
 
 function isTypeAllow(node) {
+    if (node.type === "")
+        return true;
     for (var i = 0; i < filters.allowTypes.length; i++)
         if (filters.allowTypes[i].label === node.type)
             return filters.allowTypes[i].isActive;

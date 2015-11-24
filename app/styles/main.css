@@ -134,10 +134,7 @@ svg {
 }
 
 #graph {
-    background: -moz-radial-gradient(center, ellipse cover, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
-    background: radial-gradient(ellipse at center, rgba(52, 106, 119, 0.5) 0%, rgba(0, 18, 22, 1) 100%);
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#80346a77', endColorstr='#001216', GradientType=1);
+     background: radial-gradient(ellipse at center, rgba(52, 106, 119, 0.7) 0%, rgba(0, 18, 22, 1) 100%);
     font-size: 15px;
 }
 
