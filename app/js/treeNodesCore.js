@@ -15,8 +15,8 @@ module.exports = {
 
             var node = {
                 id: treeNodes[i].id,
-                x: treeNodes[i].x,
-                y: treeNodes[i].y,
+                x: Math.round(treeNodes[i].x),
+                y: Math.round(treeNodes[i].y),
                 isSpine: treeNodes[i].isSpine,
                 brothers: brothers,
                 label: treeNodes[i].label,

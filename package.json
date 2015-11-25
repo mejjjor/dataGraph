@@ -40,7 +40,11 @@
     "watch:scripts": "chokidar 'app/js/**/*.js' -c 'echo `date` && npm run build:scripts -s'",
     "dev": "npm run build && npm run watch",
     "sync": "browser-sync start --server public --files \"public/*/*, public/*\"",
-    "sync2": "http-server public/"
+    "sync2": "http-server public/",
+    "prod": "npm run buildProd && npm run watch",
+    "buildProd": "npm run build:assets -s && npm run build:styles -s && npm run buildProd:scripts -s ",
+    "buildProd:scripts": "mkdir -p public/js && browserify app/js/viz.js -o public/js/viz.js && browserify app/js/viz_clean.js -o public/js/viz_clean.js && browserify app/js/editor.js -o public/js/editor.js"
+    
   },
   "author": "mejjjor <mejjjor@gmail.com>",
   "private": true,
