@@ -36,8 +36,8 @@ function refreshSlider() {
     if (minDate.getTime() < 1230764400000 && 1230764400000 < maxDate.getTime()) {
         noUiSlider.create(dateSlider, {
             range: {
-                //10% GROS HACK for my graph!
-                '10%': new Date("2009/01").getTime(),
+                //10% GROS HACK for my graph! 10% = "2009/01"
+                '10%': 1230764400000,
                 'min': minDate.getTime(),
                 'max': maxDate.getTime()
             },

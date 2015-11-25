@@ -96,7 +96,7 @@ module.exports = {
     orderNodes: function() {
         var tempNodes = [];
         for (var i = 0; i < treeNodes.length; i++) {
-            if (treeNodes[i].isSpine) {
+            if (treeNodes[i].isSpine && isVisible(treeNodes[i])) {
                 tempNodes.push(treeNodes[i])
             }
         }
@@ -181,4 +181,8 @@ function isTypeAllow(node) {
 function isDateAllow(node) {
     return ((node.dateBegin === "" || filters.dateEnd >= node.dateBegin) && (node.dateEnd === "" || filters.dateBegin <= node.dateEnd));
 
+}
+
+function isVisible(node) {
+    return isIdAllow(node) && isTypeAllow(node) && isDateAllow(node);
 }
