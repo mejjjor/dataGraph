@@ -193,11 +193,11 @@ $(document).ready(function() {
         document.addEventListener('keydown', function(event) {
             if (event.keyCode == 37) {
                 eventLeftArrow();
-            } else if (event.keyCode == 38) {eventUpArrow();
-            }
-            else if (event.keyCode == 39) {
+            } else if (event.keyCode == 38) {
+                eventUpArrow();
+            } else if (event.keyCode == 39) {
                 eventRightArrow();
-            }else if (event.keyCode == 40) {
+            } else if (event.keyCode == 40) {
                 eventDownArrow();
             }
         });
@@ -227,20 +227,20 @@ $(document).ready(function() {
     }
 });
 
-function eventUpArrow(){
-     var view = $("#filtersId");
-            var move = "120px";
-            var currentPosition = parseInt(view.css("top"));
-            if (currentPosition < 0) {
-                document.getElementById("downArrow").style.opacity = 1;
-                view.stop(false, true).animate({
-                    top: "+=" + move
-                }, {
-                    duration: 400
-                });
-            } else if (currentPosition > 180 - document.getElementById("filtersId").clientHeight) {
-                document.getElementById("upArrow").style.opacity = 0;
-            }
+function eventUpArrow() {
+    var view = $("#filtersId");
+    var move = "120px";
+    var currentPosition = parseInt(view.css("top"));
+    if (currentPosition < 0) {
+        document.getElementById("downArrow").style.opacity = 1;
+        view.stop(false, true).animate({
+            top: "+=" + move
+        }, {
+            duration: 400
+        });
+    } else if (currentPosition > 180 - document.getElementById("filtersId").clientHeight) {
+        document.getElementById("upArrow").style.opacity = 0;
+    }
 }
 
 function eventDownArrow() {
@@ -260,20 +260,20 @@ function eventDownArrow() {
     }
 }
 
-function eventRightArrow(){
+function eventRightArrow() {
     var view = $("#filters");
-            var move = "100px";
-            var currentPosition = parseInt(view.css("left"));
-            if (currentPosition > -tree.getNodesTypes().length * 90) {
-                document.getElementById("leftArrow").style.opacity = 1;
-                view.stop(false, true).animate({
-                    left: "-=" + move
-                }, {
-                    duration: 400
-                })
-            } else if (currentPosition < 0) {
-                document.getElementById("rightArrow").style.opacity = 0;
-            }
+    var move = "100px";
+    var currentPosition = parseInt(view.css("left"));
+    if (currentPosition > -tree.getNodesTypes().length * 90) {
+        document.getElementById("leftArrow").style.opacity = 1;
+        view.stop(false, true).animate({
+            left: "-=" + move
+        }, {
+            duration: 400
+        })
+    } else if (currentPosition < 0) {
+        document.getElementById("rightArrow").style.opacity = 0;
+    }
 }
 
 function eventLeftArrow() {
