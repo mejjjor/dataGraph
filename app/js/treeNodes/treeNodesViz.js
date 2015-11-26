@@ -1,5 +1,5 @@
 var core = require('./treeNodesCore.js');
-var _ = require('../../node_modules/underscore/underscore-min.js');
+var _ = require('../../../node_modules/underscore/underscore-min.js');
 var treeNodes = [];
 var links = [];
 var nodes = [];

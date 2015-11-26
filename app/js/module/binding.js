@@ -1,4 +1,4 @@
-var Vue = require('../../node_modules/vue/dist/vue.min.js');
+var Vue = require('../../../node_modules/vue/dist/vue.min.js');
 
 Vue.directive('content', {
     update: function(value) {

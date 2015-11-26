@@ -1,4 +1,4 @@
-var noUiSlider = require('../../node_modules/nouislider/distribute/nouislider.min.js')
+var noUiSlider = require('../../../node_modules/nouislider/distribute/nouislider.min.js')
 var minDate, maxDate;
 var startDate, endDate;
 var dateSlider = document.getElementById('dateSlider');

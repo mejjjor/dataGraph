@@ -162,20 +162,24 @@ svg {
 
 #menuImportExport {
     opacity: 0.5;
-    height: 60px;
+    height: 80px;
     width: 255px;
     position: absolute;
-    left: 0;
-    top: 60px;
+    left: 30%;
+    top: 100px;
     background-color: black;
 }
 
 #importExport {
     position: absolute;
-    left: 0;
-    top: 60px;
-    display: flex;
+    left: 30%;
+    top: 100px;
+    display: block;
     padding: 15px;
+}
+
+#importExport>div{
+    color: white;
 }
 
 #leftArrow,

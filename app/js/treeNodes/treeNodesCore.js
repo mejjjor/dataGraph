@@ -1,4 +1,4 @@
-var _ = require('../../node_modules/underscore/underscore-min.js');
+var _ = require('../../../node_modules/underscore/underscore-min.js');
 module.exports = {
     exportData: function(treeNodes, filters) {
         var data = {

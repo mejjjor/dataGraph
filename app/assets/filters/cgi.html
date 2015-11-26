@@ -8,12 +8,16 @@
     <meta name="description" content="Visualisation dynamique des compétences - cv interactif">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="css/app.css">
-    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    <link rel="stylesheet" href="../css/app.css">
+    <script src="../js/vendor/modernizr-2.8.3.min.js"></script>
     <link href='https://fonts.googleapis.com/css?family=Fugaz+One' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
+    <div id="masterPopup">
+        <p>Ce site n'est pas optimisée pour la navigation sur mobile, désolé :( </p>
+        <p>Utilsez un ordinateur !</p>
+    </div>
     <div id="menu">
     </div>
     <div id="menuFilters">
@@ -24,29 +28,26 @@
         </div>
         <i id="rightArrow" title="faire défiler à droite" class="fa fa-angle-right fa-4x"></i>
         <div id="filtersDateExclude">
-            <div id="filtersDate">
+            <div id="filtersDate" data-intro="Filtres par date: Permet de masquer tous les noeuds antérieur ou supérieur à une date." data-highlightClass="darkerHelper">
                 <div id="dateSlider"></div>
                 <div id="event-start"></div>
                 <div id="event-end"></div>
             </div>
         </div>
-        <i id="showAll" title="montrer toutes les compétences" class="fa fa-arrows-alt fa-3x"></i>
-         </div>
-    <div id="menuImportExport">
+        <i id="help" title="aide" class="fa fa-question-circle fa-3x"></i>
     </div>
-    <div id="importExport">
-        <input id="exchange" type="text" />
-        <button id="btnImportData" title="importer les données">import</button>
+    <div id="menuVertical">
+    </div>
+    <div id="menuFiltersVertical">
+        <i id="upArrow" title="faire défiler à gauche" class="fa fa-angle-up fa-4x"></i>
+        <div id="filtersIdContainer">
+            <div id="filtersId">
+            </div>
+        </div>
+        <i id="downArrow" title="faire défiler à gauche" class="fa fa-angle-down fa-4x"></i>
+        <i id="showAll" data-intro="Permet d'annuler les filtres et d'afficher tous les noeuds." data-position="top" data-highlightClass="darkerHelper" title="montrer toutes les compétences" class="fa fa-arrows-alt fa-3x"></i>
     </div>
     <svg id="graph" class="disable-selection">
-        <defs>
-            <linearGradient id="grad" x1="0" y1="0" x2="0" y2="100%">
-                <stop offset="0%" stop-color="#000" stop-opacity="0" />
-                <stop offset="20%" stop-color="#000" />
-                <stop offset="80%" stop-color="#000" />
-                <stop offset="100%" stop-color="#000" stop-opacity="0" />
-            </linearGradient>
-        </defs>
     </svg>
     <div id="modal" draggable="true">
         <div id="ModalHandle">
@@ -54,14 +55,14 @@
         <button id="btnCloseModal" title="Close" class="close">X</button>
         <form id="formNode">
             <div id="modalContent">
-                <h4>{{type}}</h4>
-                <h3>{{label | escape}}</h3>
-                <div v-html="description | marked"></div>
+                <h4>{{label | escape}}</h4>
+                <h2>{{type}}</h2>
+                <p v-html="description | marked"></p>
                 <h4 v-if="dateBegin != ''">{{dateBegin | date}} - {{dateEnd | date}}</h4>
             </div>
         </form>
     </div>
-    <script src="js/viz_clean.js"></script>
+    <script src="../js/cgi.js"></script>
 </body>
 
 </html>

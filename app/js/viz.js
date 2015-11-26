@@ -10,11 +10,11 @@ var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var marked = require('../../node_modules/marked/marked.min.js');
 var introJs = require('../../node_modules/intro.js/minified/intro.min.js')
 
-var modal = require('./modal.js');
-require('./binding.js');
-var tree = require('./treeNodesViz.js');
-var slider = require('./slider.js');
-var data = require('./data/data_s.json');
+var modal = require('./module/modal.js');
+require('./module/binding.js');
+var slider = require('./module/slider.js');
+var tree = require('./treeNodes/treeNodesViz.js');
+var data;
 
 var formNodeContent = document.getElementById("formNode").innerHTML;
 
@@ -78,6 +78,20 @@ var nodes = force.nodes(),
 
 
 tree.init(nodes, links);
+
+module.exports = {
+    initGraph: function(newData) {
+        data = newData;
+        if (window.mobilecheck())
+            document.getElementById("masterPopup").style.display = "block";
+        else {
+            if (typeof data === "string")
+                initData(tree.importData(data));
+            else
+                initData(tree.importData(JSON.stringify(data)));
+        }
+    }
+}
 
 window.onresize = function(event) {
     width = window.innerWidth,
@@ -164,68 +178,58 @@ function initData(newNodes) {
         tree.setNextUndoId(unallowIds[i].id);
     }
 
-}
+    $("#leftArrow").click(function() {
+        eventLeftArrow();
+    });
 
-$(document).ready(function() {
+    $("#rightArrow").click(function() {
+        eventRightArrow();
+    });
 
-    if (window.mobilecheck())
-        document.getElementById("masterPopup").style.display = "block";
-    else {
-        var newNodes = tree.importData(JSON.stringify(data));
-        initData(newNodes);
+    $("#upArrow").click(function() {
+        eventUpArrow();
+    });
 
-        $("#leftArrow").click(function() {
+    $("#downArrow").click(function() {
+        eventDownArrow();
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == 37) {
             eventLeftArrow();
-        });
-
-        $("#rightArrow").click(function() {
-            eventRightArrow();
-        });
-
-        $("#upArrow").click(function() {
+        } else if (event.keyCode == 38) {
             eventUpArrow();
-        });
-
-        $("#downArrow").click(function() {
+        } else if (event.keyCode == 39) {
+            eventRightArrow();
+        } else if (event.keyCode == 40) {
             eventDownArrow();
-        });
+        }
+    });
 
-        document.addEventListener('keydown', function(event) {
-            if (event.keyCode == 37) {
-                eventLeftArrow();
-            } else if (event.keyCode == 38) {
-                eventUpArrow();
-            } else if (event.keyCode == 39) {
-                eventRightArrow();
-            } else if (event.keyCode == 40) {
-                eventDownArrow();
-            }
-        });
-
-        $("#showAll").click(function() {
-            var id = tree.getNextUndoId();
-            while (id != undefined) {
-                tree.switchId(id);
-                document.getElementById("filtersId")
-                    .removeChild(document.getElementById("filtersType" + id));
-                id = tree.getNextUndoId();
-            }
-            tree.activeAllType();
-            var types = tree.getNodesTypes();
-            for (var i = 0; i < types.length; i++) {
-                if (types[i].label != "")
-                    document.getElementById("filtersType" + types[i].label).style.backgroundColor = types[i].color;
-            }
-            restart();
-        });
-
-        $("#help").click(function() {
-            introJs.introJs().start();
-        });
-
+    $("#showAll").click(function() {
+        var id = tree.getNextUndoId();
+        while (id != undefined) {
+            tree.switchId(id);
+            document.getElementById("filtersId")
+                .removeChild(document.getElementById("filtersType" + id));
+            id = tree.getNextUndoId();
+        }
+        tree.activeAllType();
+        var types = tree.getNodesTypes();
+        for (var i = 0; i < types.length; i++) {
+            if (types[i].label != "")
+                document.getElementById("filtersType" + types[i].label).style.backgroundColor = types[i].color;
+        }
         restart();
-    }
-});
+    });
+
+    $("#help").click(function() {
+        introJs.introJs().start();
+    });
+
+    restart();
+
+}
 
 function eventUpArrow() {
     var view = $("#filtersId");

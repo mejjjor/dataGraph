@@ -8,9 +8,9 @@ var $ = require('../../node_modules/jquery/dist/jquery.min.js');
 var _ = require('../../node_modules/underscore/underscore-min.js');
 var Vue = require('../../node_modules/vue/dist/vue.min.js');
 
-var modal = require('./modal.js');
-require('./binding.js');
-var tree = require('./treeNodesEditor.js');
+var modal = require('./module/modal.js');
+require('./module/binding.js');
+var tree = require('./treeNodes/treeNodesEditor.js');
 
 var formNodeContent = document.getElementById("formNode").innerHTML;
 
@@ -39,8 +39,8 @@ var svg = d3.select("#graph")
 svg.append('svg:rect')
     .attr('width', width * 3)
     .attr('height', height * 2)
-    .attr("fill", "#073642");
-// .attr('transform', 'translate(-600,-600)');
+    .attr("fill", "#073642")
+    .attr("id", "graphBackground");
 
 var force = d3.layout.force()
     .charge(-2000)
