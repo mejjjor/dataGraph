@@ -9,7 +9,26 @@ var _ = require('../../node_modules/underscore/underscore-min.js');
 var Vue = require('../../node_modules/vue/dist/vue.min.js');
 var marked = require('../../node_modules/marked/marked.min.js');
 var introJs = require('../../node_modules/intro.js/minified/intro.min.js')
+var Backendless = require('backendless')
 
+var APP_ID = "FFDC7C5B-9461-2230-FF25-390A64FE4400";
+var SECRET_KEY = "0DBD0BF2-7A45-1048-FFA7-B88507C8BF00";
+var VERSION = "v1";
+
+Backendless.initApp(APP_ID, SECRET_KEY, VERSION);
+
+
+function Datta(args) {
+    args = args || {};
+    this.data = args.data || "";
+}
+var dataObject = new Datta({
+    data: 'zzzzzzzzzz'
+});
+
+var savedData = Backendless.Persistence.of(Datta).save(dataObject);
+var dattta = Backendless.Persistence.of(Datta).find();
+console.log(dattta);
 var modal = require('./module/modal.js');
 require('./module/binding.js');
 var slider = require('./module/slider.js');
@@ -49,7 +68,9 @@ svg.append('svg:rect')
     .attr('height', height * 6)
     .attr("transform", "translate(" + width * -3 + "," + height * -3 + ")");
 
-
+document.getElementById('skipMasterPopup').addEventListener('click', function() {
+    document.getElementById('masterPopup').style.display = 'none'
+})
 
 var force = d3.layout.force()
     .charge(function(d) {
@@ -84,12 +105,12 @@ module.exports = {
         data = newData;
         if (window.mobilecheck())
             document.getElementById("masterPopup").style.display = "block";
-        else {
-            if (typeof data === "string")
-                initData(tree.importData(data));
-            else
-                initData(tree.importData(JSON.stringify(data)));
-        }
+
+        if (typeof data === "string")
+            initData(tree.importData(data));
+        else
+            initData(tree.importData(JSON.stringify(data)));
+
     }
 }
 

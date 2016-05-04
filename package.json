@@ -29,7 +29,7 @@
         "prebuild": "mkdir -p public/ && npm run clean -s",
         "build": "npm run build:assets -s && npm run build:styles -s && npm run build:scripts -s ",
         "build:assets": "cp -r app/assets/* public",
-        "build:scripts": "mkdir -p public/js && npm run build:scripts:cgi && npm run build:scripts:cgi && npm run build:scripts:java && npm run build:scripts:data && npm run build:scripts:dataGraph && npm run build:scripts:js && npm run build:scripts:middle && npm run build:scripts:editor && npm run build:scripts:dataEmpty",
+        "build:scripts": "mkdir -p public/js  && npm run build:scripts:data && npm run build:scripts:editor && npm run build:scripts:dataEmpty",
         "build:styles": "mkdir -p public/css && npm run build:styles:normalize; npm run build:styles:all; npm run build:styles:cleancss",
         "build:styles:normalize": "cat node_modules/normalize.css/normalize.css > public/css/app.css",
         "build:styles:all": "find  app/styles/ -name \"*.css\" -exec cat {} \\; >> public/css/app.css",
