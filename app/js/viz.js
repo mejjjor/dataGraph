@@ -15,7 +15,7 @@ var APP_ID = "FFDC7C5B-9461-2230-FF25-390A64FE4400";
 var SECRET_KEY = "0DBD0BF2-7A45-1048-FFA7-B88507C8BF00";
 var VERSION = "v1";
 
-Backendless.initApp(APP_ID, SECRET_KEY, VERSION);
+//Backendless.initApp(APP_ID, SECRET_KEY, VERSION);
 
 
 function Datta(args) {
@@ -26,9 +26,9 @@ var dataObject = new Datta({
     data: 'zzzzzzzzzz'
 });
 
-var savedData = Backendless.Persistence.of(Datta).save(dataObject);
-var dattta = Backendless.Persistence.of(Datta).find();
-console.log(dattta);
+// var savedData = Backendless.Persistence.of(Datta).save(dataObject);
+// var dattta = Backendless.Persistence.of(Datta).find();
+// console.log(dattta);
 var modal = require('./module/modal.js');
 require('./module/binding.js');
 var slider = require('./module/slider.js');
